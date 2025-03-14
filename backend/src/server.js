@@ -1,5 +1,13 @@
 import express from "express";
-
+import dotenv from "dotenv";
+dotenv.config();
+import {
+  appendMessageInThread,
+  createThread,
+  listMesasgesInThread,
+  createRun,
+  delThread,
+} from "./openai.utils.js";
 const app = express();
 
 app.use(express.json());
