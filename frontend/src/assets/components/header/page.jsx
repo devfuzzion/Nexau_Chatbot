@@ -1,8 +1,7 @@
 import React from 'react';
 import './index.css';
-import { Expand, ChevronDown } from 'lucide-react';
-
-const Header = () => {
+import { Expand, Minimize , ChevronDown} from 'lucide-react';
+const Header = ({ onExpand, isExpanded }) => {
   return (
     <div className='header-container'>
       <div className='left-section'>
@@ -14,11 +13,11 @@ const Header = () => {
         </div>
       </div>
       <div className='right-section'>
-        <div className='expand-icon'>
-          <Expand />
+        <div className='expand-icon' onClick={onExpand}>
+          {isExpanded ? <Minimize size={20} /> : <Expand size={20} />}
         </div>
         <div className='dropdown-icon'>
-          <ChevronDown />
+          <ChevronDown size={20} />
         </div>
       </div>
     </div>

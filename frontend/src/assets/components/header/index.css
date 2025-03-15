@@ -3,7 +3,7 @@
   justify-content: space-between;
   align-items: center;
   background-color: rgba(18, 21, 27, 255);
-  width: 100%; /* Match the width of the chatbot container */
+  width: 100%;
   color: white;
   border-radius: 5px 5px 0px 0px;
   box-shadow: -5px 0px 10px grey;
@@ -33,7 +33,9 @@
     align-items: center; 
     cursor: pointer; 
   }
-  
+  .expand-icon:hover {
+    transform: scale(1.1); 
+  }
   .logo-container {
     display: flex;
     align-items: center;

@@ -1,26 +1,29 @@
 import React, { useState } from 'react';
 import Header from '../header/page.jsx';
 import Body from '../body/page.jsx';
-import Footer from '../footer/page.jsx';
-import './index.css'; 
+import './index.css';
 
 const Chatbot = () => {
-  // State to manage all messages (both bot and client)
   const [messages, setMessages] = useState([
     { text: 'This is a bot response. It can be a longer message to test scrolling.', isBot: true },
     { text: 'This is a client query. It can also be a longer message to test scrolling.', isBot: false },
   ]);
 
-  // Function to add a new client message
+  const [isExpanded, setIsExpanded] = useState(false);
+
   const addClientMessage = (message) => {
     setMessages([...messages, { text: message, isBot: false }]);
   };
 
+  const handleExpand = () => {
+    console.log('Expanded:', !isExpanded); // Debugging
+    setIsExpanded(!isExpanded);
+  };
+
   return (
-    <div className='chatbot-container'>
-      <Header />
-      <Body messages={messages} />
-      <Footer onSendMessage={addClientMessage} />
+    <div className={`chatbot-container ${isExpanded ? 'expanded' : ''}`}>
+      <Header onExpand={handleExpand} isExpanded={isExpanded} />
+      <Body messages={messages} onSendMessage={addClientMessage} isExpanded={isExpanded} />
     </div>
   );
 };

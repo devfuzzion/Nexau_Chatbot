@@ -1,42 +1,38 @@
-/* Footer Container */
 .footer-container {
   display: flex;
   flex-direction: column;
+  margin-left: 2%;
   justify-content: center;
   align-items: center;
-  background-color: rgba(18, 21, 27, 255);
-  width: 100%; /* Match the width of the chatbot container */
-  padding: 10px;
+  background-color: white;
+  width: 95%; 
   border-radius: 0px 0px 5px 5px;
-  box-shadow: -5px 0px 10px grey;
 }
-  
-  /* Footer Form */
+
   .footer-form {
     display: flex;
     align-items: center;
-    gap: 10px; /* Space between input and buttons */
+    gap: 10px; 
     width: 100%;
   }
   
-  /* Footer Input */
   .footer-input {
-    flex: 1; /* Take up remaining space */
+    flex: 1; 
     padding: 10px;
     border: none;
     border-radius: 5px;
     outline: none;
     font-size: 14px;
-    background-color: rgba(232, 235, 241, 255); /* Light gray background */
+    background-color: rgba(232, 235, 241, 255); 
     color: black;
   }
   
-  /* Footer Buttons */
+
   .footer-button {
     display: flex;
     justify-content: center;
     align-items: center;
-    background-color: rgba(232, 235, 241, 255); /* Light gray background */
+    background-color: rgba(232, 235, 241, 255); 
     border: none;
     border-radius: 5px;
     padding: 10px;
@@ -45,22 +41,21 @@
   }
   
   .footer-button:hover {
-    background-color: rgba(200, 203, 209, 255); /* Slightly darker on hover */
+    background-color: rgba(200, 203, 209, 255);
   }
   
-  /* Icon styling */
   .footer-button svg {
-    color: rgba(18, 21, 27, 255); /* Dark icon color */
+    color: rgba(18, 21, 27, 255); 
   }
   
-  /* Powered by message */
+
   .powered-by {
-    margin-top: 5px; /* Space above the message */
+    margin-top: 5px; 
     font-size: 14px;
-    color: white; /* Light gray text */
+    color: black; 
     text-align: center;
   }
   
   .powered-by strong {
-    color: white; /* White text for "nexau.es" */
+    color: black; 
   }
