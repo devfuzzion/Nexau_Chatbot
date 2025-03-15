@@ -1,17 +1,15 @@
 /* Footer Container */
 .footer-container {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    background-color: rgba(18, 21, 27, 255); 
-    width: 25%;
-    padding: 10px;
-    border-radius: 0px 0px 5px 5px; /* Rounded corners at the bottom */
-    box-shadow: -5px 0px 10px grey;
-    /* box-shadow: -5px 0px 10px rgba(0, 0, 0, 0.3); */
-    
-  }
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(18, 21, 27, 255);
+  width: 100%; /* Match the width of the chatbot container */
+  padding: 10px;
+  border-radius: 0px 0px 5px 5px;
+  box-shadow: -5px 0px 10px grey;
+}
   
   /* Footer Form */
   .footer-form {

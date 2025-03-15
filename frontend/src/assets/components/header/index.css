@@ -1,15 +1,14 @@
 .header-container {
-    display: flex;
-    justify-content: space-between;
-    align-items: center; 
-    background-color: rgba(18, 21, 27, 255);
-    width: 25%;
-    height: 1%;
-    color: white;
-    border-radius: 5px 5px 0px 0px;
-    box-shadow: -5px 0px 10px grey;
-    padding: 10px; 
-  }
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: rgba(18, 21, 27, 255);
+  width: 100%; /* Match the width of the chatbot container */
+  color: white;
+  border-radius: 5px 5px 0px 0px;
+  box-shadow: -5px 0px 10px grey;
+  padding: 10px;
+}
   
   .left-section {
     display: flex;

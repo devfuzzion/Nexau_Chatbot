@@ -1,16 +1,29 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { FileInput, Send } from 'lucide-react'; // Import icons
 import './index.css'; // Import CSS for styling
 
-const Footer = () => {
+const Footer = ({ onSendMessage }) => {
+  const [message, setMessage] = useState(''); // State to manage the input field
+
+  // Handle form submission
+  const handleSubmit = (e) => {
+    e.preventDefault(); // Prevent default form submission
+    if (message.trim()) { // Check if the message is not empty
+      onSendMessage(message); // Pass the message to the parent component
+      setMessage(''); // Clear the input field
+    }
+  };
+
   return (
     <div className='footer-container'>
-      <form className='footer-form'>
+      <form className='footer-form' onSubmit={handleSubmit}>
         {/* Text input field */}
         <input
           type='text'
           placeholder='Send a query...'
           className='footer-input'
+          value={message}
+          onChange={(e) => setMessage(e.target.value)} // Update state on change
         />
         {/* Attach document button */}
         <button type='button' className='footer-button'>
