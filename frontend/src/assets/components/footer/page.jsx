@@ -22,7 +22,7 @@ const Footer = () => {
         </button>
       </form>
       <div className='powered-by'>
-        Powered by <strong>nexau.es</strong>
+        Powered by <strong>Devfuzzion.com</strong>
       </div>
     </div>
   );
