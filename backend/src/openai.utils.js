@@ -2,7 +2,7 @@ import OpenAI from "openai";
 import dotenv from "dotenv";
 dotenv.config();
 const openai = new OpenAI();
-
+const ASSISTANT_ID = process.env.ASSISTANT_ID;
 export const appendMessageInThread = async (threadId, userMessage) => {
   const message = await openai.beta.threads.messages.create(threadId, {
     role: "user",
@@ -17,9 +17,9 @@ export const createThread = async () => {
   return thread;
 };
 
-export const createRun = async (threadId, assistantId) => {
+export const createRun = async (threadId) => {
   const run = await openai.beta.threads.runs.createAndPoll(threadId, {
-    assistant_id: assistantId,
+    assistant_id: ASSISTANT_ID,
   });
   return run;
 };
