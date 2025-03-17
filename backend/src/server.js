@@ -23,6 +23,7 @@ app.get("/", (req, res) => {
 
 app.get("/threads", async (req, res) => {
   try {
+    console.log("LOVE")
     const threads = await getAllThreads();
     res.json({ success: true, threads });
   } catch (err) {

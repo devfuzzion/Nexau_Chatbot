@@ -1,48 +1,92 @@
+/* Header Container */
 .header-container {
   display: flex;
-  justify-content: space-between;
   align-items: center;
   background-color: rgba(18, 21, 27, 255);
   width: 100%;
   color: white;
   border-radius: 5px 5px 0px 0px;
-  box-shadow: -5px 0px 10px grey;
   padding: 10px;
+  box-sizing: border-box;
+  overflow: hidden;
 }
-  
-  .left-section {
-    display: flex;
-    align-items: center; 
-    gap: 10px; 
-  }
-  
-  .right-section {
-    display: flex;
-    align-items: center; 
-    gap: 10px; 
-  }
-  
-  .title {
-    font-family: Arial, Helvetica, sans-serif;
-    margin: 0; 
-  }
-  
-  .expand-icon,
-  .dropdown-icon {
-    display: flex;
-    align-items: center; 
-    cursor: pointer; 
-  }
-  .expand-icon:hover {
-    transform: scale(1.1); 
-  }
-  .logo-container {
-    display: flex;
-    align-items: center;
-  }
-  
-  .logo {
-    height: 35px;
-    width: 35px;
-    border-radius: 50%;
-  }
+
+.left-section {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.title {
+  font-family: Arial, Helvetica, sans-serif;
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.middle-section {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex: 1;
+  justify-content: right;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.right-section {
+  display: flex;
+  align-items: center;
+  margin-left: auto;
+  gap: 10px;
+  flex-wrap: wrap;
+  min-width: 0;
+}
+
+.logo-container {
+  display: flex;
+  align-items: center;
+}
+
+.logo {
+  height: 35px;
+  width: 35px;
+  border-radius: 50%;
+}
+
+.expand-icon,
+.search-button,
+.dropdown-icon,
+.recommend-button,
+.profile-dropdown,
+.aid-button {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  background-color: rgba(18, 21, 27, 255);
+  border: none;
+  border-radius: 5px;
+  padding: 8px 12px;
+  color: white;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.3s ease-in-out;
+  max-width: 100%;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.expand-icon:hover,
+.dropdown-icon:hover,
+.search-button:hover,
+.recommend-button:hover,
+.profile-dropdown:hover,
+.aid-button:hover {
+  background-color: rgba(30, 33, 39, 255);
+}
+.header-container.expanded {
+  border-radius: 0;
+}
+

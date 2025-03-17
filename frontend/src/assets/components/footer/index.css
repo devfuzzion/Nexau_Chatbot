@@ -1,61 +1,101 @@
+/* Existing Light Mode Styles (Untouched) */
 .footer-container {
   display: flex;
   flex-direction: column;
-  margin-left: 2%;
   justify-content: center;
   align-items: center;
+  gap: 10px;
+  padding-top: 1%;
   background-color: white;
-  width: 95%; 
+  width: 100%;
   border-radius: 0px 0px 5px 5px;
+  text-align: center;
+  transition: background-color 0.3s ease-in-out, color 0.3s ease-in-out;
 }
 
-  .footer-form {
-    display: flex;
-    align-items: center;
-    gap: 10px; 
-    width: 100%;
-  }
-  
-  .footer-input {
-    flex: 1; 
-    padding: 10px;
-    border: none;
-    border-radius: 5px;
-    outline: none;
-    font-size: 14px;
-    background-color: rgba(232, 235, 241, 255); 
-    color: black;
-  }
-  
+.footer-form {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  width: 90%;
+}
 
-  .footer-button {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background-color: rgba(232, 235, 241, 255); 
-    border: none;
-    border-radius: 5px;
-    padding: 10px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-  }
-  
-  .footer-button:hover {
-    background-color: rgba(200, 203, 209, 255);
-  }
-  
-  .footer-button svg {
-    color: rgba(18, 21, 27, 255); 
-  }
-  
+.footer-input {
+  display: flex;
+  justify-content: center;
+  width: 80%;
+  padding: 10px;
+  border: none;
+  border-radius: 5px;
+  outline: none;
+  font-size: 14px;
+  background-color: rgba(232, 235, 241, 255);
+  color: black;
+  transition: background-color 0.3s ease-in-out, color 0.3s ease-in-out;
+}
 
-  .powered-by {
-    margin-top: 5px; 
-    font-size: 14px;
-    color: black; 
-    text-align: center;
-  }
-  
-  .powered-by strong {
-    color: black; 
-  }
+.footer-button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(232, 235, 241, 255);
+  border: none;
+  border-radius: 5px;
+  padding: 8.5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.footer-button:hover {
+  background-color: rgba(200, 203, 209, 255);
+}
+
+.footer-button svg {
+  color: rgba(18, 21, 27, 255);
+}
+
+.powered-by {
+  padding-bottom: 10px;
+  font-size: 14px;
+  color: black;
+  text-align: center;
+}
+
+.powered-by strong {
+  color: black;
+}
+
+/* Dark Mode Styles */
+.dark-mode .footer-container {
+  background-color: #1e1e1e;
+  color: white;
+  transition: background-color 0.3s ease-in-out, color 0.3s ease-in-out;
+}
+
+.dark-mode .footer-input {
+  background-color: #2c2c2c;
+  color: white;
+  border: 1px solid #444;
+}
+
+.dark-mode .footer-button {
+  background-color: #2c2c2c;
+  border: 1px solid #444
+}
+
+.dark-mode .footer-button:hover {
+  background-color: #3a3a3a;
+}
+
+.dark-mode .footer-button svg {
+  color: white;
+}
+
+.dark-mode .powered-by {
+  color: white;
+}
+
+.dark-mode .powered-by strong {
+  color: #bbb;
+}
