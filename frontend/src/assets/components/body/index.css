@@ -1,8 +1,9 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
 /* Light Mode (Default) */
 .body-wrapper {
   display: flex;
   flex-direction: row;
-  background-color: rgba(230, 233, 237, 255);
+  background-color : rgb(220, 213, 213);
   width: 100%;
   height: 300px;
   color: black;
@@ -11,7 +12,7 @@
   gap: 10px;
   overflow-y: auto;
   overflow-x: hidden;
-  box-sizing: border-box; 
+  box-sizing: border-box;
   transition: all 0.3s ease-in-out;
 }
 
@@ -23,8 +24,8 @@
   background-color: white;
   display: flex;
   flex-direction: column;
-  min-width: 0; 
-  max-width: 100%; 
+  min-width: 0;
+  max-width: 100%;
   transition: background-color 0.3s ease-in-out, color 0.3s ease-in-out;
 }
 
@@ -65,14 +66,16 @@
   display: flex;
   justify-content: flex-start;
   max-width: 75%;
-  margin: 1% 1% 1% 3%;
   padding: 10px;
+  margin: 1% 1% 1% 3%;
   background-color: #E3E7EC;
-  border-radius: 10px 10px 10px 3px;
-  box-shadow: 2px 2px 3px rgba(0, 0, 0, 0.2), 
-  4px 4px 6px rgba(0, 0, 0, 0.15);
+  border-radius: 15px 15px 15px 15px;
+  box-shadow: 2px 2px 3px rgba(0, 0, 0, 0.2), 4px 4px 6px rgba(0, 0, 0, 0.15);
+  align-self: flex-start;
   word-wrap: break-word;
   overflow-wrap: break-word;
+  line-height: 1.2;
+  font-family: Inter, sans-serif;
   color: black;
   animation: slideInFromLeft 0.5s ease-out;
   transition: background-color 0.3s ease-in-out, color 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
@@ -86,12 +89,13 @@
   padding: 10px;
   background-color: #d6e3f0;
   color: black;
-  border-radius: 10px 10px 3px 10px;
-  box-shadow:2px 2px 3px rgba(0, 0, 0, 0.2), 
-  4px 4px 6px rgba(0, 0, 0, 0.15);
+  border-radius: 15px 15px 15px 15px;
+  box-shadow: 2px 2px 3px rgba(0, 0, 0, 0.2), 4px 4px 6px rgba(0, 0, 0, 0.15);
   align-self: flex-end;
   word-wrap: break-word;
+  font-family: Inter, sans-serif;
   overflow-wrap: break-word;
+  line-height: 1.2;
   animation: slideInFromRight 0.5s ease-out;
   transition: background-color 0.3s ease-in-out, color 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
 }
@@ -103,7 +107,7 @@ body.dark-mode {
 }
 
 .dark-mode .body-wrapper {
-  background-color: rgba(44,49,58,255);
+  background-color: rgba(44, 49, 58, 255);
   color: white;
 }
 
@@ -111,24 +115,145 @@ body.dark-mode {
   background-color: #1e1e1e;
 }
 
-.dark-mode .bot-message-container{
+.dark-mode .bot-message-container {
   background-color: rgba(112, 102, 102, 0.6);
   color: white;
   border: 1px solid rgba(44, 49, 58, 255);
 }
+
 .dark-mode .client-message-container {
   background-color: rgba(175, 149, 228, 0.413);
   color: white;
   border: 1px solid rgba(44, 49, 58, 255);
 }
+
 .body-wrapper.expanded {
   border-radius: 0;
   padding: 10px;
 }
 
 .expanded .messages-container {
-  border-radius: 5px 5px 0px 0px;
+  border-radius: 15px 15px 0px 0px;
+  padding: 25px;
+}
+.expanded .client-message-container {
+ margin: 1% 7% 1% 1%; 
+ max-width: 55%;
+  padding: 10px;
+  line-height: 1.2;
+}
+.expanded .bot-message-container {
+ margin: 1% 1% 1% 7%;
+ max-width: 55%;
+  padding: 10px;
+  line-height: 1.2;
 
 }
 
+/* Typing Animation */
+.typing-indicator {
+  display: flex;
+  align-items: center;
+  font-family: Inter, sans-serif;
+  font-size: 14px;
+  color: white;
+}
 
+.dot {
+  display: inline-block;
+  margin-left: 2px;
+  animation: bounce 1s infinite;
+}
+
+.dot:nth-child(1) {
+  animation-delay: 0s;
+}
+
+.dot:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.dot:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+@keyframes bounce {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-5px);
+  }
+}
+/* Responsive Design */
+/* For tablets (768px and below) */
+@media (max-width: 768px) {
+  .body-wrapper {
+    height: 250px;
+    gap: 8px;
+  }
+
+  .messages-container {
+    padding: 8px;
+  }
+
+  .bot-message-container,
+  .client-message-container {
+    max-width: 80%;
+    margin: 1% 1% 1% 1%;
+    padding: 8px;
+    line-height: 1.2;
+  }
+
+  .expanded .bot-message-container {
+    margin: 1% 1% 1% 3%;
+    padding: 15px;
+    max-width: 65%;
+    line-height: 1.4;
+  }
+  .expanded .client-message-container {
+    margin: 1% 0.5% 1% 1%;
+    padding: 15px;
+    max-width: 65%;
+    line-height: 1.4;
+  }
+}
+
+
+/* For small mobile devices (480px and below) */
+@media (max-width: 480px) {
+  .body-wrapper {
+    width: 100%; 
+    height: 200px;
+    gap: 5px;
+    margin: 0;
+  }
+
+  .messages-container {
+    padding: 20px 10px 10px 10px;
+  }
+
+  .bot-message-container{
+    max-width: 72%;
+    margin: 1% 1% 1% 4%;
+    padding: 10px;
+    font-size: 14px;
+    line-height: 1.4;
+  }
+  .client-message-container {
+    max-width: 72%;
+    margin: 1% 4% 1% 1%;
+    padding: 10px;
+    font-size: 14px;
+    line-height: 1.4;
+  }
+
+  .bot-message-container {
+    border-radius: 12px 12px 12px 3px;
+  }
+
+  .client-message-container {
+    border-radius: 12px 12px 3px 12px;
+  }
+}

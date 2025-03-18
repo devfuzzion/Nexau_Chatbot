@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { FileInput, Send } from 'lucide-react';
 import './index.css';
 
-const Footer = ({ onSendMessage, isDarkMode }) => {
+const Footer = ({ onSendMessage, isDarkMode ,isExpanded}) => {
   const [message, setMessage] = useState('');
 
   const handleSubmit = (e) => {
@@ -14,7 +14,7 @@ const Footer = ({ onSendMessage, isDarkMode }) => {
   };
 
   return (
-    <div className={`footer-container ${isDarkMode ? 'dark-mode' : ''}`}>
+    <div className={`footer-container ${isDarkMode ? 'dark-mode' : ''} ${isExpanded ? 'expanded' : ''}`}>
       <form className='footer-form' onSubmit={handleSubmit}>
         <input
           type='text'
