@@ -5,18 +5,23 @@ import './index.css';
 
 const Chatbot = () => {
   const [messages, setMessages] = useState([
-    { text: 'This is a bot response. It can be a longer message to test scrolling.', isBot: true },
-    { text: 'This is a client query. It can also be a longer message to test scrolling.', isBot: false },
+    { text: 'Hello! How can I assist you today?', isBot: true },
   ]);
-
   const [isExpanded, setIsExpanded] = useState(false);
 
   const addClientMessage = (message) => {
     setMessages([...messages, { text: message, isBot: false }]);
+
+    setTimeout(() => {
+      setMessages((prevMessages) => [
+        ...prevMessages,
+        { text: 'This is a bot response to your message. Work in progress! ⚠️🚧', isBot: true },
+      ]);
+    }, 1000); 
   };
 
   const handleExpand = () => {
-    console.log('Expanded:', !isExpanded); // Debugging
+    console.log('Expanded:', !isExpanded);
     setIsExpanded(!isExpanded);
   };
 
