@@ -5,7 +5,7 @@ import {
 } from 'lucide-react';
 import './index.css';
 
-const Header = ({ onExpand, isExpanded }) => {
+const Header = ({ onExpand, isExpanded, onToggleVisibility }) => {
   const [isDarkMode, setIsDarkMode] = useState(
     localStorage.getItem('theme') === 'dark'
   );
@@ -77,6 +77,10 @@ const Header = ({ onExpand, isExpanded }) => {
       <div className='right-section'>
         <button className='expand-icon' onClick={onExpand}>
           {isExpanded ? <Minimize size={20} /> : <Expand size={20} />}
+        </button>
+        {/* Add ChevronDown button next to the expand button */}
+        <button className='chevron-down-button' onClick={onToggleVisibility}>
+          <ChevronDown size={20} />
         </button>
       </div>
 

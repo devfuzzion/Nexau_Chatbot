@@ -72,6 +72,7 @@
   border-radius: 15px 15px 15px 15px;
   box-shadow: 2px 2px 3px rgba(0, 0, 0, 0.2), 4px 4px 6px rgba(0, 0, 0, 0.15);
   align-self: flex-start;
+  border: 1px solid white;
   word-wrap: break-word;
   overflow-wrap: break-word;
   line-height: 1.2;
@@ -93,6 +94,7 @@
   box-shadow: 2px 2px 3px rgba(0, 0, 0, 0.2), 4px 4px 6px rgba(0, 0, 0, 0.15);
   align-self: flex-end;
   word-wrap: break-word;
+  border: 1px solid white;
   font-family: Inter, sans-serif;
   overflow-wrap: break-word;
   line-height: 1.2;
@@ -156,6 +158,10 @@ body.dark-mode {
   align-items: center;
   font-family: Inter, sans-serif;
   font-size: 14px;
+  color: black;
+}
+
+.dark-mode .typing-indicator {
   color: white;
 }
 

@@ -1,3 +1,4 @@
+/* Chatbot Container */
 .chatbot-container {
   position: fixed;
   bottom: 20px;
@@ -10,7 +11,7 @@
   display: flex;
   flex-direction: column;
   z-index: 1000;
-  transition: width 0.6s ease-in-out, height 0.6s ease-in-out, bottom 0.6s ease-in-out, right 0.6s ease-in-out, border-radius 0.6s ease-in-out;
+  transition: width 0.6s ease-in-out, height 0.6s ease-in-out, bottom 0.6s ease-in-out, right 0.6s ease-in-out, border-radius 0.6s ease-in-out, transform 0.6s ease-in-out, opacity 0.6s ease-in-out;
   transform-origin: bottom right;
 }
 
@@ -22,14 +23,51 @@
   border-radius: 0;
 }
 
+/* Hidden State (for shrinking and sliding down effect) */
+.chatbot-container.hidden {
+  transform: scale(0.2) translateY(100%) translateX(100%);
+  opacity: 0;
+  pointer-events: none;
+  transition: transform 0.6s ease-in-out, opacity 0.4s ease-in-out;
+}
+
+
+/* Infinity Button */
+.infinity-button {
+  position: fixed;
+  bottom: 50px;
+  right: 50px;
+  background-color: rgba(99, 75, 144, 0.993);
+  border: none;
+  border-radius: 50%;
+  width: 60px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  z-index: 1000;
+}
+
+.infinity-button:hover {
+  background-color: rgba(82, 40, 160, 0.993);
+  transform: scale(1.1);
+}
+
+.infinity-button svg {
+  color: white;
+}
+
 /* Responsive Design */
 /* For tablets (768px and below) */
 @media (max-width: 768px) {
   .chatbot-container {
-    width: 40%; 
-    height: 400px; 
-    bottom: 15px; 
-    right: 30px; 
+    width: 40%;
+    height: 400px;
+    bottom: 15px;
+    right: 30px;
   }
 
   .chatbot-container.expanded {
@@ -39,17 +77,28 @@
     right: 0;
     border-radius: 0;
   }
+
+  .infinity-button {
+    bottom: 15px;
+    right: 30px;
+  }
 }
 
 /* For small mobile devices (480px and below) */
 @media (max-width: 480px) {
   .chatbot-container {
-    width: 100%; 
-    height: 100%; 
-    bottom: 0; 
-    right: 0; 
-    border-radius: none;
+    width: 100%;
+    height: 100%;
+    bottom: 0;
+    right: 0;
+    border-radius: 0;
     box-shadow: none;
+  }
+  .chatbot-container.hidden {
+    transform: translateY(100vh); 
+    opacity: 0;
+    pointer-events: none;
+    transition: transform 0.6s ease-in-out, opacity 0.4s ease-in-out;
   }
 
   .chatbot-container.expanded {
@@ -59,5 +108,10 @@
     bottom: 0;
     right: 0;
     border-radius: 0;
+  }
+
+  .infinity-button {
+    bottom: 10px;
+    right: 10px;
   }
 }
