@@ -8,6 +8,7 @@ const Chatbot = ({ threadId = "thread_YX9jzhPXH5LlaogOqd7yi8lJ" }) => {
   const [messages, setMessages] = useState([]);
   const [isExpanded, setIsExpanded] = useState(false);
   const [isVisible, setIsVisible] = useState(true); // State to control visibility
+  const [isThinking, setIsThinking] = useState(false); // State to control "Thinking..." animation
 
   // Fetch messages from API when chatbot opens
   useEffect(() => {
@@ -42,6 +43,9 @@ const Chatbot = ({ threadId = "thread_YX9jzhPXH5LlaogOqd7yi8lJ" }) => {
       ...prevMessages,
       { text: message, isBot: false },
     ]);
+
+    // Start the "Thinking..." animation
+    setIsThinking(true);
 
     try {
       // Send request to API
@@ -79,6 +83,9 @@ const Chatbot = ({ threadId = "thread_YX9jzhPXH5LlaogOqd7yi8lJ" }) => {
         ...prevMessages,
         { text: "Network error. Please check your connection.", isBot: true },
       ]);
+    } finally {
+      // Stop the "Thinking..." animation
+      setIsThinking(false);
     }
   };
 
@@ -115,6 +122,7 @@ const Chatbot = ({ threadId = "thread_YX9jzhPXH5LlaogOqd7yi8lJ" }) => {
           messages={messages}
           onSendMessage={addClientMessage}
           isExpanded={isExpanded}
+          isThinking={isThinking} // Pass isThinking to Body
         />
       </div>
     </>
