@@ -1,5 +1,6 @@
 import express from "express";
 import dotenv from "dotenv";
+import cors from "cors";
 dotenv.config();
 import {
   appendMessageInThread,
@@ -11,6 +12,7 @@ import {
 import { getAllThreads, createThreadInDb } from "./db/threads.queries.js";
 const app = express();
 
+app.use(cors());
 app.use(express.json());
 
 app.get("/ping", (req, res) => {
@@ -23,7 +25,6 @@ app.get("/", (req, res) => {
 
 app.get("/threads", async (req, res) => {
   try {
-    console.log("LOVE")
     const threads = await getAllThreads();
     res.json({ success: true, threads });
   } catch (err) {
@@ -65,7 +66,7 @@ app.post("/run/:threadId", async (req, res) => {
 app.post("/create-thread", async (req, res) => {
   try {
     const thread = await createThread();
-    const dbThread = await createThreadInDb(thread.id);
+    const dbThread = await createThreadInDb(thread.id, req.body.threadTitle);
     console.log(dbThread);
     res.json({ success: true, thread });
   } catch (err) {

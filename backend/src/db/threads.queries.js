@@ -10,11 +10,11 @@ export const getAllThreads = async () => {
   }
 };
 
-export const createThreadInDb = async (threadId) => {
+export const createThreadInDb = async (threadId, threadTitle) => {
   try {
     const { rows } = await sql.query(
-      'INSERT INTO threads ("threadid") VALUES ($1) RETURNING *',
-      [threadId],
+      'INSERT INTO threads ("threadid","threadTitle") VALUES ($1,$2) RETURNING *',
+      [threadId, threadTitle],
     );
     return rows[0];
   } catch (err) {
