@@ -37,11 +37,7 @@ const Chatbot = () => {
           isExpanded={isExpanded}
           onToggleVisibility={toggleVisibility}
         />
-        <Body
-          messages={messages}
-          onSendMessage={addClientMessage}
-          isExpanded={isExpanded}
-        />
+        <Body isExpanded={isExpanded} />
       </div>
     </>
   );
