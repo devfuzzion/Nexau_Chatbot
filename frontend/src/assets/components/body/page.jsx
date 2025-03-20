@@ -2,58 +2,169 @@ import React, { useState, useEffect, useRef } from "react";
 import "./index.css";
 import Footer from "../footer/page.jsx";
 import LeftColumn from "../leftcolumn/page.jsx";
+import {
+  fetchThreads,
+  fetchMessages,
+  sendMessage,
+} from "../../../api/chatService.js";
+import { useTheme } from "../../../hooks/useTheme.js";
+import MessageList from "../messageList/messageList.page.jsx";
+import TypingIndicator from "../typingIndicator/typingIndicator.page.jsx";
 
-const Body = ({ messages, onSendMessage, isExpanded, isThinking }) => {
-  const [isDarkMode, setIsDarkMode] = useState(
-    localStorage.getItem("theme") === "dark"
-  );
-  const [typingMessage, setTypingMessage] = useState("");
-  const [isTyping, setIsTyping] = useState(false);
+const Body = ({ isExpanded }) => {
+  const { isDarkMode, toggleTheme } = useTheme();
+
+  // Thread state
+  const [threads, setThreads] = useState([]);
+  const [selectedThread, setSelectedThread] = useState("");
+
+  // Message state
+  const [messages, setMessages] = useState([]);
+  const [typingState, setTypingState] = useState({
+    isTyping: false,
+    typingMessage: "",
+    showIndicator: false,
+  });
+  const [isWaitingForResponse, setIsWaitingForResponse] = useState(false);
 
   const messagesEndRef = useRef(null);
 
+  // Fetch threads on component mount
   useEffect(() => {
-    document.body.classList.toggle("dark-mode", isDarkMode);
-  }, [isDarkMode]);
+    const loadThreads = async () => {
+      try {
+        const threadsData = await fetchThreads();
+        if (threadsData.length > 0) {
+          setThreads(threadsData);
+          setSelectedThread(threadsData[0].threadid);
+        }
+      } catch (error) {
+        console.error("Failed to load threads:", error);
+        // Could add UI error state here
+      }
+    };
 
-  const toggleTheme = () => {
-    setIsDarkMode((prevMode) => {
-      const newMode = !prevMode;
-      document.body.classList.toggle("dark-mode", newMode);
-      localStorage.setItem("theme", newMode ? "dark" : "light");
-      return newMode;
-    });
+    loadThreads();
+  }, []);
+
+  // Function to create a new thread - moved from LeftColumn component
+  const createThread = async () => {
+    try {
+      const response = await fetch("http://localhost:3000/create-thread", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ threadTitle: "New Chat" }),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        // Refresh threads after creating a new one
+        const threadsData = await fetchThreads();
+        setThreads(threadsData);
+
+        // Select the newly created thread
+        if (data.thread && data.thread.id) {
+          setSelectedThread(data.thread.id);
+        }
+      } else {
+        console.error("Failed to create thread");
+      }
+    } catch (error) {
+      console.error("Error creating thread:", error);
+    }
   };
 
+  // Load messages when selected thread changes
+  useEffect(() => {
+    if (!selectedThread) return;
+
+    const loadMessages = async () => {
+      try {
+        const messageData = await fetchMessages(selectedThread);
+        setMessages(messageData);
+      } catch (error) {
+        console.error("Failed to load messages:", error);
+        // Could add UI error state here
+      }
+    };
+
+    loadMessages();
+  }, [selectedThread]);
+
+  // Scroll to bottom when messages change
   useEffect(() => {
     if (messagesEndRef.current) {
       messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
     }
-  }, [messages]);
+  }, [messages, isWaitingForResponse]);
 
+  // Handle bot typing animation
   useEffect(() => {
     const lastMessage = messages[messages.length - 1];
-    if (lastMessage && lastMessage.isBot) {
-      setIsTyping(true); // Start typing animation for bot's response
+    if (!lastMessage || !lastMessage.isBot) return;
 
-      let currentText = "";
-      let index = 0;
+    // Start typing animation for bot messages
+    setTypingState({
+      showIndicator: false,
+      isTyping: true,
+      typingMessage: "",
+    });
 
-      const typingInterval = setInterval(() => {
-        if (index < lastMessage.text.length) {
-          currentText += lastMessage.text[index];
-          setTypingMessage(currentText);
-          index++;
-        } else {
-          clearInterval(typingInterval);
-          setIsTyping(false); // Stop typing animation
-        }
-      }, 50); // Adjust typing speed (milliseconds per character)
+    let currentText = "";
+    let index = 0;
 
-      // Cleanup interval on component unmount or new message
-      return () => clearInterval(typingInterval);
-    }
+    const typingInterval = setInterval(() => {
+      if (index < lastMessage.text.length) {
+        currentText += lastMessage.text[index];
+        setTypingState((prev) => ({
+          ...prev,
+          typingMessage: currentText,
+        }));
+        index++;
+      } else {
+        clearInterval(typingInterval);
+        setTypingState((prev) => ({ ...prev, isTyping: false }));
+      }
+    }, 10);
+
+    return () => clearInterval(typingInterval);
   }, [messages]);
+
+  const handleSendMessage = async (message) => {
+    // Add user message immediately
+    setMessages((prev) => [...prev, { text: message, isBot: false }]);
+
+    // Show thinking indicator immediately after sending message
+    setIsWaitingForResponse(true);
+
+    try {
+      // Send to API and get response
+      const botResponse = await sendMessage(selectedThread, message);
+
+      // Hide thinking indicator
+      setIsWaitingForResponse(false);
+
+      // Add bot response
+      setMessages((prev) => [...prev, { text: botResponse, isBot: true }]);
+    } catch (error) {
+      console.error("Message sending failed:", error);
+
+      // Hide thinking indicator
+      setIsWaitingForResponse(false);
+
+      // Show error message
+      setMessages((prev) => [
+        ...prev,
+        {
+          text: "Sorry, there was an error sending your message. Please try again.",
+          isBot: true,
+        },
+      ]);
+    }
+  };
 
   return (
     <div
@@ -62,35 +173,26 @@ const Body = ({ messages, onSendMessage, isExpanded, isThinking }) => {
       }`}
     >
       {isExpanded && (
-        <LeftColumn isDarkMode={isDarkMode} toggleTheme={toggleTheme} />
+        <LeftColumn
+          isDarkMode={isDarkMode}
+          toggleTheme={toggleTheme}
+          threads={threads}
+          changeThread={setSelectedThread}
+          activeThread={selectedThread}
+          onCreateThread={createThread}
+        />
       )}
+
       <div className={`main-content ${isDarkMode ? "dark" : ""}`}>
-        <div className={`messages-container ${isExpanded ? "expanded" : ""}`}>
-          {messages.map((msg, index) => (
-            <div
-              key={index}
-              className={`message-container ${
-                msg.isBot ? "bot-message-container" : "client-message-container"
-              } ${isDarkMode ? "dark" : ""}${isExpanded ? "expanded" : ""}`}
-            >
-              {msg.isBot && index === messages.length - 1 && isTyping ? (
-                typingMessage
-              ) : (
-                msg.text
-              )}
-            </div>
-          ))}
-          {/* Show "Thinking..." indicator if isThinking is true */}
-          {isThinking && (
-            <div className="typing-indicator">
-              Thinking<span className="dot">.</span>
-              <span className="dot">.</span>
-              <span className="dot">.</span>
-            </div>
-          )}
-          <div ref={messagesEndRef}></div>
-        </div>
-        <Footer onSendMessage={onSendMessage} />
+        <MessageList
+          messages={messages}
+          isDarkMode={isDarkMode}
+          isExpanded={isExpanded}
+          typingState={typingState}
+          messagesEndRef={messagesEndRef}
+          isWaitingForResponse={isWaitingForResponse}
+        />
+        <Footer onSendMessage={handleSendMessage} />
       </div>
     </div>
   );
