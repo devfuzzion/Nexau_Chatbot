@@ -155,14 +155,25 @@ body.dark-mode {
 /* Typing Animation */
 .typing-indicator {
   display: flex;
+  margin-top: 2%;
+  margin-left: 7%;
+  padding: 10px;
+  width: fit-content;
+  border-radius: 10px;
   align-items: center;
   font-family: Inter, sans-serif;
+  background-color: #E3E7EC;
+  box-shadow: 2px 2px 3px rgba(0, 0, 0, 0.2), 4px 4px 6px rgba(0, 0, 0, 0.15);
   font-size: 14px;
   color: black;
 }
 
 .dark-mode .typing-indicator {
+  display: flex;
   color: white;
+  background-color: rgba(112, 102, 102, 0.6);
+  justify-content: center;
+
 }
 
 .dot {
