@@ -166,6 +166,7 @@
 @media (max-width: 480px) {
   .footer-container {
     padding-top: 3%; /* Further increase padding */
+    border-radius: none;
   }
 
   .footer-form {

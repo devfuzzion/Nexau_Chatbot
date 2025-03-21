@@ -9,7 +9,6 @@ import {
 } from "../../../api/chatService.js";
 import { useTheme } from "../../../hooks/useTheme.js";
 import MessageList from "../messageList/messageList.page.jsx";
-import TypingIndicator from "../typingIndicator/typingIndicator.page.jsx";
 
 const Body = ({ isExpanded }) => {
   const { isDarkMode, toggleTheme } = useTheme();
@@ -137,14 +136,17 @@ const Body = ({ isExpanded }) => {
     // Add user message immediately
     setMessages((prev) => [...prev, { text: message, isBot: false }]);
 
-    // Show thinking indicator immediately after sending message
-    setIsWaitingForResponse(true);
+    // Start the 2-second delay before showing the "Thinking..." animation
+    const thinkingTimeout = setTimeout(() => {
+      setIsWaitingForResponse(true); // Show "Thinking..." animation after 2 seconds
+    }, 1000); // 2-second delay
 
     try {
       // Send to API and get response
       const botResponse = await sendMessage(selectedThread, message);
 
-      // Hide thinking indicator
+      // Clear the timeout and hide the "Thinking..." animation
+      clearTimeout(thinkingTimeout);
       setIsWaitingForResponse(false);
 
       // Add bot response
@@ -152,7 +154,8 @@ const Body = ({ isExpanded }) => {
     } catch (error) {
       console.error("Message sending failed:", error);
 
-      // Hide thinking indicator
+      // Clear the timeout and hide the "Thinking..." animation
+      clearTimeout(thinkingTimeout);
       setIsWaitingForResponse(false);
 
       // Show error message
