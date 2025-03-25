@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { 
-  Expand, Minimize, ChevronDown, ChevronLeft, User, LifeBuoy, Search, Menu, X, Sun, Moon, 
-  MessageSquare, Heart, History 
+  Expand, Minimize, ChevronDown, ChevronLeft, User, Menu, X, Sun, Moon, 
+  MessageSquare, History 
 } from 'lucide-react';
 import './index.css';
 
@@ -11,6 +11,14 @@ const Header = ({ onExpand, isExpanded, onToggleVisibility }) => {
   );
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isHistoryOpen, setIsHistoryOpen] = useState(false);
+
+  // Initialize and persist expanded state
+  useEffect(() => {
+    const savedExpanded = localStorage.getItem('isExpanded') === 'true';
+    if (savedExpanded !== isExpanded) {
+      onExpand(savedExpanded); // Sync with parent component
+    }
+  }, []);
 
   useEffect(() => {
     document.body.classList.toggle('dark-mode', isDarkMode);
@@ -23,6 +31,12 @@ const Header = ({ onExpand, isExpanded, onToggleVisibility }) => {
       localStorage.setItem('theme', newMode ? 'dark' : 'light');
       return newMode;
     });
+  };
+
+  const handleExpand = () => {
+    const newExpandedState = !isExpanded;
+    localStorage.setItem('isExpanded', newExpandedState.toString());
+    onExpand(newExpandedState);
   };
 
   const toggleMenu = () => {
@@ -48,37 +62,14 @@ const Header = ({ onExpand, isExpanded, onToggleVisibility }) => {
         <div className='logo-container'>
           <img src='/images/image.jpg' alt='logo' className='logo' />
         </div>
-        <p className='title'>Consultor IA</p>
+        <p className='title'>Nexau</p>
       </div>
-
-      {/* Middle Section (visible only when expanded) */}
-      {isExpanded && (
-        <div className='middle-section'>
-          <button className='recommend-button'>
-            Recommend to a Friend ❤️
-          </button>
-          <div className='profile-dropdown'>
-            <User size={16} />
-            <span>Hello, Pablo de la Vega</span>
-            <ChevronDown size={16} />
-          </div>
-          <button className='aid-button'>
-            <LifeBuoy size={16} />
-            <span>Aid</span>
-            <ChevronDown size={16} />
-          </button>
-          <button className='search-button'>
-            <Search size={16} />
-          </button>
-        </div>
-      )}
 
       {/* Right Section */}
       <div className='right-section'>
-        <button className='expand-icon' onClick={onExpand}>
+        <button className='expand-icon' onClick={handleExpand}>
           {isExpanded ? <Minimize size={20} /> : <Expand size={20} />}
         </button>
-        {/* Add ChevronDown button next to the expand button */}
         <button className='chevron-down-button' onClick={onToggleVisibility}>
           <ChevronDown size={20} />
         </button>
@@ -95,15 +86,11 @@ const Header = ({ onExpand, isExpanded, onToggleVisibility }) => {
         <div className='mobile-menu-content'>
           <button className='mobile-menu-button'>
             <MessageSquare size={16} />
-            <span>New Chat</span>
+            <span>Nuevo Chat</span>
           </button>
           <button className='mobile-menu-button'>
             <User size={16} />
-            <span>Profile</span>
-          </button>
-          <button className='mobile-menu-button'>
-            <Search size={16} />
-            <span>Search</span>
+            <span>Perfil</span>
           </button>
           <button className='mobile-menu-button' onClick={openHistory}>
             <History size={16} />
@@ -112,14 +99,6 @@ const Header = ({ onExpand, isExpanded, onToggleVisibility }) => {
           <button className='mobile-menu-button' onClick={toggleDarkMode}>
             {isDarkMode ? <Sun size={16} /> : <Moon size={16} />}
             <span>{isDarkMode ? 'Light Mode' : 'Dark Mode'}</span>
-          </button>
-          <button className='mobile-menu-button'>
-            <Heart size={16} />
-            <span>Recommend to a Friend</span>
-          </button>
-          <button className='mobile-menu-button'>
-            <LifeBuoy size={16} />
-            <span>Aid</span>
           </button>
         </div>
       </div>

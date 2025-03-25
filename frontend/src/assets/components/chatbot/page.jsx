@@ -1,20 +1,35 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Header from "../header/page.jsx";
 import Body from "../body/page.jsx";
-import { Infinity } from "lucide-react"; // Import the Infinity icon
+import { Infinity } from "lucide-react";
 import "./index.css";
 
 const Chatbot = () => {
-  const [isExpanded, setIsExpanded] = useState(false);
-  const [isVisible, setIsVisible] = useState(true); // State to control visibility
+  // Initialize states from localStorage
+  const [isExpanded, setIsExpanded] = useState(() => {
+    return localStorage.getItem('isExpanded') === 'true';
+  });
+  
+  const [isVisible, setIsVisible] = useState(() => {
+    return localStorage.getItem('isVisible') !== 'false'; // Default to true if not set
+  });
+
+  // Persist states to localStorage when they change
+  useEffect(() => {
+    localStorage.setItem('isExpanded', isExpanded);
+  }, [isExpanded]);
+
+  useEffect(() => {
+    localStorage.setItem('isVisible', isVisible);
+  }, [isVisible]);
 
   const handleExpand = () => {
-    console.log("Expanded:", !isExpanded);
-    setIsExpanded(!isExpanded);
+    const newExpandedState = !isExpanded;
+    setIsExpanded(newExpandedState);
   };
 
   const toggleVisibility = () => {
-    setIsVisible(!isVisible); // Toggle visibility
+    setIsVisible(prev => !prev);
   };
 
   return (

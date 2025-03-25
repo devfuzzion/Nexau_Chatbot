@@ -18,7 +18,7 @@ const Footer = ({ onSendMessage, isDarkMode ,isExpanded}) => {
       <form className='footer-form' onSubmit={handleSubmit}>
         <input
           type='text'
-          placeholder='Send a query...'
+          placeholder='Escríbeme tu duda...'
           className={`footer-input ${isDarkMode ? 'dark-mode' : ''}`}
           value={message}
           onChange={(e) => setMessage(e.target.value)}
@@ -31,7 +31,7 @@ const Footer = ({ onSendMessage, isDarkMode ,isExpanded}) => {
         </button>
       </form>
       <div className={`powered-by ${isDarkMode ? 'dark-mode' : ''}`}>
-        Powered by <strong>Devfuzzion.com</strong>
+        Powered by <strong>Nexau</strong>
       </div>
     </div>
   );
