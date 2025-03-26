@@ -98,7 +98,7 @@ const Header = ({ onExpand, isExpanded, onToggleVisibility }) => {
           </button>
           <button className='mobile-menu-button' onClick={toggleDarkMode}>
             {isDarkMode ? <Sun size={16} /> : <Moon size={16} />}
-            <span>{isDarkMode ? 'Light Mode' : 'Dark Mode'}</span>
+            <span>{isDarkMode ? 'Modo de luz' : 'Modo oscuro'}</span>
           </button>
         </div>
       </div>

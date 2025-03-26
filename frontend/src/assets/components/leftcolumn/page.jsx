@@ -43,7 +43,7 @@ const LeftColumn = ({
         </button>
         <button className="theme-toggle-button" onClick={toggleTheme}>
           {isDarkMode ? <Sun size={20} /> : <Moon size={20} />}
-          <span>{isDarkMode ? "Light Mode" : "Dark Mode"}</span>
+          <span>{isDarkMode ? "Modo de luz" : "Modo oscuro"}</span>
         </button>
       </div>
     </div>
