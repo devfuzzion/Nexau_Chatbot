@@ -2,20 +2,20 @@ import React, { useState, useEffect, useRef } from "react";
 import "./index.css";
 import Footer from "../footer/page.jsx";
 import LeftColumn from "../leftcolumn/page.jsx";
-import {
-  fetchThreads,
-  fetchMessages,
-  sendMessage,
-} from "../../../api/chatService.js";
+import { fetchMessages, sendMessage } from "../../../api/chatService.js";
 import { useTheme } from "../../../hooks/useTheme.js";
 import MessageList from "../messageList/messageList.page.jsx";
 
-const Body = ({ isExpanded }) => {
+const Body = ({
+  isExpanded,
+  threads,
+  selectedThread,
+  setSelectedThread,
+  createThread,
+}) => {
   const { isDarkMode, toggleTheme } = useTheme();
 
   // Thread state
-  const [threads, setThreads] = useState([]);
-  const [selectedThread, setSelectedThread] = useState("");
 
   // Message state
   const [messages, setMessages] = useState([]);
@@ -27,54 +27,6 @@ const Body = ({ isExpanded }) => {
   const [isWaitingForResponse, setIsWaitingForResponse] = useState(false);
 
   const messagesEndRef = useRef(null);
-
-  // Fetch threads on component mount
-  useEffect(() => {
-    const loadThreads = async () => {
-      try {
-        const threadsData = await fetchThreads();
-        if (threadsData.length > 0) {
-          setThreads(threadsData);
-          setSelectedThread(threadsData[0].threadid);
-        }
-      } catch (error) {
-        console.error("Failed to load threads:", error);
-        // Could add UI error state here
-      }
-    };
-
-    loadThreads();
-  }, []);
-
-  // Function to create a new thread - moved from LeftColumn component
-  const createThread = async () => {
-    try {
-      const response = await fetch("http://localhost:3000/create-thread", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ threadTitle: "Nuevo Chat" }),
-      });
-
-      const data = await response.json();
-
-      if (data.success) {
-        // Refresh threads after creating a new one
-        const threadsData = await fetchThreads();
-        setThreads(threadsData);
-
-        // Select the newly created thread
-        if (data.thread && data.thread.id) {
-          setSelectedThread(data.thread.id);
-        }
-      } else {
-        console.error("Failed to create thread");
-      }
-    } catch (error) {
-      console.error("Error creating thread:", error);
-    }
-  };
 
   // Load messages when selected thread changes
   useEffect(() => {

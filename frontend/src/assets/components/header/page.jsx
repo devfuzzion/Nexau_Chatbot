@@ -15,7 +15,15 @@ import {
 import "./index.css";
 import { useTheme } from "../../../hooks/useTheme.js";
 
-const Header = ({ onExpand, isExpanded, onToggleVisibility }) => {
+const Header = ({
+  onExpand,
+  isExpanded,
+  onToggleVisibility,
+  threads,
+  selectedThread,
+  setSelectedThread,
+  createThread,
+}) => {
   const { isDarkMode, toggleTheme } = useTheme();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isHistoryOpen, setIsHistoryOpen] = useState(false);
@@ -83,7 +91,7 @@ const Header = ({ onExpand, isExpanded, onToggleVisibility }) => {
           </button>
         </div>
         <div className="mobile-menu-content">
-          <button className="mobile-menu-button">
+          <button className="mobile-menu-button" onClick={createThread}>
             <MessageSquare size={16} />
             <span>Nuevo Chat</span>
           </button>
@@ -113,20 +121,19 @@ const Header = ({ onExpand, isExpanded, onToggleVisibility }) => {
           </h3>
         </div>
         <div className="history-content">
-          <h4>Today</h4>
           <ul>
-            <li>How to use the chatbot?</li>
-            <li>What is React?</li>
-          </ul>
-          <h4>Yesterday</h4>
-          <ul>
-            <li>Explain CSS grid</li>
-            <li>What is JavaScript?</li>
-          </ul>
-          <h4>Last 30 Days</h4>
-          <ul>
-            <li>Introduction to Python</li>
-            <li>How to build a chatbot?</li>
+            {threads.length > 0 ? (
+              threads.map((thread) => (
+                <li
+                  key={thread.threadid}
+                  onClick={() => setSelectedThread(thread.threadid)}
+                >
+                  {thread.threadTitle}
+                </li>
+              ))
+            ) : (
+              <li>No hay chats disponibles</li>
+            )}
           </ul>
         </div>
       </div>

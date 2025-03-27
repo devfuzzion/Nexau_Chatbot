@@ -3,24 +3,72 @@ import Header from "../header/page.jsx";
 import Body from "../body/page.jsx";
 import { Infinity } from "lucide-react";
 import "./index.css";
-
+import { fetchThreads } from "../../../api/chatService.js";
 const Chatbot = () => {
   // Initialize states from localStorage
   const [isExpanded, setIsExpanded] = useState(() => {
-    return localStorage.getItem('isExpanded') === 'true';
-  });
-  
-  const [isVisible, setIsVisible] = useState(() => {
-    return localStorage.getItem('isVisible') !== 'false'; // Default to true if not set
+    return localStorage.getItem("isExpanded") === "true";
   });
 
+  const [isVisible, setIsVisible] = useState(() => {
+    return localStorage.getItem("isVisible") !== "false"; // Default to true if not set
+  });
+
+  const [threads, setThreads] = useState([]);
+  const [selectedThread, setSelectedThread] = useState("");
+  // Function to create a new thread - moved from LeftColumn component
+  const createThread = async () => {
+    try {
+      const response = await fetch("http://localhost:3000/create-thread", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ threadTitle: "Nuevo Chat" }),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        // Refresh threads after creating a new one
+        const threadsData = await fetchThreads();
+        setThreads(threadsData);
+
+        // Select the newly created thread
+        if (data.thread && data.thread.id) {
+          setSelectedThread(data.thread.id);
+        }
+      } else {
+        console.error("Failed to create thread");
+      }
+    } catch (error) {
+      console.error("Error creating thread:", error);
+    }
+  };
+  // Fetch threads on component mount
+  useEffect(() => {
+    const loadThreads = async () => {
+      try {
+        const threadsData = await fetchThreads();
+        if (threadsData.length > 0) {
+          setThreads(threadsData);
+          setSelectedThread(threadsData[0].threadid);
+        }
+      } catch (error) {
+        console.error("Failed to load threads:", error);
+        // Could add UI error state here
+      }
+    };
+
+    loadThreads();
+  }, []);
   // Persist states to localStorage when they change
   useEffect(() => {
-    localStorage.setItem('isExpanded', isExpanded);
+    localStorage.setItem("isExpanded", isExpanded);
   }, [isExpanded]);
 
   useEffect(() => {
-    localStorage.setItem('isVisible', isVisible);
+    localStorage.setItem("isVisible", isVisible);
   }, [isVisible]);
 
   const handleExpand = () => {
@@ -29,7 +77,7 @@ const Chatbot = () => {
   };
 
   const toggleVisibility = () => {
-    setIsVisible(prev => !prev);
+    setIsVisible((prev) => !prev);
   };
 
   return (
@@ -51,8 +99,18 @@ const Chatbot = () => {
           onExpand={handleExpand}
           isExpanded={isExpanded}
           onToggleVisibility={toggleVisibility}
+          threads={threads}
+          selectedThread={selectedThread}
+          setSelectedThread={setSelectedThread}
+          createThread={createThread}
         />
-        <Body isExpanded={isExpanded} />
+        <Body
+          isExpanded={isExpanded}
+          threads={threads}
+          selectedThread={selectedThread}
+          setSelectedThread={setSelectedThread}
+          createThread={createThread}
+        />
       </div>
     </>
   );
