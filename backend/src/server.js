@@ -9,7 +9,12 @@ import {
   createRun,
   delThread,
 } from "./openai.utils.js";
-import { getAllThreads, createThreadInDb } from "./db/threads.queries.js";
+import {
+  getAllThreads,
+  createThreadInDb,
+  deleteThreadInDb,
+  getThreadById,
+} from "./db/threads.queries.js";
 const app = express();
 
 app.use(cors());
@@ -73,6 +78,44 @@ app.post("/create-thread", async (req, res) => {
     res.json({
       success: true,
       err,
+    });
+  }
+});
+
+app.delete("/threads/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    // Fetch thread from DB
+    const thread = await getThreadById(id);
+    if (!thread) {
+      return res.status(404).json({
+        success: false,
+        message: "No thread found with the given ID",
+      });
+    }
+    // Delete thread from OpenAI
+    const response = await delThread(thread.threadid);
+    if (!response?.deleted) {
+      return res.status(500).json({
+        success: false,
+        message: "Error deleting thread from OpenAI",
+      });
+    }
+    if (response.deleted) {
+      console.log(`Thread deleted in OpenAi: ${thread.threadid}`);
+      const dbResponse = await deleteThreadInDb(id);
+      if (dbResponse.success) {
+        return res.json({
+          success: true,
+          mesasge: dbResponse.message,
+        });
+      }
+    }
+  } catch (err) {
+    console.error("Error deleting thread:", err);
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
     });
   }
 });

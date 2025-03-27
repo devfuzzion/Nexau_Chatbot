@@ -54,7 +54,7 @@ const Body = ({ isExpanded }) => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ threadTitle: "New Chat" }),
+        body: JSON.stringify({ threadTitle: "Nuevo Chat" }),
       });
 
       const data = await response.json();
