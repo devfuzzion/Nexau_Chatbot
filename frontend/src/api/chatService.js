@@ -55,3 +55,25 @@ export const sendMessage = async (threadId, userMessage) => {
     throw error;
   }
 };
+
+export const deleteThread = async (id) => {
+  try {
+    const response = await fetch(`http://localhost:3000/threads/${id}`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    const data = await response.json();
+
+    if (!data.success || !data.message) {
+      throw new Error(data.message || "Error processing request");
+    }
+
+    return data;
+  } catch (error) {
+    console.error("Error in deleting thread:", error);
+    throw error;
+  }
+};

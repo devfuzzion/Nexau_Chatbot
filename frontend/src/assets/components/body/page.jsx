@@ -8,16 +8,13 @@ import MessageList from "../messageList/messageList.page.jsx";
 
 const Body = ({
   isExpanded,
-  threads: initialThreads,
-  selectedThread: initialSelectedThread,
-  setSelectedThread: parentSetSelectedThread,
-  createThread: parentCreateThread,
+  threads,
+  selectedThread,
+  setSelectedThread,
+  createThread,
+  deleteThreadById,
 }) => {
   const { isDarkMode, toggleTheme } = useTheme();
-
-  // Local state for threads and selected thread
-  const [threads, setThreads] = useState(initialThreads);
-  const [selectedThread, setSelectedThread] = useState(initialSelectedThread);
 
   // Message state
   const [messages, setMessages] = useState([]);
@@ -29,15 +26,6 @@ const Body = ({
   const [isWaitingForResponse, setIsWaitingForResponse] = useState(false);
 
   const messagesEndRef = useRef(null);
-
-  // Sync with parent component's state
-  useEffect(() => {
-    setThreads(initialThreads);
-  }, [initialThreads]);
-
-  useEffect(() => {
-    setSelectedThread(initialSelectedThread);
-  }, [initialSelectedThread]);
 
   // Load messages when selected thread changes
   useEffect(() => {
@@ -52,10 +40,12 @@ const Body = ({
         setMessages(messageData);
       } catch (error) {
         console.error("Failed to load messages:", error);
-        setMessages([{
-          text: "Failed to load messages. Please try again.",
-          isBot: true
-        }]);
+        setMessages([
+          {
+            text: "Failed to load messages. Please try again.",
+            isBot: true,
+          },
+        ]);
       }
     };
 
@@ -123,49 +113,21 @@ const Body = ({
     }
   };
 
-  // Thread management functions
-  const handleCreateThread = async () => {
-    const newThread = await parentCreateThread();
-    setThreads(prev => [...prev, newThread]);
-    setSelectedThread(newThread.threadid);
-  };
-
-  const handleRenameThread = (threadId, newTitle) => {
-    setThreads(prev => 
-      prev.map(thread => 
-        thread.threadid === threadId 
-          ? { ...thread, threadTitle: newTitle } 
-          : thread
-      )
-    );
-  };
-
-  const handleDeleteThread = (threadId) => {
-    setThreads(prev => prev.filter(thread => thread.threadid !== threadId));
-    
-    if (selectedThread === threadId) {
-      setSelectedThread(null);
-      parentSetSelectedThread(null);
-    }
-  };
-
-  const handleChangeThread = (threadId) => {
-    setSelectedThread(threadId);
-    parentSetSelectedThread(threadId);
-  };
-
   return (
-    <div className={`body-wrapper ${isDarkMode ? "dark" : ""} ${isExpanded ? "expanded" : ""}`}>
+    <div
+      className={`body-wrapper ${isDarkMode ? "dark" : ""} ${
+        isExpanded ? "expanded" : ""
+      }`}
+    >
       {isExpanded && (
         <LeftColumn
           isDarkMode={isDarkMode}
           toggleTheme={toggleTheme}
           threads={threads}
-          changeThread={handleChangeThread}
+          changeThread={setSelectedThread}
           selectedThread={selectedThread}
-          onCreateThread={handleCreateThread}
-          onRenameThread={handleRenameThread}
-          onDeleteThread={handleDeleteThread}
+          onCreateThread={createThread}
+          deleteThreadById={deleteThreadById}
         />
       )}
 
@@ -178,7 +140,10 @@ const Body = ({
           messagesEndRef={messagesEndRef}
           isWaitingForResponse={isWaitingForResponse}
         />
-        <Footer onSendMessage={handleSendMessage} isDisabled={!selectedThread} />
+        <Footer
+          onSendMessage={handleSendMessage}
+          isDisabled={!selectedThread}
+        />
       </div>
     </div>
   );

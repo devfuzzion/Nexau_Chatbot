@@ -1,5 +1,15 @@
 import React, { useState, useRef, useEffect } from "react";
-import { Plus, Sun, Moon, User, MoreVertical, Pencil, Trash2, X } from "lucide-react";
+import {
+  Plus,
+  Sun,
+  Moon,
+  User,
+  MoreVertical,
+  Pencil,
+  Trash2,
+  X,
+  Theater,
+} from "lucide-react";
 import "./index.css";
 
 const LeftColumn = ({
@@ -10,21 +20,21 @@ const LeftColumn = ({
   onCreateThread,
   selectedThread,
   onRenameThread,
-  onDeleteThread,
+  deleteThreadById,
 }) => {
   const [showDeletePopup, setShowDeletePopup] = useState(false);
   const [threadToDelete, setThreadToDelete] = useState(null);
   const [deletingThread, setDeletingThread] = useState(false);
 
-  const handleDeleteWithConfirmation = (threadId) => {
-    setThreadToDelete(threadId);
+  const handleDeleteWithConfirmation = (id) => {
+    setThreadToDelete(id);
     setShowDeletePopup(true);
   };
 
   const confirmDelete = async () => {
     try {
       setDeletingThread(true);
-      await onDeleteThread(threadToDelete);
+      await deleteThreadById(threadToDelete);
     } finally {
       setDeletingThread(false);
       setShowDeletePopup(false);
@@ -36,7 +46,6 @@ const LeftColumn = ({
     setShowDeletePopup(false);
     setThreadToDelete(null);
   };
-  
 
   return (
     <div className={`left-column ${isDarkMode ? "dark" : ""}`}>
@@ -46,21 +55,28 @@ const LeftColumn = ({
           <div className="delete-confirmation-popup">
             <div className="popup-header">
               <h3>Delete Conversation</h3>
-              <button onClick={cancelDelete} className="close-button" disabled={deletingThread}>
+              <button
+                onClick={cancelDelete}
+                className="close-button"
+                disabled={deletingThread}
+              >
                 <X size={20} />
               </button>
             </div>
-            <p>Are you sure you want to delete this conversation? This action cannot be undone.</p>
+            <p>
+              Are you sure you want to delete this conversation? This action
+              cannot be undone.
+            </p>
             <div className="popup-buttons">
-              <button 
-                onClick={cancelDelete} 
+              <button
+                onClick={cancelDelete}
                 className="cancel-button"
                 disabled={deletingThread}
               >
                 Cancel
               </button>
-              <button 
-                onClick={confirmDelete} 
+              <button
+                onClick={confirmDelete}
                 className="confirm-button"
                 disabled={deletingThread}
               >
@@ -134,13 +150,6 @@ const HistoryItem = ({
     setIsMenuOpen(!isMenuOpen);
   };
 
-  const handleItemClick = () => {
-    if (!isRenaming) {
-      changeThread(thread.threadid);
-      setIsMenuOpen(false);
-    }
-  };
-
   const handleRenameClick = (e) => {
     e.stopPropagation();
     setIsRenaming(true);
@@ -149,7 +158,7 @@ const HistoryItem = ({
 
   const handleDelete = (e) => {
     e.stopPropagation();
-    onDeleteThread(thread.threadid);
+    onDeleteThread(thread.id);
     setIsMenuOpen(false);
   };
 
@@ -169,9 +178,9 @@ const HistoryItem = ({
   };
 
   const handleKeyDown = (e) => {
-    if (e.key === 'Enter') {
+    if (e.key === "Enter") {
       saveRename();
-    } else if (e.key === 'Escape') {
+    } else if (e.key === "Escape") {
       setNewTitle(thread.threadTitle);
       setIsRenaming(false);
     }
@@ -196,11 +205,12 @@ const HistoryItem = ({
       inputRef.current.select();
     }
   }, [isRenaming]);
-
   return (
     <li
-      onClick={handleItemClick}
-      className={`history-item ${selectedThread === thread.threadid ? "selected-item" : ""}`}
+      onClick={() => changeThread(thread.threadid)}
+      className={`history-item ${
+        selectedThread === thread.threadid ? "selected-item" : ""
+      }`}
     >
       <div className="history-item-content">
         {isRenaming ? (
@@ -217,8 +227,8 @@ const HistoryItem = ({
         ) : (
           <>
             <span className="thread-title">{thread.threadTitle}</span>
-            <button 
-              className="menu-button" 
+            <button
+              className="menu-button"
               onClick={toggleMenu}
               aria-label="Chat options"
             >
@@ -227,9 +237,12 @@ const HistoryItem = ({
           </>
         )}
       </div>
-      
+
       {isMenuOpen && (
-        <div ref={menuRef} className={`thread-menu-popup ${isDarkMode ? "dark" : ""}`}>
+        <div
+          ref={menuRef}
+          className={`thread-menu-popup ${isDarkMode ? "dark" : ""}`}
+        >
           <button onClick={handleRenameClick} className="menu-item">
             <Pencil size={16} />
             <span>Rename</span>
