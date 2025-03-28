@@ -8,14 +8,16 @@ import MessageList from "../messageList/messageList.page.jsx";
 
 const Body = ({
   isExpanded,
-  threads,
-  selectedThread,
-  setSelectedThread,
-  createThread,
+  threads: initialThreads,
+  selectedThread: initialSelectedThread,
+  setSelectedThread: parentSetSelectedThread,
+  createThread: parentCreateThread,
 }) => {
   const { isDarkMode, toggleTheme } = useTheme();
 
-  // Thread state
+  // Local state for threads and selected thread
+  const [threads, setThreads] = useState(initialThreads);
+  const [selectedThread, setSelectedThread] = useState(initialSelectedThread);
 
   // Message state
   const [messages, setMessages] = useState([]);
@@ -28,9 +30,21 @@ const Body = ({
 
   const messagesEndRef = useRef(null);
 
+  // Sync with parent component's state
+  useEffect(() => {
+    setThreads(initialThreads);
+  }, [initialThreads]);
+
+  useEffect(() => {
+    setSelectedThread(initialSelectedThread);
+  }, [initialSelectedThread]);
+
   // Load messages when selected thread changes
   useEffect(() => {
-    if (!selectedThread) return;
+    if (!selectedThread) {
+      setMessages([]);
+      return;
+    }
 
     const loadMessages = async () => {
       try {
@@ -38,7 +52,10 @@ const Body = ({
         setMessages(messageData);
       } catch (error) {
         console.error("Failed to load messages:", error);
-        // Could add UI error state here
+        setMessages([{
+          text: "Failed to load messages. Please try again.",
+          isBot: true
+        }]);
       }
     };
 
@@ -57,7 +74,6 @@ const Body = ({
     const lastMessage = messages[messages.length - 1];
     if (!lastMessage || !lastMessage.isBot) return;
 
-    // Start typing animation for bot messages
     setTypingState({
       showIndicator: false,
       isTyping: true,
@@ -85,32 +101,16 @@ const Body = ({
   }, [messages]);
 
   const handleSendMessage = async (message) => {
-    // Add user message immediately
-    setMessages((prev) => [...prev, { text: message, isBot: false }]);
+    if (!selectedThread) return;
 
-    // Start the 2-second delay before showing the "Thinking..." animation
-    const thinkingTimeout = setTimeout(() => {
-      setIsWaitingForResponse(true); // Show "Thinking..." animation after 2 seconds
-    }, 1000); // 2-second delay
+    setMessages((prev) => [...prev, { text: message, isBot: false }]);
+    setIsWaitingForResponse(true);
 
     try {
-      // Send to API and get response
       const botResponse = await sendMessage(selectedThread, message);
-
-      // Clear the timeout and hide the "Thinking..." animation
-      clearTimeout(thinkingTimeout);
-      setIsWaitingForResponse(false);
-
-      // Add bot response
       setMessages((prev) => [...prev, { text: botResponse, isBot: true }]);
     } catch (error) {
       console.error("Message sending failed:", error);
-
-      // Clear the timeout and hide the "Thinking..." animation
-      clearTimeout(thinkingTimeout);
-      setIsWaitingForResponse(false);
-
-      // Show error message
       setMessages((prev) => [
         ...prev,
         {
@@ -118,23 +118,54 @@ const Body = ({
           isBot: true,
         },
       ]);
+    } finally {
+      setIsWaitingForResponse(false);
     }
   };
 
+  // Thread management functions
+  const handleCreateThread = async () => {
+    const newThread = await parentCreateThread();
+    setThreads(prev => [...prev, newThread]);
+    setSelectedThread(newThread.threadid);
+  };
+
+  const handleRenameThread = (threadId, newTitle) => {
+    setThreads(prev => 
+      prev.map(thread => 
+        thread.threadid === threadId 
+          ? { ...thread, threadTitle: newTitle } 
+          : thread
+      )
+    );
+  };
+
+  const handleDeleteThread = (threadId) => {
+    setThreads(prev => prev.filter(thread => thread.threadid !== threadId));
+    
+    if (selectedThread === threadId) {
+      setSelectedThread(null);
+      parentSetSelectedThread(null);
+    }
+  };
+
+  const handleChangeThread = (threadId) => {
+    setSelectedThread(threadId);
+    parentSetSelectedThread(threadId);
+  };
+
   return (
-    <div
-      className={`body-wrapper ${isDarkMode ? "dark" : ""} ${
-        isExpanded ? "expanded" : ""
-      }`}
-    >
+    <div className={`body-wrapper ${isDarkMode ? "dark" : ""} ${isExpanded ? "expanded" : ""}`}>
       {isExpanded && (
         <LeftColumn
           isDarkMode={isDarkMode}
           toggleTheme={toggleTheme}
           threads={threads}
-          changeThread={setSelectedThread}
-          activeThread={selectedThread}
-          onCreateThread={createThread}
+          changeThread={handleChangeThread}
+          selectedThread={selectedThread}
+          onCreateThread={handleCreateThread}
+          onRenameThread={handleRenameThread}
+          onDeleteThread={handleDeleteThread}
         />
       )}
 
@@ -147,7 +178,7 @@ const Body = ({
           messagesEndRef={messagesEndRef}
           isWaitingForResponse={isWaitingForResponse}
         />
-        <Footer onSendMessage={handleSendMessage} />
+        <Footer onSendMessage={handleSendMessage} isDisabled={!selectedThread} />
       </div>
     </div>
   );

@@ -60,14 +60,14 @@ const Header = ({
   };
 
   const handleCreateThread = () => {
-    createThread(); // Call the original createThread function
-    setIsMenuOpen(false); // Close the mobile menu
+    createThread();
+    setIsMenuOpen(false); 
   };
 
   const handleHistoryItemClick = (threadId) => {
-    setSelectedThread(threadId); // Select the thread
-    setIsHistoryOpen(false); // Close history menu
-    setIsMenuOpen(false); // Also close mobile menu
+    setSelectedThread(threadId); 
+    setIsHistoryOpen(false); 
+    setIsMenuOpen(false); 
   };
 
   return (
