@@ -59,6 +59,17 @@ const Header = ({
     setIsHistoryOpen(false);
   };
 
+  const handleCreateThread = () => {
+    createThread(); // Call the original createThread function
+    setIsMenuOpen(false); // Close the mobile menu
+  };
+
+  const handleHistoryItemClick = (threadId) => {
+    setSelectedThread(threadId); // Select the thread
+    setIsHistoryOpen(false); // Close history menu
+    setIsMenuOpen(false); // Also close mobile menu
+  };
+
   return (
     <div className={`header-container ${isExpanded ? "expanded" : ""}`}>
       {/* Left Section */}
@@ -91,7 +102,7 @@ const Header = ({
           </button>
         </div>
         <div className="mobile-menu-content">
-          <button className="mobile-menu-button" onClick={createThread}>
+          <button className="mobile-menu-button" onClick={handleCreateThread}>
             <MessageSquare size={16} />
             <span>Nuevo Chat</span>
           </button>
@@ -126,7 +137,7 @@ const Header = ({
               threads.map((thread) => (
                 <li
                   key={thread.threadid}
-                  onClick={() => setSelectedThread(thread.threadid)}
+                  onClick={() => handleHistoryItemClick(thread.threadid)}
                 >
                   {thread.threadTitle}
                 </li>
