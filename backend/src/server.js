@@ -107,7 +107,7 @@ app.delete("/threads/:id", async (req, res) => {
       if (dbResponse.success) {
         return res.json({
           success: true,
-          mesasge: dbResponse.message,
+          message: dbResponse.message,
         });
       }
     }
