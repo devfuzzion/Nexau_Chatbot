@@ -14,6 +14,7 @@ import {
   createThreadInDb,
   deleteThreadInDb,
   getThreadById,
+  updateThreadTitle,
 } from "./db/threads.queries.js";
 const app = express();
 
@@ -122,4 +123,23 @@ app.delete("/threads/:id", async (req, res) => {
 
 app.listen(3000, () => {
   console.log(`Server is listening on 3000`);
+});
+
+app.put("/threads/:id", async (req, res) => {
+  const { id } = req.params;
+  const { title } = req.body;
+
+  if (!title) {
+    return res
+      .status(400)
+      .json({ success: false, message: "Title is required." });
+  }
+
+  try {
+    const result = await updateThreadTitle(id, title);
+    res.status(result.success ? 200 : 404).json(result);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).json({ success: false, message: "Internal server error." });
+  }
 });

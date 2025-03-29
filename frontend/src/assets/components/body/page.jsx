@@ -13,6 +13,7 @@ const Body = ({
   setSelectedThread,
   createThread,
   deleteThreadById,
+  updateThreadTitleById,
 }) => {
   const { isDarkMode, toggleTheme } = useTheme();
 
@@ -128,6 +129,7 @@ const Body = ({
           selectedThread={selectedThread}
           onCreateThread={createThread}
           deleteThreadById={deleteThreadById}
+          updateThreadTitleById={updateThreadTitleById}
         />
       )}
 

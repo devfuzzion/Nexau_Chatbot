@@ -3,7 +3,11 @@ import Header from "../header/page.jsx";
 import Body from "../body/page.jsx";
 import { Infinity } from "lucide-react";
 import "./index.css";
-import { fetchThreads, deleteThread } from "../../../api/chatService.js";
+import {
+  fetchThreads,
+  deleteThread,
+  updateThreadTitle,
+} from "../../../api/chatService.js";
 const Chatbot = () => {
   // Initialize states from localStorage
   const [isExpanded, setIsExpanded] = useState(() => {
@@ -58,6 +62,22 @@ const Chatbot = () => {
       }
     } catch (err) {
       console.log(err);
+    }
+  };
+
+  const updateThreadTitleById = async (id, title) => {
+    try {
+      const response = await updateThreadTitle(id, title);
+      console.log(response);
+      if (response.success) {
+        const updatedThreads = threads.map((thread) =>
+          thread.id === id ? { ...thread, threadTitle: title } : thread,
+        );
+        setThreads(updatedThreads);
+      }
+    } catch (err) {
+      console.log(err);
+      throw err;
     }
   };
   // Fetch threads on component mount
@@ -126,6 +146,7 @@ const Chatbot = () => {
           setSelectedThread={setSelectedThread}
           createThread={createThread}
           deleteThreadById={deleteThreadById}
+          updateThreadTitleById={updateThreadTitleById}
         />
       </div>
     </>
