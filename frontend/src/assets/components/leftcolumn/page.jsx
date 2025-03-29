@@ -11,8 +11,8 @@ const LeftColumn = ({
   toggleTheme,
   onCreateThread,
   selectedThread,
-  onRenameThread,
   deleteThreadById,
+  updateThreadTitleById,
 }) => {
   const [showDeletePopup, setShowDeletePopup] = useState(false);
   const [threadToDelete, setThreadToDelete] = useState(null);
@@ -65,7 +65,7 @@ const LeftColumn = ({
                 thread={thread}
                 changeThread={changeThread}
                 selectedThread={selectedThread}
-                onRenameThread={onRenameThread}
+                onRenameThread={updateThreadTitleById}
                 onDeleteThread={handleDeleteWithConfirmation}
                 isDarkMode={isDarkMode}
               />
@@ -125,7 +125,7 @@ const HistoryItem = ({
 
   const saveRename = () => {
     if (newTitle.trim() && newTitle.trim() !== thread.threadTitle) {
-      onRenameThread(thread.threadid, newTitle.trim());
+      onRenameThread(thread.id, newTitle.trim());
     }
     setIsRenaming(false);
   };

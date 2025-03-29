@@ -59,3 +59,23 @@ export const deleteThreadInDb = async (id) => {
     throw err;
   }
 };
+
+export const updateThreadTitle = async (id, newTitle) => {
+  try {
+    const { rowCount } = await sql.query(
+      'UPDATE threads SET "threadTitle" = $1 WHERE "id" = $2',
+      [newTitle, id],
+    );
+
+    if (rowCount > 0) {
+      console.log(`Thread title updated successfully for ID ${id}.`);
+      return { success: true, message: "Thread title updated successfully." };
+    } else {
+      console.log(`No thread found with ID ${id}.`);
+      return { success: false, message: "Thread not found." };
+    }
+  } catch (err) {
+    console.error(`Error updating thread title`);
+    throw err;
+  }
+};
