@@ -35,7 +35,7 @@ const ThreadMenuPopup = ({
         className="menu-item"
       >
         <Pencil size={16} />
-        <span>Rename</span>
+        <span>Rebautizar</span>
       </button>
       <button 
         onClick={(e) => {
@@ -45,7 +45,7 @@ const ThreadMenuPopup = ({
         className="menu-item"
       >
         <Trash2 size={16} />
-        <span>Delete</span>
+        <span>Borrar</span>
       </button>
     </div>
   );

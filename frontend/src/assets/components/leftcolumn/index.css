@@ -108,15 +108,13 @@
   .dark-mode .history-section li.selected-item {
     background-color: #3a3a3a !important;
   }
-  
-  /* Make sure hover doesn't override selected style */
   .history-section li.selected-item:hover {
-    background-color: #e0e0e0 !important; /* Light mode */
+    background-color: #e0e0e0 !important; 
     transform: scale(1.02) !important;
   }
   
   .dark-mode .history-section li.selected-item:hover {
-    background-color: #3a3a3a !important; /* Dark mode */
+    background-color: #3a3a3a !important; 
   }
 
   .history-item-content {
@@ -217,7 +215,8 @@
     border-color: #8884d8;
     box-shadow: 0 0 0 2px rgba(136, 132, 216, 0.2);
   }
-  /* Delete Confirmation Popup Styles */
+
+/* Delete Confirmation Popup Styles */
 .popup-overlay {
   position: fixed;
   top: 0;
@@ -233,7 +232,7 @@
 }
 
 .delete-confirmation-popup {
-    position: fixed; /* Changed from default to fixed */
+    position: fixed;
     top: 50%;
     left: 50%;
     background-color: #fff;
@@ -243,7 +242,7 @@
     max-width: 90%;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
     animation: fadeIn 0.2s ease-out;
-    z-index: 1001; /* Higher than overlay */
+    z-index: 1001;
     transform: translate(-50%, -50%) !important;
   will-change: transform;
   }
@@ -365,7 +364,54 @@
     transition: background-color 0.3s ease-in-out, transform 0.2s ease-in-out;
     animation: fadeIn 0.5s ease-in-out;
 }
+/* Skeleton Loading Animation */
+.skeleton-item {
+  padding: 10px;
+  margin: 5px 0;
+  border-radius: 8px;
+}
 
+.skeleton-content {
+  height: 20px;
+  width: 80%;
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  border-radius: 4px;
+  animation: shimmer 1.5s infinite;
+}
+
+.dark .skeleton-content {
+  background: linear-gradient(90deg, #2d3748 25%, #4a5568 50%, #2d3748 75%);
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+/* Empty State Styling */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  text-align: center;
+  color: #666;
+}
+
+.empty-icon {
+  font-size: 2rem;
+  margin-bottom: 10px;
+}
+
+.dark .empty-state {
+  color: #a0aec0;
+}
 .profile-button:hover,
 .theme-toggle-button:hover {
     background-color: #d5d5d5;
@@ -465,6 +511,31 @@ body.dark-mode {
         padding: 10px;
     }
 
+    .delete-confirmation-popup {
+      width: 50%;
+      height: 160px;
+    }
+
+    .dark-mode .delete-confirmation-popup{
+      background-color: #343541;
+       color: #fff
+    }
+    .dark-mode .cancel-button {
+      background: #3e3e43;
+      border-color: #4d4d5a;
+      color: #fff;
+  }
+
+    .popup-header h3 {
+      font-size: 16px;
+      color: black;
+    }
+
+    .dark-mode .popup-header h3 {
+      font-size: 16px;
+      color: white;
+    }
+
     .new-chat-button {
         padding: 8px;
         margin-bottom: 15px;
@@ -494,6 +565,38 @@ body.dark-mode {
 @media (max-width: 480px) {
     .left-column {
         display: none;
+    }
+    .menu-button{
+      opacity: 1;
+    }
+    .thread-menu-popup{
+      top: 30px;
+      
+    }
+
+    .delete-confirmation-popup {
+      width: 80%;
+      height: 180px;
+    }
+
+    .dark-mode .delete-confirmation-popup{
+      background-color: #343541;
+       color: #fff
+    }
+    .dark-mode .cancel-button {
+      background: #3e3e43;
+      border-color: #4d4d5a;
+      color: #fff;
+  }
+
+    .popup-header h3 {
+      font-size: 16px;
+      color: black;
+    }
+
+    .dark-mode .popup-header h3 {
+      font-size: 16px;
+      color: white;
     }
 
     .new-chat-button {

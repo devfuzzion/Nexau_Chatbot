@@ -90,7 +90,7 @@
 .profile-dropdown:hover,
 .aid-button:hover {
   background-color: rgba(30, 33, 39, 255);
-  box-shadow: 0 0 12px rgba(100, 149, 237, 0.5); /* Adjust glow effect for dark mode */
+  box-shadow: 0 0 12px rgba(100, 149, 237, 0.5);
   border: 0.1px solid white;
 }
 
@@ -402,8 +402,6 @@
     transform: scale(1.02);
     border: 1px solid rgba(112, 102, 102, 0.6);
     box-shadow: 0 0 8px rgba(162, 163, 166, 0.5);
-    /* box-shadow: 0 0 8px rgba(100, 149, 237, 0.5);
-  border: 1px solid white;   */
   }
   
   .history-content li::before {

@@ -13,7 +13,7 @@ const DeleteConfirmationPopup = ({
     <div className="popup-overlay">
       <div className="delete-confirmation-popup">
         <div className="popup-header">
-          <h3>Delete Conversation</h3>
+          <h3>Eliminar conversación</h3>
           <button
             onClick={onCancel}
             className="close-button"
@@ -23,8 +23,7 @@ const DeleteConfirmationPopup = ({
           </button>
         </div>
         <p>
-          Are you sure you want to delete this conversation? This action
-          cannot be undone.
+        ¿Estás seguro de que quieres eliminar esta conversación? Esta acción no se puede deshacer.
         </p>
         <div className="popup-buttons">
           <button
@@ -32,14 +31,14 @@ const DeleteConfirmationPopup = ({
             className="cancel-button"
             disabled={deleting}
           >
-            Cancel
+            Cancelar
           </button>
           <button
             onClick={onConfirm}
             className="confirm-button"
             disabled={deleting}
           >
-            {deleting ? "Deleting..." : "Delete"}
+            {deleting ? "Eliminando..." : "Borrar"}
           </button>
         </div>
       </div>

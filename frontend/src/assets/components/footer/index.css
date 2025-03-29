@@ -14,7 +14,6 @@
   font-family: Inter, sans-serif;
   text-align: center;
   transition: background-color 0.3s ease-in-out, color 0.3s ease-in-out;
-  /* box-shadow: 0 -4px 6px rgba(0, 0, 0, 0.1); Add shadow for depth */
 }
 
 .footer-form {
@@ -42,7 +41,7 @@
 }
 
 .footer-input:focus {
-  box-shadow: 0 0 8px rgba(46, 46, 47, 0.5); /* Add glow effect on focus */
+  box-shadow: 0 0 8px rgba(46, 46, 47, 0.5);
 }
 
 .footer-button {
@@ -59,12 +58,11 @@
 
 .footer-button:hover {
   background-color: rgba(200, 203, 209, 255);
-  transform: translateY(-2px); /* Add lift effect on hover */
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Add shadow on hover */
+  transform: translateY(-2px);
 }
 
 .footer-button:active {
-  transform: translateY(0); /* Reset lift effect on click */
+  transform: translateY(0);
 }
 
 .footer-button svg {
@@ -73,7 +71,7 @@
 }
 
 .footer-button:hover svg {
-  transform: scale(1.1); /* Add scale effect on hover */
+  transform: scale(1.1);
 }
 
 .powered-by {
@@ -98,7 +96,6 @@
   background-color: #1e1e1e;
   color: white;
   transition: background-color 0.3s ease-in-out, color 0.3s ease-in-out;
-  /* box-shadow: 0 -4px 6px rgba(255, 255, 255, 0.1); Adjust shadow for dark mode */
 }
 
 .dark-mode .footer-input {
@@ -108,7 +105,7 @@
 }
 
 .dark-mode .footer-input:focus {
-  box-shadow: 0 0 12px rgba(100, 149, 237, 0.5); /* Adjust glow effect for dark mode */
+  box-shadow: 0 0 12px rgba(100, 149, 237, 0.5); 
   border: 0.5px solid white;
 }
 
@@ -139,56 +136,56 @@
 /* For tablets (768px and below) */
 @media (max-width: 768px) {
   .footer-container {
-    padding-top: 2%; /* Increase padding for better spacing */
+    padding-top: 2%; 
   }
 
   .footer-form {
-    width: 95%; /* Increase width for better usability */
-    gap: 8px; /* Reduce gap between elements */
+    width: 95%;
+    gap: 8px;
   }
 
   .footer-input {
-    width: 75%; /* Adjust input width */
-    padding: 8px; /* Reduce padding */
-    font-size: 13px; /* Reduce font size */
+    width: 75%;
+    padding: 8px;
+    font-size: 13px; 
   }
 
   .footer-button {
-    padding: 7px; /* Reduce padding */
+    padding: 7px;
   }
 
   .powered-by {
-    font-size: 13px; /* Reduce font size */
+    font-size: 13px; 
   }
 }
 
 /* For small mobile devices (480px and below) */
 @media (max-width: 480px) {
   .footer-container {
-    padding-top: 3%; /* Further increase padding */
+    padding-top: 3%; 
     border-radius: none;
   }
 
   .footer-form {
-    width: 90%; /* Occupy full width */
-    gap: 5px; /* Further reduce gap between elements */
-    flex-direction: row; /* Stack elements vertically */
+    width: 90%;
+    gap: 5px;
+    flex-direction: row; 
   }
 
   .footer-input {
     width: 100%;
-    height: 30px; /* Increase input width */
-    padding: 6px; /* Further reduce padding */
-    font-size: 12px; /* Further reduce font size */
+    height: 30px; 
+    padding: 6px;
+    font-size: 12px;
   }
 
   .footer-button {
     width: 13%;
-    height: 44px; /* Match input width */
-    padding: 6px; /* Further reduce padding */
+    height: 44px;
+    padding: 6px;
   }
 
   .powered-by {
-    font-size: 12px; /* Further reduce font size */
+    font-size: 12px;
   }
 }

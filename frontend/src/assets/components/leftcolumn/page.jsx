@@ -13,10 +13,19 @@ const LeftColumn = ({
   selectedThread,
   deleteThreadById,
   updateThreadTitleById,
+  isLoading = false,
 }) => {
   const [showDeletePopup, setShowDeletePopup] = useState(false);
   const [threadToDelete, setThreadToDelete] = useState(null);
   const [deletingThread, setDeletingThread] = useState(false);
+  const [localThreads, setLocalThreads] = useState(threads);
+
+  // Track the last clicked thread to prevent duplicate events
+  const lastClickedThread = useRef(null);
+
+  useEffect(() => {
+    setLocalThreads(threads);
+  }, [threads]);
 
   const handleDeleteWithConfirmation = (threadId) => {
     setThreadToDelete(threadId);
@@ -29,6 +38,7 @@ const LeftColumn = ({
     try {
       setDeletingThread(true);
       await deleteThreadById(threadToDelete);
+      setLocalThreads(prev => prev.filter(t => t.threadid !== threadToDelete));
     } finally {
       setDeletingThread(false);
       setShowDeletePopup(false);
@@ -41,6 +51,18 @@ const LeftColumn = ({
     setThreadToDelete(null);
   };
 
+  const handleThreadClick = (threadId) => {
+    if (lastClickedThread.current === threadId) return;
+    
+    lastClickedThread.current = threadId;
+    changeThread(threadId, true); 
+  };
+
+  const handleCreateNewThread = () => {
+    lastClickedThread.current = null;
+    onCreateThread();
+  };
+
   return (
     <div className={`left-column ${isDarkMode ? "dark" : ""}`}>
       <DeleteConfirmationPopup
@@ -50,48 +72,57 @@ const LeftColumn = ({
         deleting={deletingThread}
       />
 
-      <div className="new-chat-button" onClick={onCreateThread}>
+      <div className="new-chat-button" onClick={handleCreateNewThread}>
         <Plus size={20} />
-        <span>New Chat</span>
+        <span>Nuevo Chat</span>
       </div>
 
       <div className="history-section">
-        <h4>Recent Chats</h4>
-        <ul>
-          {threads.length > 0 ? (
-            threads.map((thread) => (
+        <h4>Chats recientes</h4>
+        {isLoading ? (
+          <ul>
+            {[...Array(5)].map((_, i) => (
+              <SkeletonItem key={i} isDarkMode={isDarkMode} />
+            ))}
+          </ul>
+        ) : localThreads.length > 0 ? (
+          <ul>
+            {localThreads.map((thread) => (
               <HistoryItem
                 key={thread.threadid}
                 thread={thread}
-                changeThread={changeThread}
+                changeThread={handleThreadClick}
                 selectedThread={selectedThread}
                 onRenameThread={updateThreadTitleById}
                 onDeleteThread={handleDeleteWithConfirmation}
                 isDarkMode={isDarkMode}
               />
-            ))
-          ) : (
-            <li className="no-chats">No conversations yet</li>
-          )}
-        </ul>
+            ))}
+          </ul>
+        ) : (
+          <div className="empty-state">
+            <div className="empty-icon">💬</div>
+            <p>Iniciar una nueva conversación</p>
+          </div>
+        )}
       </div>
 
       <hr className="divider" />
       <div className="bottom-buttons">
         <button className="profile-button">
           <User size={20} />
-          <span>Profile</span>
+          <span>Perfil</span>
         </button>
         <button className="theme-toggle-button" onClick={toggleTheme}>
           {isDarkMode ? <Sun size={20} /> : <Moon size={20} />}
-          <span>{isDarkMode ? "Light Mode" : "Dark Mode"}</span>
+          <span>{isDarkMode ? "Modo de luz" : "Modo oscuro"}</span>
         </button>
       </div>
     </div>
   );
 };
 
-const HistoryItem = ({
+const HistoryItem = React.memo(({
   thread,
   changeThread,
   selectedThread,
@@ -150,6 +181,10 @@ const HistoryItem = ({
     }
   }, [isRenaming]);
 
+  useEffect(() => {
+    setNewTitle(thread.threadTitle);
+  }, [thread.threadTitle]);
+
   return (
     <li
       onClick={() => changeThread(thread.threadid)}
@@ -193,6 +228,14 @@ const HistoryItem = ({
       )}
     </li>
   );
-};
+});
+
+const SkeletonItem = React.memo(({ isDarkMode }) => {
+  return (
+    <li className={`skeleton-item ${isDarkMode ? "dark" : ""}`}>
+      <div className="skeleton-content" />
+    </li>
+  );
+});
 
 export default LeftColumn;

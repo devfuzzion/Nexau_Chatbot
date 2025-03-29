@@ -9,18 +9,16 @@ import {
   updateThreadTitle,
 } from "../../../api/chatService.js";
 const Chatbot = () => {
-  // Initialize states from localStorage
   const [isExpanded, setIsExpanded] = useState(() => {
     return localStorage.getItem("isExpanded") === "true";
   });
 
   const [isVisible, setIsVisible] = useState(() => {
-    return localStorage.getItem("isVisible") !== "false"; // Default to true if not set
+    return localStorage.getItem("isVisible") !== "false";
   });
 
   const [threads, setThreads] = useState([]);
   const [selectedThread, setSelectedThread] = useState("");
-  // Function to create a new thread - moved from LeftColumn component
   const createThread = async () => {
     try {
       const response = await fetch("http://localhost:3000/create-thread", {
@@ -34,11 +32,9 @@ const Chatbot = () => {
       const data = await response.json();
 
       if (data.success) {
-        // Refresh threads after creating a new one
         const threadsData = await fetchThreads();
         setThreads(threadsData);
 
-        // Select the newly created thread
         if (data.thread && data.thread.id) {
           setSelectedThread(data.thread.id);
         }
@@ -91,13 +87,11 @@ const Chatbot = () => {
         }
       } catch (error) {
         console.error("Failed to load threads:", error);
-        // Could add UI error state here
       }
     };
 
     loadThreads();
   }, []);
-  // Persist states to localStorage when they change
   useEffect(() => {
     localStorage.setItem("isExpanded", isExpanded);
   }, [isExpanded]);
