@@ -78,14 +78,14 @@ export const deleteThread = async (id) => {
   }
 };
 
-export const updateThreadTitle = async (id, newTitle) => {
+export const updateThreadTitle = async (id, newTitle, aiTitle) => {
   try {
     const response = await fetch(`http://localhost:3000/threads/${id}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ title: newTitle }),
+      body: JSON.stringify({ title: newTitle, aiTitle }),
     });
 
     const data = await response.json();

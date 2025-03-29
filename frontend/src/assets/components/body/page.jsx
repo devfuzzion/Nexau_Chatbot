@@ -100,6 +100,9 @@ const Body = ({
     try {
       const botResponse = await sendMessage(selectedThread, message);
       setMessages((prev) => [...prev, { text: botResponse, isBot: true }]);
+      if (messages.length <= 2) {
+        updateThreadTitleById(selectedThread, null, true);
+      }
     } catch (error) {
       console.error("Message sending failed:", error);
       setMessages((prev) => [

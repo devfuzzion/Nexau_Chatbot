@@ -65,13 +65,14 @@ const Chatbot = () => {
     }
   };
 
-  const updateThreadTitleById = async (id, title) => {
+  const updateThreadTitleById = async (id, title, aiTitle) => {
     try {
-      const response = await updateThreadTitle(id, title);
-      console.log(response);
+      const response = await updateThreadTitle(id, title, aiTitle);
       if (response.success) {
         const updatedThreads = threads.map((thread) =>
-          thread.id === id ? { ...thread, threadTitle: title } : thread,
+          thread.threadid === selectedThread
+            ? { ...thread, threadTitle: response.title }
+            : thread,
         );
         setThreads(updatedThreads);
       }

@@ -168,7 +168,7 @@ const HistoryItem = ({
 
   const saveRename = () => {
     if (newTitle.trim() && newTitle.trim() !== thread.threadTitle) {
-      onRenameThread(thread.id, newTitle.trim());
+      onRenameThread(selectedThread, newTitle.trim());
     }
     setIsRenaming(false);
   };

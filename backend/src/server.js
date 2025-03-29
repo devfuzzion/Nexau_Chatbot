@@ -8,6 +8,7 @@ import {
   listMesasgesInThread,
   createRun,
   delThread,
+  generateThreadTitle,
 } from "./openai.utils.js";
 import {
   getAllThreads,
@@ -127,17 +128,25 @@ app.listen(3000, () => {
 
 app.put("/threads/:id", async (req, res) => {
   const { id } = req.params;
-  const { title } = req.body;
+  const { title, aiTitle } = req.body;
 
-  if (!title) {
+  if (!title && !aiTitle) {
     return res
       .status(400)
       .json({ success: false, message: "Title is required." });
   }
 
   try {
-    const result = await updateThreadTitle(id, title);
-    res.status(result.success ? 200 : 404).json(result);
+    if (!aiTitle) {
+      const result = await updateThreadTitle(id, title);
+      res.status(result.success ? 200 : 404).json({ ...result, title });
+    } else {
+      const messages = await listMesasgesInThread(id);
+      const title = await generateThreadTitle(messages);
+      const result = await updateThreadTitle(id, title);
+
+      res.status(result.success ? 200 : 404).json({ ...result, title });
+    }
   } catch (err) {
     console.error(err.message);
     res.status(500).json({ success: false, message: "Internal server error." });

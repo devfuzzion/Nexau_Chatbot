@@ -63,7 +63,7 @@ export const deleteThreadInDb = async (id) => {
 export const updateThreadTitle = async (id, newTitle) => {
   try {
     const { rowCount } = await sql.query(
-      'UPDATE threads SET "threadTitle" = $1 WHERE "id" = $2',
+      'UPDATE threads SET "threadTitle" = $1 WHERE "threadid" = $2',
       [newTitle, id],
     );
 
