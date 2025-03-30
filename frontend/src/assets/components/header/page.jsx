@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   Expand,
   Minimize,
@@ -32,11 +32,14 @@ const Header = ({
   const { isDarkMode, toggleTheme } = useTheme();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isHistoryOpen, setIsHistoryOpen] = useState(false);
-
   const [showDeletePopup, setShowDeletePopup] = useState(false);
   const [threadToDelete, setThreadToDelete] = useState(null);
   const [deletingThread, setDeletingThread] = useState(false);
   const [threadMenuOpen, setThreadMenuOpen] = useState(null);
+  const [renamingThread, setRenamingThread] = useState(null);
+  const [newTitle, setNewTitle] = useState("");
+  const inputRef = useRef(null);
+
   // Initialize and persist expanded state
   useEffect(() => {
     const savedExpanded = localStorage.getItem("isExpanded") === "true";
@@ -66,8 +69,8 @@ const Header = ({
 
   const closeHistory = () => {
     setIsHistoryOpen(false);
-
     setThreadMenuOpen(null);
+    setRenamingThread(null);
   };
 
   const handleCreateThread = () => {
@@ -110,10 +113,42 @@ const Header = ({
     setThreadMenuOpen(threadMenuOpen === threadId ? null : threadId);
   };
 
-  const handleRename = (threadId, newTitle) => {
-    updateThreadTitleById(threadId, newTitle);
+  const handleRenameClick = (threadId, currentTitle) => {
+    setRenamingThread(threadId);
+    setNewTitle(currentTitle);
     setThreadMenuOpen(null);
   };
+
+  const handleTitleChange = (e) => {
+    setNewTitle(e.target.value);
+  };
+
+  const saveRename = (threadId) => {
+    if (newTitle.trim() && newTitle.trim() !== threads.find(t => t.threadid === threadId)?.threadTitle) {
+      updateThreadTitleById(threadId, newTitle.trim());
+    }
+    setRenamingThread(null);
+  };
+
+  const handleTitleBlur = (threadId) => {
+    saveRename(threadId);
+  };
+
+  const handleKeyDown = (e, threadId) => {
+    if (e.key === "Enter") {
+      saveRename(threadId);
+    } else if (e.key === "Escape") {
+      setRenamingThread(null);
+    }
+  };
+
+  useEffect(() => {
+    if (renamingThread && inputRef.current) {
+      inputRef.current.focus();
+      inputRef.current.select();
+    }
+  }, [renamingThread]);
+
   return (
     <div className={`header-container ${isExpanded ? "expanded" : ""}`}>
       <DeleteConfirmationPopup
@@ -191,30 +226,35 @@ const Header = ({
                     selectedThread === thread.threadid ? "selected" : ""
                   }`}
                 >
-                  <div
-                    className="history-item-content"
-                    onClick={() => handleHistoryItemClick(thread.threadid)}
-                  >
-                    {thread.threadTitle}
-                    <button
-                      className="menu-button"
-                      onClick={(e) => toggleThreadMenu(e, thread.threadid)}
-                      aria-label="Thread options"
+                  {renamingThread === thread.threadid ? (
+                    <input
+                      ref={inputRef}
+                      type="text"
+                      value={newTitle}
+                      onChange={handleTitleChange}
+                      onBlur={() => handleTitleBlur(thread.threadid)}
+                      onKeyDown={(e) => handleKeyDown(e, thread.threadid)}
+                      className="rename-input"
+                      maxLength={50}
+                    />
+                  ) : (
+                    <div
+                      className="history-item-content"
+                      onClick={() => handleHistoryItemClick(thread.threadid)}
                     >
-                      <MoreVertical size={16} />
-                    </button>
-                  </div>
+                      {thread.threadTitle}
+                      <button
+                        className="menu-button"
+                        onClick={(e) => toggleThreadMenu(e, thread.threadid)}
+                        aria-label="Thread options"
+                      >
+                        <MoreVertical size={16} />
+                      </button>
+                    </div>
+                  )}
                   {threadMenuOpen === thread.threadid && (
                     <ThreadMenuPopup
-                      onRename={() => {
-                        const newTitle = prompt(
-                          "Enter new title:",
-                          thread.threadTitle,
-                        );
-                        if (newTitle) {
-                          handleRename(thread.threadid, newTitle);
-                        }
-                      }}
+                      onRename={() => handleRenameClick(thread.threadid, thread.threadTitle)}
                       onDelete={() =>
                         handleDeleteWithConfirmation(thread.threadid)
                       }
