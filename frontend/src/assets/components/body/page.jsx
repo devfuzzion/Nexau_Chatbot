@@ -27,8 +27,28 @@ const Body = ({
   const [isWaitingForResponse, setIsWaitingForResponse] = useState(false);
 
   const messagesEndRef = useRef(null);
-
+  const typingIntervalRef = useRef(null);
+  const thinkingTimeoutRef = useRef(null);
   // Load messages when selected thread changes
+
+  useEffect(() => {
+    return () => {
+      clearInterval(typingIntervalRef.current);
+      clearTimeout(thinkingTimeoutRef.current);
+    };
+  }, []);
+
+  const handleThreadChange = (threadId) => {
+    clearInterval(typingIntervalRef.current);
+    clearTimeout(thinkingTimeoutRef.current);
+    setSelectedThread(threadId);
+    setTypingState({
+      isTyping: false,
+      typingMessage: "",
+      showIndicator: false,
+    });
+  };
+
   useEffect(() => {
     if (!selectedThread) {
       setMessages([]);
@@ -38,13 +58,14 @@ const Body = ({
     const loadMessages = async () => {
       try {
         const messageData = await fetchMessages(selectedThread);
-        setMessages(messageData);
+        setMessages(messageData.map((msg) => ({ ...msg, isNew: false })));
       } catch (error) {
         console.error("Failed to load messages:", error);
         setMessages([
           {
             text: "Failed to load messages. Please try again.",
             isBot: true,
+            isNew: false,
           },
         ]);
       }
@@ -53,28 +74,27 @@ const Body = ({
     loadMessages();
   }, [selectedThread]);
 
-  // Scroll to bottom when messages change
+  // Scroll to bottom
   useEffect(() => {
-    if (messagesEndRef.current) {
-      messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
-    }
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, isWaitingForResponse]);
 
-  // Handle bot typing animation
+  // Typing animation
   useEffect(() => {
+    if (messages.length === 0) return;
     const lastMessage = messages[messages.length - 1];
-    if (!lastMessage || !lastMessage.isBot) return;
+    if (!lastMessage.isNew || !lastMessage?.isBot) return;
 
-    setTypingState({
-      showIndicator: false,
+    setTypingState((prev) => ({
+      ...prev,
       isTyping: true,
       typingMessage: "",
-    });
+    }));
 
     let currentText = "";
     let index = 0;
 
-    const typingInterval = setInterval(() => {
+    typingIntervalRef.current = setInterval(() => {
       if (index < lastMessage.text.length) {
         currentText += lastMessage.text[index];
         setTypingState((prev) => ({
@@ -83,41 +103,69 @@ const Body = ({
         }));
         index++;
       } else {
-        clearInterval(typingInterval);
+        clearInterval(typingIntervalRef.current);
         setTypingState((prev) => ({ ...prev, isTyping: false }));
       }
     }, 10);
 
-    return () => clearInterval(typingInterval);
+    return () => clearInterval(typingIntervalRef.current);
   }, [messages]);
 
   const handleSendMessage = async (message) => {
     if (!selectedThread) return;
 
-    setMessages((prev) => [...prev, { text: message, isBot: false }]);
+    setMessages((prev) => [
+      ...prev,
+      {
+        text: message,
+        isBot: false,
+        isNew: true,
+      },
+    ]);
     setIsWaitingForResponse(true);
+    clearTimeout(thinkingTimeoutRef.current);
 
+    thinkingTimeoutRef.current = setTimeout(() => {
+      setTypingState({
+        showIndicator: true,
+        isTyping: false,
+        typingMessage: "",
+      });
+      sendMessageToBot(message);
+    }, 1000);
+  };
+
+  const sendMessageToBot = async (message) => {
     try {
       const botResponse = await sendMessage(selectedThread, message);
-      setMessages((prev) => [...prev, { text: botResponse, isBot: true }]);
+      setTypingState((prev) => ({ ...prev, showIndicator: false }));
+      setMessages((prev) => [
+        ...prev,
+        {
+          text: botResponse,
+          isBot: true,
+          isNew: true,
+        },
+      ]);
       if (messages.length === 2) {
         setIsWaitingForResponse(false);
         await updateThreadTitleById(selectedThread, null, true);
       }
     } catch (error) {
       console.error("Message sending failed:", error);
+      setTypingState((prev) => ({ ...prev, showIndicator: false }));
       setMessages((prev) => [
         ...prev,
         {
           text: "Sorry, there was an error sending your message. Please try again.",
           isBot: true,
+          isNew: true,
         },
       ]);
     } finally {
       setIsWaitingForResponse(false);
     }
   };
-
   return (
     <div
       className={`body-wrapper ${isDarkMode ? "dark" : ""} ${
@@ -129,7 +177,7 @@ const Body = ({
           isDarkMode={isDarkMode}
           toggleTheme={toggleTheme}
           threads={threads}
-          changeThread={setSelectedThread}
+          changeThread={handleThreadChange}
           selectedThread={selectedThread}
           onCreateThread={createThread}
           deleteThreadById={deleteThreadById}

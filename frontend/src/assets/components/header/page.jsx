@@ -11,9 +11,12 @@ import {
   Moon,
   MessageSquare,
   History,
+  MoreVertical,
 } from "lucide-react";
 import "./index.css";
 import { useTheme } from "../../../hooks/useTheme.js";
+import ThreadMenuPopup from "../threadMenu/threadMenu.page.jsx";
+import DeleteConfirmationPopup from "../deletePopup/deletePopup.page.jsx";
 
 const Header = ({
   onExpand,
@@ -23,11 +26,17 @@ const Header = ({
   selectedThread,
   setSelectedThread,
   createThread,
+  deleteThreadById,
+  updateThreadTitleById,
 }) => {
   const { isDarkMode, toggleTheme } = useTheme();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isHistoryOpen, setIsHistoryOpen] = useState(false);
 
+  const [showDeletePopup, setShowDeletePopup] = useState(false);
+  const [threadToDelete, setThreadToDelete] = useState(null);
+  const [deletingThread, setDeletingThread] = useState(false);
+  const [threadMenuOpen, setThreadMenuOpen] = useState(null);
   // Initialize and persist expanded state
   useEffect(() => {
     const savedExpanded = localStorage.getItem("isExpanded") === "true";
@@ -57,21 +66,62 @@ const Header = ({
 
   const closeHistory = () => {
     setIsHistoryOpen(false);
+
+    setThreadMenuOpen(null);
   };
 
   const handleCreateThread = () => {
     createThread();
-    setIsMenuOpen(false); 
+    setIsMenuOpen(false);
+  };
+
+  const handleDeleteWithConfirmation = (threadId) => {
+    setThreadToDelete(threadId);
+    setShowDeletePopup(true);
+  };
+
+  const confirmDelete = async () => {
+    if (!threadToDelete) return;
+
+    try {
+      setDeletingThread(true);
+      await deleteThreadById(threadToDelete);
+    } finally {
+      setDeletingThread(false);
+      setShowDeletePopup(false);
+      setThreadToDelete(null);
+      setThreadMenuOpen(null);
+    }
+  };
+
+  const cancelDelete = () => {
+    setShowDeletePopup(false);
+    setThreadToDelete(null);
   };
 
   const handleHistoryItemClick = (threadId) => {
-    setSelectedThread(threadId); 
-    setIsHistoryOpen(false); 
-    setIsMenuOpen(false); 
+    setSelectedThread(threadId);
+    setIsHistoryOpen(false);
+    setIsMenuOpen(false);
   };
 
+  const toggleThreadMenu = (e, threadId) => {
+    e.stopPropagation();
+    setThreadMenuOpen(threadMenuOpen === threadId ? null : threadId);
+  };
+
+  const handleRename = (threadId, newTitle) => {
+    updateThreadTitleById(threadId, newTitle);
+    setThreadMenuOpen(null);
+  };
   return (
     <div className={`header-container ${isExpanded ? "expanded" : ""}`}>
+      <DeleteConfirmationPopup
+        show={showDeletePopup}
+        onCancel={cancelDelete}
+        onConfirm={confirmDelete}
+        deleting={deletingThread}
+      />
       {/* Left Section */}
       <div className="left-section">
         <button className="hamburger-button" onClick={toggleMenu}>
@@ -137,9 +187,41 @@ const Header = ({
               threads.map((thread) => (
                 <li
                   key={thread.threadid}
-                  onClick={() => handleHistoryItemClick(thread.threadid)}
+                  className={`history-item ${
+                    selectedThread === thread.threadid ? "selected" : ""
+                  }`}
                 >
-                  {thread.threadTitle}
+                  <div
+                    className="history-item-content"
+                    onClick={() => handleHistoryItemClick(thread.threadid)}
+                  >
+                    {thread.threadTitle}
+                    <button
+                      className="menu-button"
+                      onClick={(e) => toggleThreadMenu(e, thread.threadid)}
+                      aria-label="Thread options"
+                    >
+                      <MoreVertical size={16} />
+                    </button>
+                  </div>
+                  {threadMenuOpen === thread.threadid && (
+                    <ThreadMenuPopup
+                      onRename={() => {
+                        const newTitle = prompt(
+                          "Enter new title:",
+                          thread.threadTitle,
+                        );
+                        if (newTitle) {
+                          handleRename(thread.threadid, newTitle);
+                        }
+                      }}
+                      onDelete={() =>
+                        handleDeleteWithConfirmation(thread.threadid)
+                      }
+                      isDarkMode={isDarkMode}
+                      onClose={() => setThreadMenuOpen(null)}
+                    />
+                  )}
                 </li>
               ))
             ) : (

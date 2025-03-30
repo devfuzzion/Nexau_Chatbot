@@ -10,6 +10,8 @@ import {
   X,
   Theater,
 } from "lucide-react";
+import ThreadMenuPopup from "../threadMenu/threadMenu.page.jsx";
+import DeleteConfirmationPopup from "../deletePopup/deletePopup.page.jsx";
 import "./index.css";
 
 const LeftColumn = ({
@@ -33,6 +35,7 @@ const LeftColumn = ({
 
   const confirmDelete = async () => {
     try {
+      if (!threadToDelete) return;
       setDeletingThread(true);
       await deleteThreadById(threadToDelete);
     } finally {
@@ -50,43 +53,12 @@ const LeftColumn = ({
   return (
     <div className={`left-column ${isDarkMode ? "dark" : ""}`}>
       {/* Delete Confirmation Popup */}
-      {showDeletePopup && (
-        <div className="popup-overlay">
-          <div className="delete-confirmation-popup">
-            <div className="popup-header">
-              <h3>Delete Conversation</h3>
-              <button
-                onClick={cancelDelete}
-                className="close-button"
-                disabled={deletingThread}
-              >
-                <X size={20} />
-              </button>
-            </div>
-            <p>
-              Are you sure you want to delete this conversation? This action
-              cannot be undone.
-            </p>
-            <div className="popup-buttons">
-              <button
-                onClick={cancelDelete}
-                className="cancel-button"
-                disabled={deletingThread}
-              >
-                Cancel
-              </button>
-              <button
-                onClick={confirmDelete}
-                className="confirm-button"
-                disabled={deletingThread}
-              >
-                {deletingThread ? "Deleting..." : "Delete"}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
+      <DeleteConfirmationPopup
+        show={showDeletePopup}
+        onCancel={cancelDelete}
+        onConfirm={confirmDelete}
+        deleting={deletingThread}
+      />
       {/* New Chat Button */}
       <div className="new-chat-button" onClick={onCreateThread}>
         <Plus size={20} />
@@ -142,7 +114,6 @@ const HistoryItem = ({
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isRenaming, setIsRenaming] = useState(false);
   const [newTitle, setNewTitle] = useState(thread.threadTitle);
-  const menuRef = useRef(null);
   const inputRef = useRef(null);
 
   useEffect(() => {
@@ -153,14 +124,12 @@ const HistoryItem = ({
     setIsMenuOpen(!isMenuOpen);
   };
 
-  const handleRenameClick = (e) => {
-    e.stopPropagation();
+  const handleRenameClick = () => {
     setIsRenaming(true);
     setIsMenuOpen(false);
   };
 
-  const handleDelete = (e) => {
-    e.stopPropagation();
+  const handleDelete = () => {
     onDeleteThread(thread.id);
     setIsMenuOpen(false);
   };
@@ -188,19 +157,6 @@ const HistoryItem = ({
       setIsRenaming(false);
     }
   };
-
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (menuRef.current && !menuRef.current.contains(event.target)) {
-        setIsMenuOpen(false);
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, []);
 
   useEffect(() => {
     if (isRenaming && inputRef.current) {
@@ -242,19 +198,12 @@ const HistoryItem = ({
       </div>
 
       {isMenuOpen && (
-        <div
-          ref={menuRef}
-          className={`thread-menu-popup ${isDarkMode ? "dark" : ""}`}
-        >
-          <button onClick={handleRenameClick} className="menu-item">
-            <Pencil size={16} />
-            <span>Rename</span>
-          </button>
-          <button onClick={handleDelete} className="menu-item">
-            <Trash2 size={16} />
-            <span>Delete</span>
-          </button>
-        </div>
+        <ThreadMenuPopup
+          onRename={handleRenameClick}
+          onDelete={handleDelete}
+          isDarkMode={isDarkMode}
+          onClose={() => setIsMenuOpen(false)}
+        />
       )}
     </li>
   );

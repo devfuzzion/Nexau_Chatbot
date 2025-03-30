@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap");
 
 /* Existing Light Mode Styles (Untouched) */
 .footer-container {
@@ -38,7 +38,8 @@
   font-size: 14px;
   background-color: rgba(232, 235, 241, 255);
   color: black;
-  transition: background-color 0.3s ease-in-out, color 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+  transition: background-color 0.3s ease-in-out, color 0.3s ease-in-out,
+    box-shadow 0.3s ease-in-out;
 }
 
 .footer-input:focus {
@@ -54,13 +55,13 @@
   border-radius: 5px;
   padding: 8.5px;
   cursor: pointer;
-  transition: background-color 0.3s ease, transform 0.2s ease-in-out, box-shadow 0.3s ease-in-out;
+  transition: background-color 0.3s ease, transform 0.2s ease-in-out,
+    box-shadow 0.3s ease-in-out;
 }
 
 .footer-button:hover {
   background-color: rgba(200, 203, 209, 255);
   transform: translateY(-2px); /* Add lift effect on hover */
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Add shadow on hover */
 }
 
 .footer-button:active {

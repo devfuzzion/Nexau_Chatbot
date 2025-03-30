@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { ThumbsUp, ThumbsDown, Edit, Copy, Check, Send } from "lucide-react";
 import TypingIndicator from "../typingIndicator/typingIndicator.page.jsx";
 
@@ -16,11 +16,50 @@ const MessageList = ({
   const [copiedIndex, setCopiedIndex] = useState(null);
   const [editingIndex, setEditingIndex] = useState(null);
   const [feedbackText, setFeedbackText] = useState("");
+  const [showThinkingIndicator, setShowThinkingIndicator] = useState(false);
+  const thinkingTimeoutRef = useRef(null);
+  const thinkingIndicatorRef = useRef(null);
+  const containerRef = useRef(null);
+
+  useEffect(() => {
+    return () => {
+      if (thinkingTimeoutRef.current) {
+        clearTimeout(thinkingTimeoutRef.current);
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    if (isWaitingForResponse) {
+      if (thinkingTimeoutRef.current) {
+        clearTimeout(thinkingTimeoutRef.current);
+      }
+
+      thinkingTimeoutRef.current = setTimeout(() => {
+        setShowThinkingIndicator(true);
+      }, 1000);
+    } else {
+      setShowThinkingIndicator(false);
+    }
+  }, [isWaitingForResponse]);
+
+  const scrollToAbsoluteBottom = () => {
+    setTimeout(() => {
+      const container = containerRef.current;
+      if (container) {
+        container.scrollTop = container.scrollHeight;
+      }
+    }, 50);
+  };
+
+  useEffect(() => {
+    scrollToAbsoluteBottom();
+  }, [showThinkingIndicator, messages, isTyping]);
 
   const handleFeedback = (messageId, feedbackType) => {
-    setFeedbackStates(prev => ({
+    setFeedbackStates((prev) => ({
       ...prev,
-      [messageId]: feedbackType
+      [messageId]: feedbackType,
     }));
     console.log(`Feedback for message ${messageId}: ${feedbackType}`);
   };
@@ -49,12 +88,18 @@ const MessageList = ({
   };
 
   return (
-    <div className={`messages-container ${isExpanded ? "expanded" : ""}`}>
+    <div
+      className={`messages-container ${isExpanded ? "expanded" : ""}`}
+      ref={containerRef}
+      style={{ overflowY: "auto" }}
+    >
       {messages.map((msg, index) => (
         <React.Fragment key={index}>
           <div
             className={`message-container 
-              ${msg.isBot ? "bot-message-container" : "client-message-container"}
+              ${
+                msg.isBot ? "bot-message-container" : "client-message-container"
+              }
               ${isDarkMode ? "dark" : ""}
               ${isExpanded ? "expanded" : ""}`}
           >
@@ -78,7 +123,7 @@ const MessageList = ({
                       className="feedback-btn cancel-btn"
                       onClick={cancelEditing}
                     >
-                      Cancel
+                      Cancelar
                     </button>
                     <button
                       className="feedback-btn submit-btn"
@@ -134,17 +179,18 @@ const MessageList = ({
         </React.Fragment>
       ))}
 
-      {isWaitingForResponse && (
+      {showThinkingIndicator && (
         <div
+          ref={thinkingIndicatorRef}
           className={`message-container bot-message-container ${
             isDarkMode ? "dark" : ""
           } ${isExpanded ? "expanded" : ""}`}
         >
-          <TypingIndicator />
+          <TypingIndicator text="Pensando..." />
         </div>
       )}
 
-      <div ref={messagesEndRef}></div>
+      <div ref={messagesEndRef} style={{ height: "0px" }} />
     </div>
   );
 };
