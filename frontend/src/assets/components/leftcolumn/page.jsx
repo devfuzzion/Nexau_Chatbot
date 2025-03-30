@@ -145,6 +145,9 @@ const HistoryItem = ({
   const menuRef = useRef(null);
   const inputRef = useRef(null);
 
+  useEffect(() => {
+    setNewTitle(thread.threadTitle);
+  }, [thread.threadTitle]);
   const toggleMenu = (e) => {
     e.stopPropagation();
     setIsMenuOpen(!isMenuOpen);
@@ -168,7 +171,7 @@ const HistoryItem = ({
 
   const saveRename = () => {
     if (newTitle.trim() && newTitle.trim() !== thread.threadTitle) {
-      onRenameThread(selectedThread, newTitle.trim());
+      onRenameThread(thread.threadid, newTitle.trim());
     }
     setIsRenaming(false);
   };

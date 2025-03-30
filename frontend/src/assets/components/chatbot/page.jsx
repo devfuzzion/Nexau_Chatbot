@@ -70,7 +70,7 @@ const Chatbot = () => {
       const response = await updateThreadTitle(id, title, aiTitle);
       if (response.success) {
         const updatedThreads = threads.map((thread) =>
-          thread.threadid === selectedThread
+          thread.threadid === id
             ? { ...thread, threadTitle: response.title }
             : thread,
         );
