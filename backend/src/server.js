@@ -93,9 +93,6 @@ app.get("/threads/:threadId", async (req, res) => {
 app.post("/run/:threadId", async (req, res) => {
   try {
     console.log('\n=== New Query Processing ===');
-    console.log(`Thread ID: ${req.params.threadId}`);
-    console.log(`User Message: ${req.body.userMessage}`);
-
     // Handle file upload
     upload(req, res, async function(err) {
       if (err instanceof multer.MulterError) {
@@ -135,13 +132,9 @@ app.post("/run/:threadId", async (req, res) => {
           console.log('Temporary file cleaned up');
         }
         
-        console.log('=== Query Processing Complete ===\n');
         res.json({ success: true, botMessage: messages[0] });
       } catch (err) {
-        console.error('\n=== Error in Query Processing ===');
-        console.error('Error details:', err);
-        console.error('Stack trace:', err.stack);
-        
+
         // Clean up the uploaded file in case of error
         if (req.file) {
           try {
@@ -152,15 +145,10 @@ app.post("/run/:threadId", async (req, res) => {
           }
         }
         
-        console.error('=== Error Processing Complete ===\n');
         res.status(500).json({ success: false, error: err.message });
       }
     });
   } catch (err) {
-    console.error('\n=== Error in Request Processing ===');
-    console.error('Error details:', err);
-    console.error('Stack trace:', err.stack);
-    console.error('=== Error Processing Complete ===\n');
     res.status(500).json({ success: false, error: err.message });
   }
 });
