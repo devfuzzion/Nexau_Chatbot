@@ -15,7 +15,6 @@
   text-align: center;
   transition: background-color 0.3s ease-in-out, color 0.3s ease-in-out;
   padding: 1rem;
-  border-top: 1px solid #e5e7eb;
   /* box-shadow: 0 -4px 6px rgba(0, 0, 0, 0.1); Add shadow for depth */
 }
 
@@ -77,6 +76,15 @@
 
 .footer-button:hover svg {
   transform: scale(1.1); /* Add scale effect on hover */
+}
+.footer-input.disabled,
+.footer-button.disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.footer-button.disabled:hover {
+  background-color: inherit;
 }
 
 .powered-by {

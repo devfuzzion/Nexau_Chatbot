@@ -196,7 +196,9 @@ const Body = ({
         />
         <Footer
           onSendMessage={handleSendMessage}
-          isDisabled={!selectedThread}
+          isDarkMode={isDarkMode}
+          isExpanded={isExpanded}
+          isDisabled={!selectedThread || isWaitingForResponse || typingState.isTyping || typingState.showIndicator}
         />
       </div>
     </div>

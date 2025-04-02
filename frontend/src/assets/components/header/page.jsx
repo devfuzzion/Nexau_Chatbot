@@ -163,9 +163,9 @@ const Header = ({
           {isMenuOpen ? <X size={20} /> : <Menu size={25} />}
         </button>
         <div className="logo-container">
-          <img src="/images/image.jpg" alt="logo" className="logo" />
+          <img src="/images/Logo C.io.png" alt="logo" className="logo" />
         </div>
-        <p className="title">Nexau</p>
+        <p className="title">Consultor  Genesis</p>
       </div>
 
       {/* Right Section */}
@@ -197,7 +197,7 @@ const Header = ({
           </button>
           <button className="mobile-menu-button" onClick={openHistory}>
             <History size={16} />
-            <span>History</span>
+            <span>Historia</span>
           </button>
           <button className="mobile-menu-button" onClick={toggleTheme}>
             {isDarkMode ? <Sun size={16} /> : <Moon size={16} />}

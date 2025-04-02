@@ -2,7 +2,7 @@ import React, { useState, useRef } from 'react';
 import { FileInput, Send, FileCheck } from 'lucide-react';
 import './index.css';
 
-const Footer = ({ onSendMessage, isDarkMode, isExpanded }) => {
+const Footer = ({ onSendMessage, isDarkMode, isExpanded, isDisabled }) => {
   const [message, setMessage] = useState('');
   const [selectedFile, setSelectedFile] = useState(null);
   const fileInputRef = useRef(null);
@@ -17,7 +17,7 @@ const Footer = ({ onSendMessage, isDarkMode, isExpanded }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (message.trim()) {
+    if (message.trim() && !isDisabled) {
       console.log('Sending message with file:', selectedFile?.name);
       await onSendMessage(message, selectedFile);
       setMessage('');
@@ -34,9 +34,10 @@ const Footer = ({ onSendMessage, isDarkMode, isExpanded }) => {
         <input
           type='text'
           placeholder='Escríbeme tu duda...'
-          className={`footer-input ${isDarkMode ? 'dark-mode' : ''}`}
+          className={`footer-input ${isDarkMode ? 'dark-mode' : ''} ${isDisabled ? 'disabled' : ''}`}
           value={message}
           onChange={(e) => setMessage(e.target.value)}
+          disabled={isDisabled}
         />
         <input
           type="file"
@@ -44,26 +45,32 @@ const Footer = ({ onSendMessage, isDarkMode, isExpanded }) => {
           onChange={handleFileSelect}
           style={{ display: 'none' }}
           id="file-input"
+          disabled={isDisabled}
         />
         <button 
           type='button' 
-          className={`footer-button ${isDarkMode ? 'dark-mode' : ''} ${selectedFile ? 'file-selected' : ''}`}
-          onClick={() => fileInputRef.current?.click()}
+          className={`footer-button ${isDarkMode ? 'dark-mode' : ''} ${selectedFile ? 'file-selected' : ''} ${isDisabled ? 'disabled' : ''}`}
+          onClick={() => !isDisabled && fileInputRef.current?.click()}
           title={selectedFile ? `Selected: ${selectedFile.name}` : 'Attach file'}
+          disabled={isDisabled}
         >
           {selectedFile ? <FileCheck size={20} /> : <FileInput size={20} />}
         </button>
-        <button type='submit' className={`footer-button ${isDarkMode ? 'dark-mode' : ''}`}>
+        <button 
+          type='submit' 
+          className={`footer-button ${isDarkMode ? 'dark-mode' : ''} ${isDisabled ? 'disabled' : ''}`}
+          disabled={isDisabled || !message.trim()}
+        >
           <Send size={20} />
         </button>
       </form>
       {selectedFile && (
         <div className={`selected-file ${isDarkMode ? 'dark-mode' : ''}`}>
-          Selected: {selectedFile.name}
+         Seleccionada: {selectedFile.name}
         </div>
       )}
       <div className={`powered-by ${isDarkMode ? 'dark-mode' : ''}`}>
-        Powered by <strong>Nexau</strong>
+      Desarrollado por <strong>Nexau</strong>
       </div>
     </div>
   );
