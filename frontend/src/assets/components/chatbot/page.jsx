@@ -23,7 +23,7 @@ const Chatbot = () => {
   // Function to create a new thread - moved from LeftColumn component
   const createThread = async () => {
     try {
-      const response = await fetch("http://localhost:3000/create-thread", {
+      const response = await fetch("http://13.38.107.93:3000/create-thread", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
