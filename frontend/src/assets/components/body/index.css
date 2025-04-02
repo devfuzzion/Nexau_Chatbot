@@ -105,6 +105,14 @@
     box-shadow 0.3s ease-in-out;
 }
 
+.markdown-preview {
+  background-color: transparent !important;
+}
+
+.wmde-markdown wmde-markdown-color markdown-preview {
+  background-color: transparent !important;
+}
+
 /* Feedback row styles */
 .feedback-row {
   width: 75%;
