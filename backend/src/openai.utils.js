@@ -1,14 +1,58 @@
 import OpenAI from "openai";
 import dotenv from "dotenv";
+import fs from "fs";
 dotenv.config();
 const openai = new OpenAI();
 const ASSISTANT_ID = process.env.ASSISTANT_ID;
-export const appendMessageInThread = async (threadId, userMessage) => {
-  const message = await openai.beta.threads.messages.create(threadId, {
-    role: "user",
-    content: userMessage,
-  });
-  return message;
+
+export const processFileContent = async (file) => {
+  // Convert file buffer to text
+  console.log("file", file)
+  const text = file.buffer.toString('utf-8');
+  return text;
+};
+
+export const uploadFileToOpenAI = async (file) => {
+  try {
+    console.log('Uploading file to OpenAI:', file.originalname);
+    const uploadedFile = await openai.files.create({
+      file: fs.createReadStream(file.path),
+      purpose: "assistants",
+    });
+    console.log('File uploaded successfully:', uploadedFile.id);
+    return uploadedFile;
+  } catch (error) {
+    console.error('Error uploading file to OpenAI:', error);
+    throw error;
+  }
+};
+
+export const appendMessageInThread = async (threadId, userMessage, file = null) => {
+  try {
+    let messageOptions = {
+      role: "user",
+      content: userMessage,
+    };
+
+    if (file) {
+      // Upload file to OpenAI first
+      const uploadedFile = await uploadFileToOpenAI(file);
+      
+      // Add file attachment to message
+      messageOptions['attachments'] = [
+        {
+          file_id: uploadedFile.id,
+          tools:[{type: "file_search"}]
+        }
+      ];
+    }
+
+    const message = await openai.beta.threads.messages.create(threadId, messageOptions);
+    return message;
+  } catch (error) {
+    console.error('Error appending message to thread:', error);
+    throw error;
+  }
 };
 
 export const createThread = async () => {

@@ -111,7 +111,7 @@ const Body = ({
     return () => clearInterval(typingIntervalRef.current);
   }, [messages]);
 
-  const handleSendMessage = async (message) => {
+  const handleSendMessage = async (message, file = null) => {
     if (!selectedThread) return;
 
     setMessages((prev) => [
@@ -131,13 +131,13 @@ const Body = ({
         isTyping: false,
         typingMessage: "",
       });
-      sendMessageToBot(message);
+      sendMessageToBot(message, file);
     }, 1000);
   };
 
-  const sendMessageToBot = async (message) => {
+  const sendMessageToBot = async (message, file = null) => {
     try {
-      const botResponse = await sendMessage(selectedThread, message);
+      const botResponse = await sendMessage(selectedThread, message, file);
       setTypingState((prev) => ({ ...prev, showIndicator: false }));
       setMessages((prev) => [
         ...prev,

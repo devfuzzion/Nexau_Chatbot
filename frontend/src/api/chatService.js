@@ -33,15 +33,37 @@ export const fetchMessages = async (threadId) => {
   }
 };
 
-export const sendMessage = async (threadId, userMessage) => {
+export const sendMessage = async (threadId, userMessage, file = null) => {
   try {
+    const formData = new FormData();
+    formData.append('userMessage', userMessage);
+    console.log("file", file)
+    
+    if (file) {
+      console.log('Adding file to FormData:', file.name);
+      formData.append('file', file);
+      
+      // Log the actual file object
+      console.log('File object:', file);
+      console.log('File type:', file.type);
+      console.log('File size:', file.size);
+    }
+
+    // Log the complete FormData contents
+    for (let pair of formData.entries()) {
+      console.log(pair[0] + ': ' + pair[1]);
+    }
+
     const response = await fetch(`http://localhost:3000/run/${threadId}`, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ userMessage }),
+      body: formData,
+      // Remove Content-Type header to let browser set it with boundary
     });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || 'Failed to send message');
+    }
 
     const data = await response.json();
 
