@@ -62,12 +62,12 @@ const LeftColumn = ({
       {/* New Chat Button */}
       <div className="new-chat-button" onClick={onCreateThread}>
         <Plus size={20} />
-        <span>New Chat</span>
+        <span>Nuevo Chat</span>
       </div>
 
       {/* Chat History Section */}
       <div className="history-section">
-        <h4>Recent Chats</h4>
+        <h4>Chats recientes</h4>
         <ul>
           {threads.length > 0 ? (
             threads.map((thread) => (
@@ -82,7 +82,7 @@ const LeftColumn = ({
               />
             ))
           ) : (
-            <li className="no-chats">No conversations yet</li>
+            <li className="no-chats">Aún no hay conversaciones</li>
           )}
         </ul>
       </div>
@@ -92,11 +92,11 @@ const LeftColumn = ({
       <div className="bottom-buttons">
         <button className="profile-button">
           <User size={20} />
-          <span>Profile</span>
+          <span>Perfil</span>
         </button>
         <button className="theme-toggle-button" onClick={toggleTheme}>
           {isDarkMode ? <Sun size={20} /> : <Moon size={20} />}
-          <span>{isDarkMode ? "Light Mode" : "Dark Mode"}</span>
+          <span>{isDarkMode ? "Modo Claro" : "Modo Oscuro"}</span>
         </button>
       </div>
     </div>
