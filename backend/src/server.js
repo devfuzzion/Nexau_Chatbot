@@ -116,7 +116,7 @@ app.post("/run/:threadId", async (req, res) => {
 
       try {
         console.log("Appending message to thread...");
-        // console.log(req.body.userMessage, 222);
+        console.log(req.body.userMessage, 222);
         const message = await appendMessageInThread(
           req.params.threadId,
           req.body.userMessage,
@@ -259,7 +259,7 @@ app.post("/threads/:threadId/:messageId", async (req, res) => {
   }
 });
 
-app.listen(3000, () => {
+app.listen(3000, "0.0.0.0", () => {
   console.log(`Server is listening on 3000`);
 });
 
