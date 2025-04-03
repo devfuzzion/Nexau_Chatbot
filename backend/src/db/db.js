@@ -17,5 +17,4 @@ const config = {
 
 const client = new pg.Pool(config); // Use Pool for better connection handling
 
-
 export default client;

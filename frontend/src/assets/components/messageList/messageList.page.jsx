@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { ThumbsUp, ThumbsDown, Edit, Copy, Check, Send } from "lucide-react";
 import TypingIndicator from "../typingIndicator/typingIndicator.page.jsx";
-import MarkdownPreview from '@uiw/react-markdown-preview';
+import MarkdownPreview from "@uiw/react-markdown-preview";
 
 const MessageList = ({
   messages,
@@ -10,7 +10,7 @@ const MessageList = ({
   typingState,
   messagesEndRef,
   isWaitingForResponse,
-  onFeedbackSubmit,
+  handleFeedback,
 }) => {
   const { isTyping, typingMessage } = typingState;
   const [feedbackStates, setFeedbackStates] = useState({});
@@ -57,13 +57,13 @@ const MessageList = ({
     scrollToAbsoluteBottom();
   }, [showThinkingIndicator, messages, isTyping]);
 
-  const handleFeedback = (messageId, feedbackType) => {
-    setFeedbackStates((prev) => ({
-      ...prev,
-      [messageId]: feedbackType,
-    }));
-    console.log(`Feedback for message ${messageId}: ${feedbackType}`);
-  };
+  // const handleFeedback = (messageId, feedbackType) => {
+  //   setFeedbackStates((prev) => ({
+  //     ...prev,
+  //     [messageId]: feedbackType,
+  //   }));
+  //   console.log(`Feedback for message ${messageId}: ${feedbackType}`);
+  // };
 
   const handleCopy = (text, index) => {
     navigator.clipboard.writeText(text);
@@ -81,13 +81,13 @@ const MessageList = ({
     setFeedbackText("");
   };
 
-  const submitFeedback = (index) => {
-    if (feedbackText.trim() && onFeedbackSubmit) {
-      onFeedbackSubmit(index, feedbackText);
+  const submitFeedback = (messageId) => {
+    if (feedbackText.trim()) {
+      handleFeedback(messageId, feedbackText.trim());
     }
     cancelEditing();
   };
-
+  // console.log(messagess);
   return (
     <div
       className={`messages-container ${isExpanded ? "expanded" : ""}`}
@@ -106,7 +106,7 @@ const MessageList = ({
               <div className="markdown-preview">
                 {index === messages.length - 1 && isTyping ? (
                   <MarkdownPreview className={`${isDarkMode ? "markdown-preview-dark" : "markdown-preview" }`} source={typingMessage} />
-                ) : (
+            ) : (
                   <MarkdownPreview className={`${isDarkMode ? "markdown-preview-dark" : "markdown-preview" }`} source={msg.text} />
                 )}
               </div>
@@ -136,7 +136,7 @@ const MessageList = ({
                     </button>
                     <button
                       className="feedback-btn submit-btn"
-                      onClick={() => submitFeedback(index)}
+                      onClick={() => submitFeedback(msg.id)}
                       disabled={!feedbackText.trim()}
                     >
                       <Send size={16} />
@@ -146,15 +146,23 @@ const MessageList = ({
               ) : (
                 <div className="feedback-container">
                   <button
-                    className={`feedback-btn ${feedbackStates[index] === "like" ? "active" : ""}`}
-                    onClick={() => handleFeedback(index, "like")}
+                    className={`feedback-btn ${
+                      feedbackStates[index] === "like" ? "active" : ""
+                    }`}
+                    onClick={() =>
+                      handleFeedback(msg.id, "I liked this message")
+                    }
                     aria-label="Like this response"
                   >
                     <ThumbsUp size={16} />
                   </button>
                   <button
-                    className={`feedback-btn ${feedbackStates[index] === "dislike" ? "active" : ""}`}
-                    onClick={() => handleFeedback(index, "dislike")}
+                    className={`feedback-btn ${
+                      feedbackStates[index] === "dislike" ? "active" : ""
+                    }`}
+                    onClick={() =>
+                      handleFeedback(msg.id, "I didn't liked this message")
+                    }
                     aria-label="Dislike this response"
                   >
                     <ThumbsDown size={16} />
@@ -187,7 +195,9 @@ const MessageList = ({
       {showThinkingIndicator && (
         <div
           ref={thinkingIndicatorRef}
-          className={`message-container bot-message-container ${isDarkMode ? "dark" : ""} ${isExpanded ? "expanded" : ""}`}
+          className={`message-container bot-message-container ${
+            isDarkMode ? "dark" : ""
+          } ${isExpanded ? "expanded" : ""}`}
         >
           <TypingIndicator text="Pensando..." />
         </div>

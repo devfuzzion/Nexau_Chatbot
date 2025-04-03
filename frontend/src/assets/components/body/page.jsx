@@ -2,13 +2,18 @@ import React, { useState, useEffect, useRef } from "react";
 import "./index.css";
 import Footer from "../footer/page.jsx";
 import LeftColumn from "../leftcolumn/page.jsx";
-import { fetchMessages, sendMessage } from "../../../api/chatService.js";
+import {
+  fetchMessages,
+  sendMessage,
+  appendFeedbackMessage,
+} from "../../../api/chatService.js";
 import { useTheme } from "../../../hooks/useTheme.js";
 import MessageList from "../messageList/messageList.page.jsx";
 
 const Body = ({
   isExpanded,
   threads,
+  setThreads,
   selectedThread,
   setSelectedThread,
   createThread,
@@ -137,14 +142,31 @@ const Body = ({
 
   const sendMessageToBot = async (message, file = null) => {
     try {
-      const botResponse = await sendMessage(selectedThread, message, file);
+      const thread = threads.find(
+        (thread) => thread.threadid === selectedThread,
+      );
+      if (!thread) {
+        console.error("Thread not found");
+        return;
+      }
+      const threadFeedback = thread.feedback ?? ""; // Get the existing feedback
+      // console.log(thread);
+      // console.log(threadFeedback, 4444);
+      const formattedMessage = `User feedback: ${threadFeedback}\nUser message: ${message}`;
+
+      const botResponse = await sendMessage(
+        selectedThread,
+        formattedMessage,
+        file,
+      );
       setTypingState((prev) => ({ ...prev, showIndicator: false }));
       setMessages((prev) => [
         ...prev,
         {
-          text: botResponse,
+          text: botResponse.botMessage,
           isBot: true,
           isNew: true,
+          id: botResponse.messageId,
         },
       ]);
       if (messages.length === 2) {
@@ -164,6 +186,37 @@ const Body = ({
       ]);
     } finally {
       setIsWaitingForResponse(false);
+    }
+  };
+
+  const handleFeedback = async (messageId, feedback) => {
+    if (!selectedThread) return;
+
+    const thread = threads.find((thread) => thread.threadid === selectedThread);
+    if (!thread) {
+      console.error("Thread not found");
+      return;
+    }
+
+    const originalFeedback = thread.feedback ?? ""; // Get the existing feedback
+
+    try {
+      const updatedFeedback = await appendFeedbackMessage(
+        selectedThread, // Thread ID
+        messageId, // Message ID
+        feedback, // New feedback
+        originalFeedback, // Previous feedback
+      );
+      setThreads((threads) =>
+        threads.map((el) =>
+          el.threadid === thread.threadid
+            ? { ...el, feedback: updatedFeedback.updatedFeedback }
+            : el,
+        ),
+      );
+      console.log("Updated Feedback:", updatedFeedback);
+    } catch (error) {
+      console.error("Failed to update feedback:", error);
     }
   };
   return (
@@ -193,12 +246,19 @@ const Body = ({
           typingState={typingState}
           messagesEndRef={messagesEndRef}
           isWaitingForResponse={isWaitingForResponse}
+          selectedThread={selectedThread}
+          handleFeedback={handleFeedback}
         />
         <Footer
           onSendMessage={handleSendMessage}
           isDarkMode={isDarkMode}
           isExpanded={isExpanded}
-          isDisabled={!selectedThread || isWaitingForResponse || typingState.isTyping || typingState.showIndicator}
+          isDisabled={
+            !selectedThread ||
+            isWaitingForResponse ||
+            typingState.isTyping ||
+            typingState.showIndicator
+          }
         />
       </div>
     </div>

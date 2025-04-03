@@ -79,3 +79,23 @@ export const updateThreadTitle = async (id, newTitle) => {
     throw err;
   }
 };
+
+export const updateFeedback = async (id, feedback) => {
+  try {
+    const { rowCount } = await sql.query(
+      'UPDATE threads SET "feedback" = $1 WHERE "threadid" = $2',
+      [feedback, id],
+    );
+
+    if (rowCount > 0) {
+      console.log(`Feedback updated successfully for ID ${id}.`);
+      return { success: true, message: "Feedback updated successfully." };
+    } else {
+      console.log(`No thread found with ID ${id}.`);
+      return { success: false, message: "Thread not found." };
+    }
+  } catch (err) {
+    console.error(`Error updating feedback`);
+    throw err;
+  }
+};

@@ -1,4 +1,5 @@
-const backendUrl = "https://ejitukppt8.execute-api.eu-west-3.amazonaws.com/dev";
+// const backendUrl = "https://ejitukppt8.execute-api.eu-west-3.amazonaws.com/dev";
+const backendUrl = "http://localhost:3000";
 
 export const fetchThreads = async () => {
   try {
@@ -28,6 +29,7 @@ export const fetchMessages = async (threadId) => {
     return data.messages.reverse().map((msg) => ({
       text: msg.content[0].text.value,
       isBot: msg.role === "assistant",
+      id: msg.id,
     }));
   } catch (error) {
     console.error("Error in fetchMessages:", error);
@@ -73,7 +75,10 @@ export const sendMessage = async (threadId, userMessage, file = null) => {
       throw new Error(data.message || "Error processing request");
     }
 
-    return data.botMessage.content[0].text.value;
+    return {
+      botMessage: data.botMessage.content[0].text.value,
+      messageId: data.botMessage.id,
+    };
   } catch (error) {
     console.error("Error in sendMessage:", error);
     throw error;
@@ -125,20 +130,28 @@ export const updateThreadTitle = async (id, newTitle, aiTitle) => {
   }
 };
 
-export const appendFeedbackMessage = async (threadId, feedback) => {
+export const appendFeedbackMessage = async (
+  threadId,
+  messageId,
+  feedback,
+  originalFeedback,
+) => {
   try {
-    // Ensure threadId and feedback are provided
-    if (!threadId || !feedback) {
-      throw new Error("Thread ID and feedback are required.");
+    // Ensure required parameters are provided
+    if (!threadId || !messageId || !feedback) {
+      throw new Error("Thread ID, Message ID, and Feedback are required.");
     }
 
-    const response = await fetch(`${backendUrl}/threads/${threadId}/feedback`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
+    const response = await fetch(
+      `${backendUrl}/threads/${threadId}/${messageId}`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ feedback, originalFeedback }),
       },
-      body: JSON.stringify({ feedback }),
-    });
+    );
 
     // Check if response is successful
     if (!response.ok) {
@@ -148,11 +161,11 @@ export const appendFeedbackMessage = async (threadId, feedback) => {
 
     const data = await response.json();
 
-    if (!data.success || !data.message) {
+    if (!data.success || !data.savedFeedback) {
       throw new Error(data.message || "Error processing feedback");
     }
 
-    return data.message; // Return the appended message from the backend
+    return data.savedFeedback; // Return the saved feedback from the backend
   } catch (error) {
     console.error("Error in appendFeedbackMessage:", error);
     throw error;

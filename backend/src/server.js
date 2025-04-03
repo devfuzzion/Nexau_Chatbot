@@ -14,6 +14,10 @@ import {
   delThread,
   generateThreadTitle,
   processFileContent,
+  getMessageById,
+  getThreadDataFromOpenAi,
+  generateFeedbackSummary,
+  // saveFeedback,
 } from "./openai.utils.js";
 import {
   getAllThreads,
@@ -21,6 +25,7 @@ import {
   deleteThreadInDb,
   getThreadById,
   updateThreadTitle,
+  updateFeedback,
 } from "./db/threads.queries.js";
 const app = express();
 const __filename = fileURLToPath(import.meta.url);
@@ -29,7 +34,7 @@ const __dirname = path.dirname(__filename);
 // Configure multer for file upload
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    const uploadDir = path.join(__dirname, 'uploads');
+    const uploadDir = path.join(__dirname, "uploads");
     if (!fs.existsSync(uploadDir)) {
       fs.mkdirSync(uploadDir);
     }
@@ -37,21 +42,21 @@ const storage = multer.diskStorage({
   },
   filename: function (req, file, cb) {
     // Sanitize filename and add timestamp
-    const sanitizedFilename = file.originalname.replace(/[^a-zA-Z0-9.-]/g, '_');
+    const sanitizedFilename = file.originalname.replace(/[^a-zA-Z0-9.-]/g, "_");
     cb(null, `${Date.now()}-${sanitizedFilename}`);
-  }
+  },
 });
 
-const upload = multer({ 
+const upload = multer({
   storage: storage,
   limits: {
-    fileSize: 5 * 1024 * 1024 // 5MB limit
+    fileSize: 5 * 1024 * 1024, // 5MB limit
   },
   fileFilter: (req, file, cb) => {
     // Accept all files
     cb(null, true);
-  }
-}).single('file');
+  },
+}).single("file");
 
 app.use(cors());
 app.use(express.json());
@@ -92,59 +97,59 @@ app.get("/threads/:threadId", async (req, res) => {
 
 app.post("/run/:threadId", async (req, res) => {
   try {
-    console.log('\n=== New Query Processing ===');
+    console.log("\n=== New Query Processing ===");
     // Handle file upload
-    upload(req, res, async function(err) {
+    upload(req, res, async function (err) {
       if (err instanceof multer.MulterError) {
-        console.error('Multer error:', err);
-        return res.status(400).json({ 
-          success: false, 
-          error: 'File upload error: ' + err.message 
+        console.error("Multer error:", err);
+        return res.status(400).json({
+          success: false,
+          error: "File upload error: " + err.message,
         });
       } else if (err) {
-        console.error('Unknown error:', err);
-        return res.status(500).json({ 
-          success: false, 
-          error: 'Server error: ' + err.message 
+        console.error("Unknown error:", err);
+        return res.status(500).json({
+          success: false,
+          error: "Server error: " + err.message,
         });
       }
 
       try {
-        console.log('Appending message to thread...');
+        console.log("Appending message to thread...");
+        // console.log(req.body.userMessage, 222);
         const message = await appendMessageInThread(
           req.params.threadId,
           req.body.userMessage,
-          req.file
+          req.file,
         );
-        console.log('Message appended successfully');
-        
-        console.log('Creating run...');
+        console.log("Message appended successfully");
+
+        console.log("Creating run...");
         const run = await createRun(req.params.threadId);
-        console.log('Run created successfully');
-        
-        console.log('Fetching updated messages...');
+        console.log("Run created successfully");
+
+        console.log("Fetching updated messages...");
         const messages = await listMesasgesInThread(req.params.threadId);
-        console.log('Messages fetched successfully');
+        console.log("Messages fetched successfully");
 
         // Clean up the uploaded file
         if (req.file) {
           fs.unlinkSync(req.file.path);
-          console.log('Temporary file cleaned up');
+          console.log("Temporary file cleaned up");
         }
-        
+
         res.json({ success: true, botMessage: messages[0] });
       } catch (err) {
-
         // Clean up the uploaded file in case of error
         if (req.file) {
           try {
             fs.unlinkSync(req.file.path);
-            console.log('Temporary file cleaned up after error');
+            console.log("Temporary file cleaned up after error");
           } catch (cleanupError) {
-            console.error('Error cleaning up file:', cleanupError);
+            console.error("Error cleaning up file:", cleanupError);
           }
         }
-        
+
         res.status(500).json({ success: false, error: err.message });
       }
     });
@@ -201,6 +206,55 @@ app.delete("/threads/:id", async (req, res) => {
     return res.status(500).json({
       success: false,
       message: "Internal server error",
+    });
+  }
+});
+
+app.post("/threads/:threadId/:messageId", async (req, res) => {
+  try {
+    const { threadId, messageId } = req.params;
+    const { feedback, originalFeedback } = req.body;
+
+    // Validate inputs
+    if (!threadId || !messageId) {
+      return res.status(400).json({
+        success: false,
+        error: "Thread ID and Message Id are required",
+      });
+    }
+    if (!feedback) {
+      return res.status(400).json({
+        success: false,
+        error: "Feedback is required",
+      });
+    }
+    const messageonWhichToGiveFeedback = await getMessageById(
+      threadId,
+      messageId,
+    );
+
+    const context = `Assistant Message:\n${
+      messageonWhichToGiveFeedback.content[0].text.value
+    }\n\nUser feedback on this message:\n${feedback}\n\nUser feedback before this feedback submission:\n${
+      originalFeedback ? originalFeedback : "No feedback till now"
+    }`;
+    const updatedFeedback = await generateFeedbackSummary(context);
+    const savedFeedback = await updateFeedback(threadId, updatedFeedback);
+    if (savedFeedback.success) {
+      res.json({
+        success: true,
+        savedFeedback: { ...savedFeedback, updatedFeedback },
+      });
+    } else {
+      throw new Error(savedFeedback.message);
+    }
+  } catch (error) {
+    console.error("Error processing feedback:", error);
+
+    res.status(500).json({
+      success: false,
+      error: "Internal server error",
+      details: error.message, // Optional: Include for debugging, but remove in production
     });
   }
 });
