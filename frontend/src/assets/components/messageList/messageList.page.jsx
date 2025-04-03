@@ -98,21 +98,35 @@ const MessageList = ({
         <React.Fragment key={index}>
           <div
             className={`message-container 
-              ${msg.isBot ? "bot-message-container" : "client-message-container"}
+              ${
+                msg.isBot ? "bot-message-container" : "client-message-container"
+              }
               ${isDarkMode ? "dark" : ""}
               ${isExpanded ? "expanded" : ""}`}
           >
             {msg.isBot ? (
               <div className="markdown-preview">
                 {index === messages.length - 1 && isTyping ? (
-                  <MarkdownPreview className={`${isDarkMode ? "markdown-preview-dark" : "markdown-preview" }`} source={typingMessage} />
-            ) : (
-                  <MarkdownPreview className={`${isDarkMode ? "markdown-preview-dark" : "markdown-preview" }`} source={msg.text} />
+                  <MarkdownPreview
+                    className={`${
+                      isDarkMode ? "markdown-preview-dark" : "markdown-preview"
+                    }`}
+                    source={typingMessage}
+                  />
+                ) : (
+                  <MarkdownPreview
+                    className={`${
+                      isDarkMode ? "markdown-preview-dark" : "markdown-preview"
+                    }`}
+                    source={msg.text}
+                  />
                 )}
               </div>
             ) : (
               <div className="client-message-text">
-                {msg.text}
+                {msg.text.split("User message: ")[1]
+                  ? msg.text.split("User message: ")[1]
+                  : msg.text}
               </div>
             )}
           </div>
