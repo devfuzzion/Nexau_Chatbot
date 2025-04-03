@@ -14,7 +14,6 @@
   font-family: Inter, sans-serif;
   text-align: center;
   transition: background-color 0.3s ease-in-out, color 0.3s ease-in-out;
-  padding: 1rem;
   /* box-shadow: 0 -4px 6px rgba(0, 0, 0, 0.1); Add shadow for depth */
 }
 
@@ -24,6 +23,8 @@
   align-items: center;
   gap: 10px;
   width: 90%;
+  border-radius: 5px;
+  /* background-color: rgba(232, 235, 241, 255); */
   font-family: Inter, sans-serif;
 }
 

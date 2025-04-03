@@ -201,7 +201,7 @@ const Header = ({
           </button>
           <button className="mobile-menu-button" onClick={toggleTheme}>
             {isDarkMode ? <Sun size={16} /> : <Moon size={16} />}
-            <span>{isDarkMode ? "Modo de luz" : "Modo oscuro"}</span>
+            <span>{isDarkMode ? "Modo Claro" : "Modo oscuro"}</span>
           </button>
         </div>
       </div>
@@ -213,7 +213,7 @@ const Header = ({
             <ChevronLeft size={20} />
           </button>
           <h3 className="history-title">
-            History <History size={20} />
+          historia <History size={20} />
           </h3>
         </div>
         <div className="history-content">

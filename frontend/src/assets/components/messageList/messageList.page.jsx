@@ -3,7 +3,6 @@ import { ThumbsUp, ThumbsDown, Edit, Copy, Check, Send } from "lucide-react";
 import TypingIndicator from "../typingIndicator/typingIndicator.page.jsx";
 import MarkdownPreview from '@uiw/react-markdown-preview';
 
-
 const MessageList = ({
   messages,
   isDarkMode,
@@ -74,7 +73,7 @@ const MessageList = ({
 
   const startEditing = (index) => {
     setEditingIndex(index);
-    setFeedbackText(""); // Start with empty textarea
+    setFeedbackText("");
   };
 
   const cancelEditing = () => {
@@ -99,14 +98,23 @@ const MessageList = ({
         <React.Fragment key={index}>
           <div
             className={`message-container 
-              ${msg.isBot ? "bot-message-container" : "client-message-container"
-              }
+              ${msg.isBot ? "bot-message-container" : "client-message-container"}
               ${isDarkMode ? "dark" : ""}
               ${isExpanded ? "expanded" : ""}`}
           >
-            {msg.isBot && index === messages.length - 1 && isTyping
-              ? <MarkdownPreview className="markdown-preview" source={typingMessage} />
-              : <MarkdownPreview className="markdown-preview" source={msg.text} />}
+            {msg.isBot ? (
+              <div className="markdown-preview">
+                {index === messages.length - 1 && isTyping ? (
+                  <MarkdownPreview className={`${isDarkMode ? "markdown-preview-dark" : "markdown-preview" }`} source={typingMessage} />
+                ) : (
+                  <MarkdownPreview className={`${isDarkMode ? "markdown-preview-dark" : "markdown-preview" }`} source={msg.text} />
+                )}
+              </div>
+            ) : (
+              <div className="client-message-text">
+                {msg.text}
+              </div>
+            )}
           </div>
           {msg.isBot && !isTyping && (
             <div className={`feedback-row ${isDarkMode ? "dark" : ""}`}>
@@ -138,16 +146,14 @@ const MessageList = ({
               ) : (
                 <div className="feedback-container">
                   <button
-                    className={`feedback-btn ${feedbackStates[index] === "like" ? "active" : ""
-                      }`}
+                    className={`feedback-btn ${feedbackStates[index] === "like" ? "active" : ""}`}
                     onClick={() => handleFeedback(index, "like")}
                     aria-label="Like this response"
                   >
                     <ThumbsUp size={16} />
                   </button>
                   <button
-                    className={`feedback-btn ${feedbackStates[index] === "dislike" ? "active" : ""
-                      }`}
+                    className={`feedback-btn ${feedbackStates[index] === "dislike" ? "active" : ""}`}
                     onClick={() => handleFeedback(index, "dislike")}
                     aria-label="Dislike this response"
                   >
@@ -181,8 +187,7 @@ const MessageList = ({
       {showThinkingIndicator && (
         <div
           ref={thinkingIndicatorRef}
-          className={`message-container bot-message-container ${isDarkMode ? "dark" : ""
-            } ${isExpanded ? "expanded" : ""}`}
+          className={`message-container bot-message-container ${isDarkMode ? "dark" : ""} ${isExpanded ? "expanded" : ""}`}
         >
           <TypingIndicator text="Pensando..." />
         </div>

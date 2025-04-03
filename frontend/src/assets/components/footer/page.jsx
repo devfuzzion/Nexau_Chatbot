@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { FileInput, Send, FileCheck } from 'lucide-react';
+import { FileInput, SendHorizonal, FileCheck } from 'lucide-react';
 import './index.css';
 
 const Footer = ({ onSendMessage, isDarkMode, isExpanded, isDisabled }) => {
@@ -36,7 +36,10 @@ const Footer = ({ onSendMessage, isDarkMode, isExpanded, isDisabled }) => {
           placeholder='Escríbeme tu duda...'
           className={`footer-input ${isDarkMode ? 'dark-mode' : ''} ${isDisabled ? 'disabled' : ''}`}
           value={message}
+          autoFocus={false}
           onChange={(e) => setMessage(e.target.value)}
+          style={{ fontSize: '16px' }}
+          inputMode="text"
           disabled={isDisabled}
         />
         <input
@@ -61,7 +64,7 @@ const Footer = ({ onSendMessage, isDarkMode, isExpanded, isDisabled }) => {
           className={`footer-button ${isDarkMode ? 'dark-mode' : ''} ${isDisabled ? 'disabled' : ''}`}
           disabled={isDisabled || !message.trim()}
         >
-          <Send size={20} />
+          <SendHorizonal size={20} />
         </button>
       </form>
       {selectedFile && (

@@ -66,5 +66,26 @@ button:focus-visible {
     background-color: #f9f9f9;
   }
 } */
+/* Prevent zooming on input focus for mobile devices */
+input[type="text"],
+textarea {
+  font-size: 16px !important; /* Minimum 16px prevents iOS zoom */
+  transform: scale(1); /* Reset any transforms */
+  transform-origin: left top; /* Ensure proper positioning */
+}
 
+/* For React components, you might need to target the class */
+.footer-input {
+  font-size: 16px !important;
+  transform: scale(1);
+  transform-origin: left top;
+}
+
+/* Disable text size adjustment */
+html {
+  -webkit-text-size-adjust: 100%;
+  -moz-text-size-adjust: 100%;
+  -ms-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
 
