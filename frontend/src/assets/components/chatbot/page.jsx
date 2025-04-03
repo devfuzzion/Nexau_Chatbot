@@ -142,6 +142,8 @@ const Chatbot = () => {
           selectedThread={selectedThread}
           setSelectedThread={setSelectedThread}
           createThread={createThread}
+          deleteThreadById={deleteThreadById}
+          updateThreadTitleById={updateThreadTitleById}
         />
         <Body
           isExpanded={isExpanded}
