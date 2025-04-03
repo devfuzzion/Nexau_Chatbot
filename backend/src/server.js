@@ -97,6 +97,11 @@ app.get("/threads/:threadId", async (req, res) => {
 
 app.post("/run/:threadId", async (req, res) => {
   try {
+    console.log(req.body, 222);
+    console.log(req.file, 333);
+    console.log(req.params.threadId, 444);
+    console.log(req.body.userMessage, 555);
+    console.log(req.body.feedback, 666);
     console.log("\n=== New Query Processing ===");
     // Handle file upload
     upload(req, res, async function (err) {
@@ -104,7 +109,7 @@ app.post("/run/:threadId", async (req, res) => {
         console.error("Multer error:", err);
         return res.status(400).json({
           success: false,
-          error: "File upload error: " + err.message,
+          error: "File uplcoad error: " + err.message,
         });
       } else if (err) {
         console.error("Unknown error:", err);
