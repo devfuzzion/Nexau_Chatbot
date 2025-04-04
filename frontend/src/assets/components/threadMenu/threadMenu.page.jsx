@@ -30,7 +30,7 @@ const ThreadMenuPopup = ({ onRename, onDelete, isDarkMode, onClose }) => {
         className="menu-item"
       >
         <Pencil size={16} />
-        <span>Rebautizar</span>
+        <span>Renombrar</span>
       </button>
       <button
         onClick={(e) => {

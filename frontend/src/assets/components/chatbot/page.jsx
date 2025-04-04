@@ -125,7 +125,7 @@ const Chatbot = () => {
       {/* Infinity Button (visible only when chatbot is hidden) */}
       {!isVisible && (
         <button className="infinity-button" onClick={toggleVisibility}>
-          <Infinity size={30} />
+          <img src="/images/chat_icon.png" alt="logo" className="chat-logo" />
         </button>
       )}
 
@@ -143,6 +143,8 @@ const Chatbot = () => {
           selectedThread={selectedThread}
           setSelectedThread={setSelectedThread}
           createThread={createThread}
+          deleteThreadById={deleteThreadById}
+          updateThreadTitleById={updateThreadTitleById}
         />
         <Body
           isExpanded={isExpanded}

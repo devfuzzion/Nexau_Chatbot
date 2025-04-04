@@ -88,7 +88,10 @@ const Header = ({
 
     try {
       setDeletingThread(true);
-      await deleteThreadById(threadToDelete);
+      const thread = threads.find(
+        (thread) => thread.threadid === threadToDelete,
+      );
+      await deleteThreadById(thread.id);
     } finally {
       setDeletingThread(false);
       setShowDeletePopup(false);
@@ -124,7 +127,11 @@ const Header = ({
   };
 
   const saveRename = (threadId) => {
-    if (newTitle.trim() && newTitle.trim() !== threads.find(t => t.threadid === threadId)?.threadTitle) {
+    if (
+      newTitle.trim() &&
+      newTitle.trim() !==
+        threads.find((t) => t.threadid === threadId)?.threadTitle
+    ) {
       updateThreadTitleById(threadId, newTitle.trim());
     }
     setRenamingThread(null);
@@ -165,7 +172,7 @@ const Header = ({
         <div className="logo-container">
           <img src="/images/Logo C.io.png" alt="logo" className="logo" />
         </div>
-        <p className="title">Consultor  Genesis</p>
+        <p className="title">Consultor Genesis</p>
       </div>
 
       {/* Right Section */}
@@ -213,7 +220,7 @@ const Header = ({
             <ChevronLeft size={20} />
           </button>
           <h3 className="history-title">
-          historia <History size={20} />
+            historia <History size={20} />
           </h3>
         </div>
         <div className="history-content">
@@ -254,7 +261,9 @@ const Header = ({
                   )}
                   {threadMenuOpen === thread.threadid && (
                     <ThreadMenuPopup
-                      onRename={() => handleRenameClick(thread.threadid, thread.threadTitle)}
+                      onRename={() =>
+                        handleRenameClick(thread.threadid, thread.threadTitle)
+                      }
                       onDelete={() =>
                         handleDeleteWithConfirmation(thread.threadid)
                       }
