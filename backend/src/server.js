@@ -19,6 +19,7 @@ import {
   generateFeedbackSummary,
   // saveFeedback,
 } from "./openai.utils.js";
+import { logConversation, logFeedback, storeFeedbackState, getFeedbackStates } from "./airtable.utils.js";
 import {
   getAllThreads,
   createThreadInDb,
@@ -97,11 +98,6 @@ app.get("/threads/:threadId", async (req, res) => {
 
 app.post("/run/:threadId", async (req, res) => {
   try {
-    console.log(req.body, 222);
-    console.log(req.file, 333);
-    console.log(req.params.threadId, 444);
-    console.log(req.body.userMessage, 555);
-    console.log(req.body.feedback, 666);
     console.log("\n=== New Query Processing ===");
     // Handle file upload
     upload(req, res, async function (err) {
@@ -142,6 +138,28 @@ app.post("/run/:threadId", async (req, res) => {
           fs.unlinkSync(req.file.path);
           console.log("Temporary file cleaned up");
         }
+
+        await logConversation({
+          userId: "123",
+          threadId: req.params.threadId,
+          messageId: run.id,
+          question: req.body.userMessage.split("User message:")[1]?.trim(),
+          response: messages[0].content[0].text.value,
+        });
+
+        const feedbackMatch = req.body.userMessage.match(/User feedback:\s*(.*?)\s*User message:/s);
+        const feedback = feedbackMatch && feedbackMatch[1].trim() ? feedbackMatch[1].trim() : null;
+
+        if (feedback) {
+          await logFeedback({
+            userId: "123",
+            threadId: req.params.threadId,
+            messageId: run.id,
+            feedback: feedback,
+          });
+          console.log("Feedback logged successfully");
+        }
+        console.log("Conversation logged successfully");
 
         res.json({ success: true, botMessage: messages[0] });
       } catch (err) {
@@ -259,7 +277,70 @@ app.post("/threads/:threadId/:messageId", async (req, res) => {
     res.status(500).json({
       success: false,
       error: "Internal server error",
-      details: error.message, // Optional: Include for debugging, but remove in production
+      details: error.message,
+    });
+  }
+});
+
+// New endpoint to store like/dislike state
+app.post("/feedback/state", async (req, res) => {
+  try {
+    const { userId, messageId, threadId, isLiked } = req.body;
+
+    if (!userId || !messageId || !threadId || isLiked === undefined) {
+      return res.status(400).json({
+        success: false,
+        error: "Missing required fields",
+      });
+    }
+
+    const result = await storeFeedbackState({
+      userId,
+      messageId,
+      threadId,
+      isLiked
+    });
+
+    if (result.success) {
+      res.json({ success: true, recordId: result.recordId });
+    } else {
+      throw new Error(result.error);
+    }
+  } catch (error) {
+    console.error("Error storing feedback state:", error);
+    res.status(500).json({
+      success: false,
+      error: "Internal server error",
+      details: error.message,
+    });
+  }
+});
+
+// New endpoint to fetch feedback states for a thread
+app.get("/feedback/states/:threadId", async (req, res) => {
+  try {
+    const { threadId } = req.params;
+
+    if (!threadId) {
+      return res.status(400).json({
+        success: false,
+        error: "Thread ID is required",
+      });
+    }
+
+    const result = await getFeedbackStates(threadId);
+
+    if (result.success) {
+      res.json({ success: true, feedbackStates: result.feedbackStates });
+    } else {
+      throw new Error(result.error);
+    }
+  } catch (error) {
+    console.error("Error fetching feedback states:", error);
+    res.status(500).json({
+      success: false,
+      error: "Internal server error",
+      details: error.message,
     });
   }
 });

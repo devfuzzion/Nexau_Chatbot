@@ -241,6 +241,8 @@ const Body = ({
       <div className={`main-content ${isDarkMode ? "dark" : ""}`}>
         <MessageList
           messages={messages}
+          userId={'123'}
+          threadId={selectedThread}
           isDarkMode={isDarkMode}
           isExpanded={isExpanded}
           typingState={typingState}

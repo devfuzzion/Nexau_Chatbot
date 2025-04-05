@@ -11,9 +11,11 @@ const MessageList = ({
   messagesEndRef,
   isWaitingForResponse,
   handleFeedback,
+  threadId,
+  userId,
 }) => {
   const { isTyping, typingMessage } = typingState;
-  const [feedbackStates, setFeedbackStates] = useState({});
+  const [feedbackStates, setFeedbackStates] = useState([]);
   const [copiedIndex, setCopiedIndex] = useState(null);
   const [editingIndex, setEditingIndex] = useState(null);
   const [feedbackText, setFeedbackText] = useState("");
@@ -21,6 +23,25 @@ const MessageList = ({
   const thinkingTimeoutRef = useRef(null);
   const thinkingIndicatorRef = useRef(null);
   const containerRef = useRef(null);
+
+  // Fetch feedback states when component mounts or threadId changes
+  useEffect(() => {
+    const fetchFeedbackStates = async () => {
+      try {
+        const response = await fetch(`http://localhost:3000/feedback/states/${threadId}`);
+        const data = await response.json();
+        if (data.success) {
+          setFeedbackStates(data.feedbackStates);
+        }
+      } catch (error) {
+        console.error("Error fetching feedback states:", error);
+      }
+    };
+
+    if (threadId) {
+      fetchFeedbackStates();
+    }
+  }, [threadId]);
 
   useEffect(() => {
     return () => {
@@ -57,13 +78,69 @@ const MessageList = ({
     scrollToAbsoluteBottom();
   }, [showThinkingIndicator, messages, isTyping]);
 
-  // const handleFeedback = (messageId, feedbackType) => {
-  //   setFeedbackStates((prev) => ({
-  //     ...prev,
-  //     [messageId]: feedbackType,
-  //   }));
-  //   console.log(`Feedback for message ${messageId}: ${feedbackType}`);
-  // };
+  // Function to get feedback state for a specific message
+  const getMessageFeedbackState = (messageId) => {
+    return feedbackStates.find(state => state.messageId === messageId);
+  };
+
+  // Function to handle like/dislike
+  const handleLikeDislike = async (messageId, type) => {
+    const isLiked = type === "I liked this message";
+    console.log(userId, messageId, threadId, isLiked, 222);
+    
+    // Validate required fields
+    if (!userId || !messageId || !threadId) {
+      console.error("Missing required fields:", {
+        userId,
+        messageId,
+        threadId,
+        isLiked
+      });
+      return;
+    }
+
+    try {
+      // Update local state
+      setFeedbackStates(prev => {
+        const filtered = prev.filter(state => state.messageId !== messageId);
+        return [...filtered, { messageId, isLiked }];
+      });
+
+      // Store in Airtable
+      const response = await fetch("http://localhost:3000/feedback/state", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          userId: userId,
+          messageId: messageId,
+          threadId: threadId,
+          isLiked: isLiked
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Failed to store feedback state");
+      }
+
+      const data = await response.json();
+      if (!data.success) {
+        throw new Error(data.error);
+      }
+
+      // Call the parent handler
+      await handleFeedback(messageId, type);
+    } catch (error) {
+      console.error("Error storing feedback state:", error);
+      // Revert local state on error
+      setFeedbackStates(prev => {
+        const filtered = prev.filter(state => state.messageId !== messageId);
+        return filtered;
+      });
+    }
+  };
 
   const handleCopy = (text, index) => {
     navigator.clipboard.writeText(text);
@@ -87,124 +164,126 @@ const MessageList = ({
     }
     cancelEditing();
   };
-  // console.log(messagess);
+
   return (
     <div
       className={`messages-container ${isExpanded ? "expanded" : ""}`}
       ref={containerRef}
       style={{ overflowY: "auto" }}
     >
-      {messages.map((msg, index) => (
-        <React.Fragment key={index}>
-          <div
-            className={`message-container 
-              ${
-                msg.isBot ? "bot-message-container" : "client-message-container"
-              }
-              ${isDarkMode ? "dark" : ""}
-              ${isExpanded ? "expanded" : ""}`}
-          >
-            {msg.isBot ? (
-              <div className="markdown-preview">
-                {index === messages.length - 1 && isTyping ? (
-                  <MarkdownPreview
-                    className={`${
-                      isDarkMode ? "markdown-preview-dark" : "markdown-preview"
-                    }`}
-                    source={typingMessage}
-                  />
-                ) : (
-                  <MarkdownPreview
-                    className={`${
-                      isDarkMode ? "markdown-preview-dark" : "markdown-preview"
-                    }`}
-                    source={msg.text}
-                  />
-                )}
-              </div>
-            ) : (
-              <div className="client-message-text">
-                {msg.text.split("User message: ")[1]
-                  ? msg.text.split("User message: ")[1]
-                  : msg.text}
-              </div>
-            )}
-          </div>
-          {msg.isBot && !isTyping && (
-            <div className={`feedback-row ${isDarkMode ? "dark" : ""}`}>
-              {editingIndex === index ? (
-                <div className="feedback-edit-container">
-                  <textarea
-                    value={feedbackText}
-                    onChange={(e) => setFeedbackText(e.target.value)}
-                    className={`feedback-textarea ${isDarkMode ? "dark" : ""}`}
-                    placeholder="envíanos un comentario..."
-                    autoFocus
-                  />
-                  <div className="feedback-edit-buttons">
-                    <button
-                      className="feedback-btn cancel-btn"
-                      onClick={cancelEditing}
-                    >
-                      Cancelar
-                    </button>
-                    <button
-                      className="feedback-btn submit-btn"
-                      onClick={() => submitFeedback(msg.id)}
-                      disabled={!feedbackText.trim()}
-                    >
-                      <Send size={16} />
-                    </button>
-                  </div>
+      {messages.map((msg, index) => {
+        const messageFeedback = getMessageFeedbackState(msg.id);
+        
+        return (
+          <React.Fragment key={index}>
+            <div
+              className={`message-container 
+                ${msg.isBot ? "bot-message-container" : "client-message-container"}
+                ${isDarkMode ? "dark" : ""}
+                ${isExpanded ? "expanded" : ""}`}
+            >
+              {msg.isBot ? (
+                <div className="markdown-preview">
+                  {index === messages.length - 1 && isTyping ? (
+                    <MarkdownPreview
+                      className={`${
+                        isDarkMode ? "markdown-preview-dark" : "markdown-preview"
+                      }`}
+                      source={typingMessage}
+                    />
+                  ) : (
+                    <MarkdownPreview
+                      className={`${
+                        isDarkMode ? "markdown-preview-dark" : "markdown-preview"
+                      }`}
+                      source={msg.text}
+                    />
+                  )}
                 </div>
               ) : (
-                <div className="feedback-container">
-                  <button
-                    className={`feedback-btn ${
-                      feedbackStates[index] === "like" ? "active" : ""
-                    }`}
-                    onClick={() =>
-                      handleFeedback(msg.id, "I liked this message")
-                    }
-                    aria-label="Like this response"
-                  >
-                    <ThumbsUp size={16} />
-                  </button>
-                  <button
-                    className={`feedback-btn ${
-                      feedbackStates[index] === "dislike" ? "active" : ""
-                    }`}
-                    onClick={() =>
-                      handleFeedback(msg.id, "I didn't liked this message")
-                    }
-                    aria-label="Dislike this response"
-                  >
-                    <ThumbsDown size={16} />
-                  </button>
-                  <button
-                    className="feedback-btn edit-btn"
-                    onClick={() => startEditing(index)}
-                    aria-label="Edit this response"
-                  >
-                    <Edit size={16} />
-                  </button>
-                  <button
-                    className="feedback-btn copy-btn"
-                    onClick={() => handleCopy(msg.text, index)}
-                    aria-label="Copy to clipboard"
-                  >
-                    {copiedIndex === index ? (
-                      <Check size={16} className="copied-icon" />
-                    ) : (
-                      <Copy size={16} />
-                    )}
-                  </button>
+                <div className="client-message-text">
+                  {msg.text.split("User message: ")[1]
+                    ? msg.text.split("User message: ")[1]
+                    : msg.text}
                 </div>
               )}
             </div>
-          )}
-        </React.Fragment>
-      ))}
+            {msg.isBot && !isTyping && (
+              <div className={`feedback-row ${isDarkMode ? "dark" : ""}`}>
+                {editingIndex === index ? (
+                  <div className="feedback-edit-container">
+                    <textarea
+                      value={feedbackText}
+                      onChange={(e) => setFeedbackText(e.target.value)}
+                      className={`feedback-textarea ${isDarkMode ? "dark" : ""}`}
+                      placeholder="envíanos un comentario..."
+                      autoFocus
+                    />
+                    <div className="feedback-edit-buttons">
+                      <button
+                        className="feedback-btn cancel-btn"
+                        onClick={cancelEditing}
+                      >
+                        Cancelar
+                      </button>
+                      <button
+                        className="feedback-btn submit-btn"
+                        onClick={() => submitFeedback(msg.id)}
+                        disabled={!feedbackText.trim()}
+                      >
+                        <Send size={16} />
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="feedback-container">
+                    <button
+                      className={`feedback-btn ${
+                        messageFeedback?.isLiked ? "active" : ""
+                      }`}
+                      onClick={() =>
+                        handleLikeDislike(msg.id, "I liked this message")
+                      }
+                      aria-label="Like this response"
+                    >
+                      <ThumbsUp size={16} />
+                    </button>
+                    <button
+                      className={`feedback-btn ${
+                        messageFeedback?.isLiked === false ? "active" : ""
+                      }`}
+                      onClick={() =>
+                        handleLikeDislike(msg.id, "I didn't liked this message")
+                      }
+                      aria-label="Dislike this response"
+                    >
+                      <ThumbsDown size={16} />
+                    </button>
+                    <button
+                      className="feedback-btn edit-btn"
+                      onClick={() => startEditing(index)}
+                      aria-label="Edit this response"
+                    >
+                      <Edit size={16} />
+                    </button>
+                    <button
+                      className="feedback-btn copy-btn"
+                      onClick={() => handleCopy(msg.text, index)}
+                      aria-label="Copy to clipboard"
+                    >
+                      {copiedIndex === index ? (
+                        <Check size={16} className="copied-icon" />
+                      ) : (
+                        <Copy size={16} />
+                      )}
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
+          </React.Fragment>
+        );
+      })}
 
       {showThinkingIndicator && (
         <div
