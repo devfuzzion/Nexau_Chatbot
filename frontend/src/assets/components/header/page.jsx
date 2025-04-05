@@ -20,6 +20,8 @@ import DeleteConfirmationPopup from "../deletePopup/deletePopup.page.jsx";
 import ProfileOverlay from "../profile/page.jsx";
 
 const Header = ({
+  isProfileOpen,
+  handleProfileOpen,
   onExpand,
   isExpanded,
   onToggleVisibility,
@@ -40,7 +42,6 @@ const Header = ({
   const [renamingThread, setRenamingThread] = useState(null);
   const [newTitle, setNewTitle] = useState("");
   const inputRef = useRef(null);
-  const [isProfileOpen, setIsProfileOpen] = useState(false);
 
   // Initialize and persist expanded state
   useEffect(() => {
@@ -157,6 +158,10 @@ const Header = ({
       inputRef.current.select();
     }
   }, [renamingThread]);
+  const toggleProfileOpen = () => {
+    setIsMenuOpen(false);
+    handleProfileOpen();
+  }
 
   return (
     <div className={`header-container ${isExpanded ? "expanded" : ""}`}>
@@ -186,13 +191,6 @@ const Header = ({
           <ChevronDown size={20} />
         </button>
       </div>
-      {isProfileOpen && (
-  <ProfileOverlay
-    isDarkMode={isDarkMode}
-    isVisible={isProfileOpen}
-    onClose={() => setIsProfileOpen(false)}
-  />
-)}
       {/* Mobile Menu */}
       <div className={`mobile-menu ${isMenuOpen ? "" : "hidden"}`}>
         <div className="mobile-menu-header">
@@ -206,10 +204,10 @@ const Header = ({
             <MessageSquare size={16} />
             <span>Nuevo Chat</span>
           </button>
-          <button className="mobile-menu-button" onClick={() => setIsProfileOpen(true)}>
-  <User size={16} />
-  <span>Perfil</span>
-</button>
+          <button className="mobile-menu-button" onClick={toggleProfileOpen}>
+           <User size={16} />
+           <span>Perfil</span>
+            </button>
 
           <button className="mobile-menu-button" onClick={openHistory}>
             <History size={16} />

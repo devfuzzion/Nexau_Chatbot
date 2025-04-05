@@ -9,8 +9,11 @@ import {
 } from "../../../api/chatService.js";
 import { useTheme } from "../../../hooks/useTheme.js";
 import MessageList from "../messageList/messageList.page.jsx";
+import ProfileOverlay from "../profile/page.jsx";
 
 const Body = ({
+  handleProfileOpen,
+  isProfileOpen,
   isExpanded,
   threads,
   setThreads,
@@ -34,6 +37,7 @@ const Body = ({
   const messagesEndRef = useRef(null);
   const typingIntervalRef = useRef(null);
   const thinkingTimeoutRef = useRef(null);
+
   // Load messages when selected thread changes
 
   useEffect(() => {
@@ -219,6 +223,7 @@ const Body = ({
       console.error("Failed to update feedback:", error);
     }
   };
+
   return (
     <div
       className={`body-wrapper ${isDarkMode ? "dark" : ""} ${
@@ -227,6 +232,7 @@ const Body = ({
     >
       {isExpanded && (
         <LeftColumn
+          handleProfileOpen={handleProfileOpen}
           isDarkMode={isDarkMode}
           toggleTheme={toggleTheme}
           threads={threads}
@@ -239,7 +245,15 @@ const Body = ({
       )}
 
       <div className={`main-content ${isDarkMode ? "dark" : ""}`}>
-        <MessageList
+        {isProfileOpen ? (
+          <ProfileOverlay
+            isDarkMode={isDarkMode}
+            isVisible={isProfileOpen}
+            onClose={handleProfileOpen}
+          />
+        ):(
+          <>
+          <MessageList
           messages={messages}
           userId={'123'}
           threadId={selectedThread}
@@ -262,6 +276,8 @@ const Body = ({
             typingState.showIndicator
           }
         />
+          </>
+        )}
       </div>
     </div>
   );
