@@ -119,7 +119,11 @@ const Chatbot = () => {
   const toggleVisibility = () => {
     setIsVisible((prev) => !prev);
   };
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
 
+  const handleProfileOpen = () => {
+    setIsProfileOpen((prev) => !prev);
+  }
   return (
     <>
       {/* Infinity Button (visible only when chatbot is hidden) */}
@@ -136,6 +140,8 @@ const Chatbot = () => {
         }`}
       >
         <Header
+          isProfileOpen={isProfileOpen}
+          handleProfileOpen={handleProfileOpen}
           onExpand={handleExpand}
           isExpanded={isExpanded}
           onToggleVisibility={toggleVisibility}
@@ -147,6 +153,8 @@ const Chatbot = () => {
           updateThreadTitleById={updateThreadTitleById}
         />
         <Body
+          isProfileOpen={isProfileOpen}
+          handleProfileOpen={handleProfileOpen}
           isExpanded={isExpanded}
           threads={threads}
           setThreads={setThreads}

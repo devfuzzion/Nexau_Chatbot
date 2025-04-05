@@ -16,6 +16,7 @@ import ProfileOverlay from "../profile/page.jsx";
 import "./index.css";
 
 const LeftColumn = ({
+  handleProfileOpen,
   threads,
   changeThread,
   isDarkMode,
@@ -99,7 +100,7 @@ const LeftColumn = ({
       {/* Bottom Buttons */}
       <hr className="divider" />
       <div className="bottom-buttons">
-        <button className="profile-button" onClick={() => setShowProfile(!showProfile)} >
+        <button className="profile-button" onClick={handleProfileOpen} >
           <User size={20} />
           <span>Perfil</span>
         </button>

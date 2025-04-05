@@ -124,6 +124,13 @@
   color: white !important;
 }
 
+.markdown-preview .wmde-markdown pre > code{
+  background-color: #ece9e9 !important;
+}
+
+.dark .markdown-preview .wmde-markdown pre > code{
+  background-color: rgba(15,16,22,255) !important;
+}
 
 .markdown-preview wmde-markdown wmde-markdown-color {
   background-color:  transparent !important;
