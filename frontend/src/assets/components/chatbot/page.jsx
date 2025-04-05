@@ -24,8 +24,8 @@ const Chatbot = () => {
   const createThread = async () => {
     try {
       const response = await fetch(
-        // "https://ejitukppt8.execute-api.eu-west-3.amazonaws.com/dev/create-thread",
-        "http://localhost:3000/create-thread",
+        "https://ejitukppt8.execute-api.eu-west-3.amazonaws.com/dev/create-thread",
+        // "http://localhost:3000/create-thread",
         {
           method: "POST",
           headers: {
