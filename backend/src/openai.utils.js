@@ -1,9 +1,13 @@
 import OpenAI from "openai";
 import dotenv from "dotenv";
 import fs from "fs";
+
 dotenv.config();
 const openai = new OpenAI();
 const ASSISTANT_ID = process.env.ASSISTANT_ID;
+
+
+
 
 export const processFileContent = async (file) => {
   // Convert file buffer to text
@@ -103,6 +107,7 @@ Asegúrate de que tus respuestas sean:
 
 Recuerda: No importa en qué idioma te escriba el usuario, siempre responde en español.`,
   });
+
   return run;
 };
 
