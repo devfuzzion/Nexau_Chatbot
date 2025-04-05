@@ -28,8 +28,9 @@ const MessageList = ({
   useEffect(() => {
     const fetchFeedbackStates = async () => {
       try {
-        // const response = await fetch(`http://localhost:3000/feedback/states/${threadId}`);
-        const response = await fetch(`https://ejitukppt8.execute-api.eu-west-3.amazonaws.com/dev/feedback/states/${threadId}`);
+        const response = await fetch(
+          `https://ejitukppt8.execute-api.eu-west-3.amazonaws.com/dev/feedback/states/${threadId}`,
+        );
         const data = await response.json();
         if (data.success) {
           setFeedbackStates(data.feedbackStates);
@@ -81,48 +82,48 @@ const MessageList = ({
 
   // Function to get feedback state for a specific message
   const getMessageFeedbackState = (messageId) => {
-    return feedbackStates.find(state => state.messageId === messageId);
+    return feedbackStates.find((state) => state.messageId === messageId);
   };
 
   // Function to handle like/dislike
   const handleLikeDislike = async (messageId, type) => {
     const isLiked = type === "I liked this message";
     console.log(userId, messageId, threadId, isLiked, 222);
-    
+
     // Validate required fields
     if (!userId || !messageId || !threadId) {
       console.error("Missing required fields:", {
         userId,
         messageId,
         threadId,
-        isLiked
+        isLiked,
       });
       return;
     }
 
     try {
       // Update local state
-      setFeedbackStates(prev => {
-        const filtered = prev.filter(state => state.messageId !== messageId);
+      setFeedbackStates((prev) => {
+        const filtered = prev.filter((state) => state.messageId !== messageId);
         return [...filtered, { messageId, isLiked }];
       });
 
       // Store in Airtable
       const response = await fetch(
-        // "http://localhost:3000/feedback/state", 
         "https://ejitukppt8.execute-api.eu-west-3.amazonaws.com/dev/feedback/state",
         {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            userId: userId,
+            messageId: messageId,
+            threadId: threadId,
+            isLiked: isLiked,
+          }),
         },
-        body: JSON.stringify({
-          userId: userId,
-          messageId: messageId,
-          threadId: threadId,
-          isLiked: isLiked
-        }),
-      });
+      );
 
       if (!response.ok) {
         const errorData = await response.json();
@@ -139,8 +140,8 @@ const MessageList = ({
     } catch (error) {
       console.error("Error storing feedback state:", error);
       // Revert local state on error
-      setFeedbackStates(prev => {
-        const filtered = prev.filter(state => state.messageId !== messageId);
+      setFeedbackStates((prev) => {
+        const filtered = prev.filter((state) => state.messageId !== messageId);
         return filtered;
       });
     }
@@ -177,12 +178,16 @@ const MessageList = ({
     >
       {messages.map((msg, index) => {
         const messageFeedback = getMessageFeedbackState(msg.id);
-        
+
         return (
           <React.Fragment key={index}>
             <div
               className={`message-container 
-                ${msg.isBot ? "bot-message-container" : "client-message-container"}
+                ${
+                  msg.isBot
+                    ? "bot-message-container"
+                    : "client-message-container"
+                }
                 ${isDarkMode ? "dark" : ""}
                 ${isExpanded ? "expanded" : ""}`}
             >
@@ -190,16 +195,12 @@ const MessageList = ({
                 <div className="markdown-preview">
                   {index === messages.length - 1 && isTyping ? (
                     <MarkdownPreview
-                      className={`${
-                        isDarkMode ? "markdown-preview-dark" : "markdown-preview"
-                      }`}
+                    className={`markdown-preview ${isDarkMode ? "dark" : ""}`}
                       source={typingMessage}
                     />
                   ) : (
                     <MarkdownPreview
-                      className={`${
-                        isDarkMode ? "markdown-preview-dark" : "markdown-preview"
-                      }`}
+                    className={`markdown-preview ${isDarkMode ? "dark" : ""}`}
                       source={msg.text}
                     />
                   )}
@@ -219,7 +220,9 @@ const MessageList = ({
                     <textarea
                       value={feedbackText}
                       onChange={(e) => setFeedbackText(e.target.value)}
-                      className={`feedback-textarea ${isDarkMode ? "dark" : ""}`}
+                      className={`feedback-textarea ${
+                        isDarkMode ? "dark" : ""
+                      }`}
                       placeholder="envíanos un comentario..."
                       autoFocus
                     />
