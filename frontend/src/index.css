@@ -89,3 +89,10 @@ html {
   text-size-adjust: 100%;
 }
 
+html, body, #root {
+  height: auto;
+  width: auto;
+  margin: 0;
+  padding: 0;
+  background: transparent;
+}
