@@ -86,9 +86,40 @@
 .markdown-preview {
   background-color: transparent !important;
   color: rgba(58,62,72,255) !important;
+  max-width: 90%;
+}
+.expanded .markdown-preview{
+  max-width: none;
 }
 
-.markdown-preview-dark {
+.markdown-preview table {
+  color: rgb(53, 53, 53);
+}
+
+.markdown-preview .wmde-markdown table tr {
+  background-color: #ece9e9;
+  border-top: 1px solid var(--color-border-muted);
+}
+
+/* Zebra striping - even rows */
+.markdown-preview .wmde-markdown table tr:nth-child(even) {
+  background-color: #ffffff; 
+}
+
+
+.dark .markdown-preview .wmde-markdown table tr{
+  background-color: rgba(15,16,22,255);
+}
+.dark .markdown-preview .wmde-markdown table tr:nth-child(even) {
+  background-color: rgba(23,27,36,255);
+}  
+
+.dark .markdown-preview .wmde-markdown table{
+  color: white;
+  border-top: none;
+}
+
+.markdown-preview .dark {
   background-color: transparent !important;
   color: white !important;
 }

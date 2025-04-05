@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import ThreadMenuPopup from "../threadMenu/threadMenu.page.jsx";
 import DeleteConfirmationPopup from "../deletePopup/deletePopup.page.jsx";
+import ProfileOverlay from "../profile/page.jsx";
 import "./index.css";
 
 const LeftColumn = ({
@@ -27,6 +28,7 @@ const LeftColumn = ({
   const [showDeletePopup, setShowDeletePopup] = useState(false);
   const [threadToDelete, setThreadToDelete] = useState(null);
   const [deletingThread, setDeletingThread] = useState(false);
+  const [showProfile, setShowProfile] = useState(false);
 
   const handleDeleteWithConfirmation = (id) => {
     setThreadToDelete(id);
@@ -49,10 +51,17 @@ const LeftColumn = ({
     setShowDeletePopup(false);
     setThreadToDelete(null);
   };
+ 
 
   return (
     <div className={`left-column ${isDarkMode ? "dark" : ""}`}>
       {/* Delete Confirmation Popup */}
+      
+      <ProfileOverlay
+        isDarkMode={isDarkMode}
+        isVisible={showProfile}
+        onClose={() => setShowProfile(false)}
+      />
       <DeleteConfirmationPopup
         show={showDeletePopup}
         onCancel={cancelDelete}
@@ -90,7 +99,7 @@ const LeftColumn = ({
       {/* Bottom Buttons */}
       <hr className="divider" />
       <div className="bottom-buttons">
-        <button className="profile-button">
+        <button className="profile-button" onClick={() => setShowProfile(!showProfile)} >
           <User size={20} />
           <span>Perfil</span>
         </button>

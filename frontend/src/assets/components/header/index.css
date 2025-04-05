@@ -473,6 +473,7 @@
   .dark-mode  .history-content li:hover{
     box-shadow: 0 0 8px rgba(100, 149, 237, 0.5);
   border: 1px solid white;  
+  
 
   }
 }

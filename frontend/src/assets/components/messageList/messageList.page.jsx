@@ -108,16 +108,12 @@ const MessageList = ({
               <div className="markdown-preview">
                 {index === messages.length - 1 && isTyping ? (
                   <MarkdownPreview
-                    className={`${
-                      isDarkMode ? "markdown-preview-dark" : "markdown-preview"
-                    }`}
+                  className={`markdown-preview ${isDarkMode ? "dark" : ""}`}
                     source={typingMessage}
                   />
                 ) : (
                   <MarkdownPreview
-                    className={`${
-                      isDarkMode ? "markdown-preview-dark" : "markdown-preview"
-                    }`}
+                  className={`markdown-preview ${isDarkMode ? "dark" : ""}`}
                     source={msg.text}
                   />
                 )}
