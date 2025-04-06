@@ -53,7 +53,7 @@ const ProfileOverlay = ({ isDarkMode, isVisible, onClose }) => {
           />
         </div>
 
-        <div className="form-section">
+        <div className="form-section text-area-section">
           <h3 className="section-title">¿Qué vendes?</h3>
           <p className="section-description">
           ¿De qué trata tu ecommerce, qué productos vendes, para qué sirven, etc.?
@@ -67,7 +67,7 @@ const ProfileOverlay = ({ isDarkMode, isVisible, onClose }) => {
           />
         </div>
 
-        <div className="form-section">
+        <div className="form-section text-area-section">
           <h3 className="section-title">¿Cual es tu historia?</h3>
           <p className="section-description">
           ¿Cuándo se fundó, quiénes son los fundadores, cuál es vuestra propuesta de valor, etc.?

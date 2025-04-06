@@ -172,7 +172,10 @@
     max-height: none;
     border-radius: 0;
     padding: 16px 12px;
-    overflow-y: none;
+  }
+
+  .profile-form{
+    height: 100%;
   }
 
   .dark-mode .profile-overlay{
@@ -199,19 +202,29 @@
   }
 
   .profile-form {
-    gap: 10px;
+    gap: 1%;
   }
 
+  .form-section{
+    flex:1;
+  }
+  .update-btn{
+    flex:1;
+  }
   .form-input,
   .form-textarea {
     width: 80%;
     font-size: 0.95rem;
   }
 
-  .form-textarea {
-    height: 35%;
+  .form-input{
+    height: 5%;
   }
 
+  .form-textarea {
+    height: 25%;
+  }
+  
   .update-btn {
     width: 90%;
     padding: 12px;
