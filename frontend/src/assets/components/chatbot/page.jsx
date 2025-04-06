@@ -20,6 +20,8 @@ const Chatbot = () => {
 
   const [threads, setThreads] = useState([]);
   const [selectedThread, setSelectedThread] = useState("");
+
+  const [chatState, setChatState] = useState("minimized"); 
   // Function to create a new thread - moved from LeftColumn component
   const createThread = async () => {
     try {
@@ -117,9 +119,34 @@ const Chatbot = () => {
   };
 
   const toggleVisibility = () => {
+    console.log("toggleVisibility",isExpanded,isVisible,chatState);
     setIsVisible((prev) => !prev);
+    if (localStorage.getItem("isExpanded") === "true" && isVisible === true){
+      setChatState("minimized");
+    }else if(localStorage.getItem("isExpanded") === "true"){
+      setChatState("maximized");
+    }else{
+      setChatState(isVisible ? "minimized" : "open");
+    }
   };
+
   const [isProfileOpen, setIsProfileOpen] = useState(false);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      if (chatState === "minimized") {
+        window.parent.postMessage({ type: 'resize-iframe', width: 60, height: 60 }, '*');
+      } else if (chatState === "open") {
+        window.parent.postMessage({ type: 'resize-iframe', width: 400, height: 500 }, '*');
+      } else if (chatState === "maximized") {
+        window.parent.postMessage({
+          type: 'resize-iframe',
+          width: window.innerWidth,
+          height: window.innerHeight
+        }, '*');
+      }
+    }
+  }, [chatState]);
 
   const handleProfileOpen = () => {
     setIsProfileOpen((prev) => !prev);
@@ -140,6 +167,8 @@ const Chatbot = () => {
         }`}
       >
         <Header
+          chatState={chatState} 
+          setChatState={setChatState}
           isProfileOpen={isProfileOpen}
           handleProfileOpen={handleProfileOpen}
           onExpand={handleExpand}

@@ -20,6 +20,8 @@ import DeleteConfirmationPopup from "../deletePopup/deletePopup.page.jsx";
 import ProfileOverlay from "../profile/page.jsx";
 
 const Header = ({
+  chatState,
+  setChatState,
   isProfileOpen,
   handleProfileOpen,
   onExpand,
@@ -54,8 +56,12 @@ const Header = ({
   useEffect(() => {
     document.body.classList.toggle("dark-mode", isDarkMode);
   }, [isDarkMode]);
-
+  useEffect(() => {
+    console.log(chatState, "header");
+  }, [chatState]);
   const handleExpand = () => {
+    setChatState(isExpanded ? "open" : "maximized");
+    console.log("handleExpand",isExpanded,chatState);
     const newExpandedState = !isExpanded;
     localStorage.setItem("isExpanded", newExpandedState.toString());
     onExpand(newExpandedState);
