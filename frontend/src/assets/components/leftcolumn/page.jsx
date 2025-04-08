@@ -16,6 +16,8 @@ import ProfileOverlay from "../profile/page.jsx";
 import "./index.css";
 
 const LeftColumn = ({
+  userData,
+  setUserData,
   handleProfileOpen,
   threads,
   changeThread,
@@ -52,13 +54,14 @@ const LeftColumn = ({
     setShowDeletePopup(false);
     setThreadToDelete(null);
   };
- 
 
   return (
     <div className={`left-column ${isDarkMode ? "dark" : ""}`}>
       {/* Delete Confirmation Popup */}
-      
+
       <ProfileOverlay
+        userData={userData}
+        setUserData={setUserData}
         isDarkMode={isDarkMode}
         isVisible={showProfile}
         onClose={() => setShowProfile(false)}
@@ -100,7 +103,7 @@ const LeftColumn = ({
       {/* Bottom Buttons */}
       <hr className="divider" />
       <div className="bottom-buttons">
-        <button className="profile-button" onClick={handleProfileOpen} >
+        <button className="profile-button" onClick={handleProfileOpen}>
           <User size={20} />
           <span>Perfil</span>
         </button>

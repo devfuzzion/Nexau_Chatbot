@@ -195,19 +195,19 @@ const MessageList = ({
                 <div className="markdown-preview">
                   {index === messages.length - 1 && isTyping ? (
                     <MarkdownPreview
-                    className={`markdown-preview ${isDarkMode ? "dark" : ""}`}
+                      className={`markdown-preview ${isDarkMode ? "dark" : ""}`}
                       source={typingMessage}
                     />
                   ) : (
                     <MarkdownPreview
-                    className={`markdown-preview ${isDarkMode ? "dark" : ""}`}
+                      className={`markdown-preview ${isDarkMode ? "dark" : ""}`}
                       source={msg.text}
                     />
                   )}
                 </div>
               ) : (
                 <div className="client-message-text">
-                  {msg.text.split("User message: ")[1]
+                  {msg.text.split("User message:")[1]
                     ? msg.text.split("User message: ")[1]
                     : msg.text}
                 </div>

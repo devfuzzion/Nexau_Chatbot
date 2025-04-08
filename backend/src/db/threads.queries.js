@@ -99,3 +99,23 @@ export const updateFeedback = async (id, feedback) => {
     throw err;
   }
 };
+
+export const createUser = async ({ storeName, website, products, story }) => {
+  try {
+    const { rowCount } = await sql.query(
+      'INSERT INTO users ("storeName", "website", "products", "story") VALUES ($1, $2, $3, $4)',
+      [storeName, website, products, story]
+    );
+
+    if (rowCount > 0) {
+      console.log(`User created successfully: ${storeName}`);
+      return { success: true, message: "User created successfully." };
+    } else {
+      return { success: false, message: "Failed to create user." };
+    }
+  } catch (err) {
+    console.error("Error creating user:", err);
+    throw err;
+  }
+};
+
