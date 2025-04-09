@@ -19,7 +19,13 @@ import {
   generateFeedbackSummary,
   // saveFeedback,
 } from "./openai.utils.js";
-import { logConversation, logFeedback, storeFeedbackState, getFeedbackStates } from "./airtable.utils.js";
+import {
+  logConversation,
+  logFeedback,
+  logUserData,
+  storeFeedbackState,
+  getFeedbackStates,
+} from "./airtable.utils.js";
 import {
   getAllThreads,
   createThreadInDb,
@@ -28,6 +34,7 @@ import {
   updateThreadTitle,
   updateFeedback,
 } from "./db/threads.queries.js";
+import userRouter from "./routes/user.router.js";
 const app = express();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -61,6 +68,7 @@ const upload = multer({
 
 app.use(cors());
 app.use(express.json());
+app.use("/users", userRouter);
 
 app.get("/ping", (req, res) => {
   res.send("<h1>Pong</h1>");
@@ -147,7 +155,7 @@ app.post("/run/:threadId", async (req, res) => {
           response: messages[0].content[0].text.value,
         });
 
-        console.log("Conversation logged successfully");
+              console.log("Conversation logged successfully");
 
         res.json({ success: true, botMessage: messages[0] });
       } catch (err) {
@@ -298,7 +306,7 @@ app.post("/feedback/state", async (req, res) => {
       userId,
       messageId,
       threadId,
-      isLiked
+      isLiked,
     });
 
     if (result.success) {

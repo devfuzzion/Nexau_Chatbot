@@ -1,30 +1,72 @@
-import React, { useState } from 'react';
-import { X } from 'lucide-react';
-import './index.css';
+import React, { useState, useEffect } from "react";
+import { ChartNoAxesColumnDecreasing, X } from "lucide-react";
+import "./index.css";
+import { updateUserData } from "../../../api/chatService.js"; // adjust path as needed
 
-const ProfileOverlay = ({ isDarkMode, isVisible, onClose }) => {
+const ProfileOverlay = ({
+  userData,
+  setUserData,
+  isDarkMode,
+  isVisible,
+  onClose,
+}) => {
   const [storeInfo, setStoreInfo] = useState({
-    storeName: '',
-    website: '',
-    products: '',
-    story: ''
+    storeName: "",
+    website: "",
+    products: "",
+    story: "",
   });
-
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  // console.log(userData, 11);
+  useEffect(() => {
+    // console.log("Fron parent");
+    // console.log(storeInfo);
+    if (!userData?.userid) return;
+    if (userData) {
+      setStoreInfo({
+        storeName: userData.storename || "",
+        website: userData.website || "",
+        products: userData.products || "",
+        story: userData.story || "",
+      });
+    }
+  }, [userData]);
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setStoreInfo(prev => ({ ...prev, [name]: value }));
+    setStoreInfo((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('Store info updated:', storeInfo);
-    onClose();
+    setIsSubmitting(true);
+
+    try {
+      const response = await updateUserData(1, storeInfo);
+      if (response.success) {
+        setUserData({
+          ...userData,
+          storename: storeInfo.storeName,
+          website: storeInfo.website,
+          products: storeInfo.products,
+          story: storeInfo.story,
+        });
+        // onClose(); // close overlay if needed
+      } else {
+        // setError(response.message || "Error al actualizar los datos.");
+        console.log(response.message);
+      }
+    } catch (err) {
+      console.log("Error del servidor. Intenta nuevamente.");
+      console.error(err);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   if (!isVisible) return null;
 
   return (
-    <div className={`profile-overlay ${isDarkMode ? 'dark' : ''}`}>
+    <div className={`profile-overlay ${isDarkMode ? "dark" : ""}`}>
       <div className="profile-header">
         <h2 className="profile-title">Perfil</h2>
         <button className="bk-button" onClick={onClose}>
@@ -56,7 +98,8 @@ const ProfileOverlay = ({ isDarkMode, isVisible, onClose }) => {
         <div className="form-section text-area-section">
           <h3 className="section-title">¿Qué vendes?</h3>
           <p className="section-description">
-          ¿De qué trata tu ecommerce, qué productos vendes, para qué sirven, etc.?
+            ¿De qué trata tu ecommerce, qué productos vendes, para qué sirven,
+            etc.?
           </p>
           <textarea
             name="products"
@@ -70,7 +113,8 @@ const ProfileOverlay = ({ isDarkMode, isVisible, onClose }) => {
         <div className="form-section text-area-section">
           <h3 className="section-title">¿Cual es tu historia?</h3>
           <p className="section-description">
-          ¿Cuándo se fundó, quiénes son los fundadores, cuál es vuestra propuesta de valor, etc.?
+            ¿Cuándo se fundó, quiénes son los fundadores, cuál es vuestra
+            propuesta de valor, etc.?
           </p>
           <textarea
             name="story"
@@ -81,8 +125,8 @@ const ProfileOverlay = ({ isDarkMode, isVisible, onClose }) => {
           />
         </div>
 
-        <button type="submit" className="update-btn">
-          Actualizar
+        <button type="submit" className="update-btn" disabled={isSubmitting}>
+          {isSubmitting ? "Actualizando..." : "Actualizar"}
         </button>
       </form>
     </div>

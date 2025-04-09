@@ -17,7 +17,6 @@ import "./index.css";
 import { useTheme } from "../../../hooks/useTheme.js";
 import ThreadMenuPopup from "../threadMenu/threadMenu.page.jsx";
 import DeleteConfirmationPopup from "../deletePopup/deletePopup.page.jsx";
-import ProfileOverlay from "../profile/page.jsx";
 
 const Header = ({
   chatState,
@@ -178,7 +177,7 @@ const Header = ({
   const toggleProfileOpen = () => {
     setIsMenuOpen(false);
     handleProfileOpen();
-  }
+  };
 
   return (
     <div className={`header-container ${isExpanded ? "expanded" : ""}`}>
@@ -222,9 +221,9 @@ const Header = ({
             <span>Nuevo Chat</span>
           </button>
           <button className="mobile-menu-button" onClick={toggleProfileOpen}>
-           <User size={16} />
-           <span>Perfil</span>
-            </button>
+            <User size={16} />
+            <span>Perfil</span>
+          </button>
 
           <button className="mobile-menu-button" onClick={openHistory}>
             <History size={16} />

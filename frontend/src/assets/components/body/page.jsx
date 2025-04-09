@@ -12,6 +12,8 @@ import MessageList from "../messageList/messageList.page.jsx";
 import ProfileOverlay from "../profile/page.jsx";
 
 const Body = ({
+  userData,
+  setUserData,
   handleProfileOpen,
   isProfileOpen,
   isExpanded,
@@ -156,7 +158,15 @@ const Body = ({
       const threadFeedback = thread.feedback ?? ""; // Get the existing feedback
       // console.log(thread);
       // console.log(threadFeedback, 4444);
-      const formattedMessage = `User feedback: ${threadFeedback}\nUser message: ${message}`;
+      const formattedMessage = `User Info:
+      You can use this to generate the response but no need to mention it to the user that you know this without him asking
+      - Store Name: ${userData?.storename || "N/A"}
+      - Website: ${userData?.website || "N/A"}
+      - Products: ${userData?.products || "N/A"}
+      - Story: ${userData?.story || "N/A"}
+
+      User feedback: ${threadFeedback}
+      User message: ${message}`;
 
       const botResponse = await sendMessage(
         selectedThread,
@@ -232,6 +242,8 @@ const Body = ({
     >
       {isExpanded && (
         <LeftColumn
+          userData={userData}
+          setUserData={setUserData}
           handleProfileOpen={handleProfileOpen}
           isDarkMode={isDarkMode}
           toggleTheme={toggleTheme}
@@ -247,35 +259,37 @@ const Body = ({
       <div className={`main-content ${isDarkMode ? "dark" : ""}`}>
         {isProfileOpen ? (
           <ProfileOverlay
+            setUserData={setUserData}
+            userData={userData}
             isDarkMode={isDarkMode}
             isVisible={isProfileOpen}
             onClose={handleProfileOpen}
           />
-        ):(
+        ) : (
           <>
-          <MessageList
-          messages={messages}
-          userId={'123'}
-          threadId={selectedThread}
-          isDarkMode={isDarkMode}
-          isExpanded={isExpanded}
-          typingState={typingState}
-          messagesEndRef={messagesEndRef}
-          isWaitingForResponse={isWaitingForResponse}
-          selectedThread={selectedThread}
-          handleFeedback={handleFeedback}
-        />
-        <Footer
-          onSendMessage={handleSendMessage}
-          isDarkMode={isDarkMode}
-          isExpanded={isExpanded}
-          isDisabled={
-            !selectedThread ||
-            isWaitingForResponse ||
-            typingState.isTyping ||
-            typingState.showIndicator
-          }
-        />
+            <MessageList
+              messages={messages}
+              userId={"123"}
+              threadId={selectedThread}
+              isDarkMode={isDarkMode}
+              isExpanded={isExpanded}
+              typingState={typingState}
+              messagesEndRef={messagesEndRef}
+              isWaitingForResponse={isWaitingForResponse}
+              selectedThread={selectedThread}
+              handleFeedback={handleFeedback}
+            />
+            <Footer
+              onSendMessage={handleSendMessage}
+              isDarkMode={isDarkMode}
+              isExpanded={isExpanded}
+              isDisabled={
+                !selectedThread ||
+                isWaitingForResponse ||
+                typingState.isTyping ||
+                typingState.showIndicator
+              }
+            />
           </>
         )}
       </div>

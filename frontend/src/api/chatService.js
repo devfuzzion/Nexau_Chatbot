@@ -171,3 +171,69 @@ export const appendFeedbackMessage = async (
     throw error;
   }
 };
+
+export const updateUserData = async (userId, userData) => {
+  try {
+    if (!userId || !userData) {
+      throw new Error("User ID and user data are required.");
+    }
+
+    const response = await fetch(
+      `${backendUrl}/users/${userId}/user-questions-data`,
+      {
+        method: "POST", // or "POST" if you're not strictly RESTful
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(userData),
+      },
+    );
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || "Failed to update user data.");
+    }
+
+    const data = await response.json();
+
+    if (!data.success) {
+      throw new Error(data.message || "User update failed.");
+    }
+
+    return data;
+  } catch (error) {
+    console.error("Error updating user data:", error);
+    throw error;
+  }
+};
+
+export const getUserData = async (userId) => {
+  try {
+    if (!userId) {
+      throw new Error("User ID is required.");
+    }
+
+    const response = await fetch(`${backendUrl}/users/${userId}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || "Failed to fetch user data.");
+    }
+
+    const data = await response.json();
+
+    if (!data.success || !data.data) {
+      throw new Error(data.message || "User data not found.");
+    }
+
+    return data.data; // returning only the actual user data
+  } catch (error) {
+    console.error("Error fetching user data:", error);
+    throw error; // optional: or return null if you prefer silent failure
+  }
+};
