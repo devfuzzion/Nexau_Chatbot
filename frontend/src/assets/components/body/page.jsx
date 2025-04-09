@@ -203,7 +203,7 @@ const Body = ({
     }
 
     const originalFeedback = thread.feedback ?? ""; // Get the existing feedback
-
+    
     try {
       const updatedFeedback = await appendFeedbackMessage(
         selectedThread, // Thread ID

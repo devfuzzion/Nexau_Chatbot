@@ -47,6 +47,14 @@ const Header = ({
 
   // Initialize and persist expanded state
   useEffect(() => {
+    console.log(window.location.href, 222);
+
+    if(window.location.href.includes("/expanded")){
+      localStorage.setItem("isExpanded", true);
+    }else{
+      localStorage.setItem("isExpanded", false);
+    }
+
     const savedExpanded = localStorage.getItem("isExpanded") === "true";
     if (savedExpanded !== isExpanded) {
       onExpand(savedExpanded); // Sync with parent component
@@ -60,11 +68,14 @@ const Header = ({
     console.log(chatState, "header");
   }, [chatState]);
   const handleExpand = () => {
-    setChatState(isExpanded ? "open" : "maximized");
-    console.log("handleExpand",isExpanded,chatState);
-    const newExpandedState = !isExpanded;
-    localStorage.setItem("isExpanded", newExpandedState.toString());
-    onExpand(newExpandedState);
+    // Get the current URL and construct the expanded URL
+    const currentUrl = window.location.href;
+    localStorage.setItem("isExpanded", !isExpanded);
+    const baseUrl = currentUrl.split('/').slice(0, 3).join('/'); // Get protocol and domain
+    const expandedUrl = `${baseUrl}/expanded`;
+    
+    // Redirect to the expanded URL
+    window.location.href = expandedUrl;
   };
 
   const toggleMenu = () => {

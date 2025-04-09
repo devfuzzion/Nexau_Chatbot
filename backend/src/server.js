@@ -147,18 +147,6 @@ app.post("/run/:threadId", async (req, res) => {
           response: messages[0].content[0].text.value,
         });
 
-        const feedbackMatch = req.body.userMessage.match(/User feedback:\s*(.*?)\s*User message:/s);
-        const feedback = feedbackMatch && feedbackMatch[1].trim() ? feedbackMatch[1].trim() : null;
-
-        if (feedback) {
-          await logFeedback({
-            userId: "123",
-            threadId: req.params.threadId,
-            messageId: run.id,
-            feedback: feedback,
-          });
-          console.log("Feedback logged successfully");
-        }
         console.log("Conversation logged successfully");
 
         res.json({ success: true, botMessage: messages[0] });
@@ -238,6 +226,17 @@ app.post("/threads/:threadId/:messageId", async (req, res) => {
   try {
     const { threadId, messageId } = req.params;
     const { feedback, originalFeedback } = req.body;
+
+    console.log(feedback, originalFeedback, 222);
+
+    if (feedback) {
+      logFeedback({
+        userId: "123",
+        feedback: feedback,
+        threadId: threadId,
+        messageId: messageId,
+      });
+    }
 
     // Validate inputs
     if (!threadId || !messageId) {
