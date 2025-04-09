@@ -132,13 +132,34 @@ export const logUserData = async ({
   story,
 }) => {
   try {
-    const record = await base(USER_DATA_TABLE_NAME).create({
-      user_id: parseInt(userId),
-      store_name: storeName || "",
-      website: website || "",
-      products: products || "",
-      story: story || "",
-    });
+    const records = await base(USER_DATA_TABLE_NAME)
+      .select({
+        filterByFormula: `{user_id} = '${userId}'`,
+        maxRecords: 1,
+      })
+      .firstPage();
+    if (records.length > 0) {
+      // ✅ Update existing record
+      const recordId = records[0].id;
+
+      const updated = await base(USER_DATA_TABLE_NAME).update(recordId, {
+        store_name: storeName || "",
+        website: website || "",
+        products: products || "",
+        story: story || "",
+      });
+
+      return { success: true, recordId: updated.id, updated: true };
+    } else {
+      // 🆕 Create new record
+      const created = await base(USER_DATA_TABLE_NAME).create({
+        user_id: parseInt(userId),
+        store_name: storeName || "",
+        website: website || "",
+        products: products || "",
+        story: story || "",
+      });
+    }
 
     return { success: true, recordId: record.id };
   } catch (error) {
