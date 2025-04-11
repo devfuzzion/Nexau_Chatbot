@@ -473,6 +473,11 @@ body.dark-mode {
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  background-color:white;
+}
+
+.dark-mode .main-content {
+  background-color: #2d303a;
 }
 
 .dark-mode .divider {
