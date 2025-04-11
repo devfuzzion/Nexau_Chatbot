@@ -71,7 +71,14 @@ const Header = ({
     const currentUrl = window.location.href;
     localStorage.setItem("isExpanded", !isExpanded);
     const baseUrl = currentUrl.split('/').slice(0, 3).join('/'); // Get protocol and domain
-    const expandedUrl = `${baseUrl}/expanded`;
+    
+    let expandedUrl;
+
+    if(!isExpanded){
+      expandedUrl = `${baseUrl}/expanded`;
+    }else{
+       expandedUrl = `${baseUrl}/`;
+    }
     
     // Redirect to the expanded URL
     window.location.href = expandedUrl;

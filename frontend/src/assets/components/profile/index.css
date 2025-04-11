@@ -12,6 +12,7 @@
   border-radius: 15px;
   flex-direction: column;
   padding-left: 4%;
+  padding-top: 3%;
   min-width: 0;
   max-width: 100%;
   transition: background-color 0.3s ease-in-out, color 0.3s ease-in-out;
@@ -56,8 +57,8 @@
 }
 
 .section-title {
-  font-size: 1.1rem;
-  font-weight: 500;
+  font-size: 1.5rem;
+  font-weight: 400;
   margin: 0;
 }
 
@@ -100,7 +101,7 @@
 
 /* Dark Mode */
 .dark-mode .profile-overlay {
-  background-color: #1e1e1e;
+  background-color: #2d303a;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
 }
 
@@ -122,13 +123,17 @@
 
 .dark-mode .form-input,
 .dark-mode .form-textarea {
-  background-color: #2d2d2d;
+  background-color: #464c59;
   border-color: #444;
   color: white;
 }
 
 .dark-mode .update-btn {
   background-color: #3b82f6;
+}
+
+.profile-overlay input,textarea {
+  background-color: #e8ebf0;
 }
 
 

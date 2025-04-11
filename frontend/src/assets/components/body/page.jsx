@@ -49,15 +49,43 @@ const Body = ({
     };
   }, []);
 
-  const handleThreadChange = (threadId) => {
+  const handleThreadChange = async (threadId) => {
+    // First clear any existing intervals and timeouts
     clearInterval(typingIntervalRef.current);
     clearTimeout(thinkingTimeoutRef.current);
-    setSelectedThread(threadId);
+
+    // Reset typing state
     setTypingState({
       isTyping: false,
       typingMessage: "",
       showIndicator: false,
     });
+
+    // If profile is open, close it first
+    if (isProfileOpen) {
+      handleProfileOpen();
+    }
+
+    // Clear messages before setting new thread to prevent flash of old messages
+    setMessages([]);
+
+    // Then set the new thread
+    setSelectedThread(threadId);
+
+    // Load messages for the new thread
+    try {
+      const messageData = await fetchMessages(threadId);
+      setMessages(messageData.map((msg) => ({ ...msg, isNew: false })));
+    } catch (error) {
+      console.error("Failed to load messages:", error);
+      setMessages([
+        {
+          text: "Failed to load messages. Please try again.",
+          isBot: true,
+          isNew: false,
+        },
+      ]);
+    }
   };
 
   useEffect(() => {
@@ -234,6 +262,12 @@ const Body = ({
     }
   };
 
+  const handleCloseProfile = () => {
+    if (isProfileOpen) {
+      handleProfileOpen();
+    }
+  };
+
   return (
     <div
       className={`body-wrapper ${isDarkMode ? "dark" : ""} ${
@@ -253,6 +287,8 @@ const Body = ({
           onCreateThread={createThread}
           deleteThreadById={deleteThreadById}
           updateThreadTitleById={updateThreadTitleById}
+          isProfileOpen={isProfileOpen}
+          onCloseProfile={handleCloseProfile}
         />
       )}
 

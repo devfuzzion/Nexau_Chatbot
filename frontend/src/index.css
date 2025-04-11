@@ -67,6 +67,12 @@ button:focus-visible {
   }
 } */
 /* Prevent zooming on input focus for mobile devices */
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Open+Sans:ital,wght@0,300..800;1,300..800&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap');
+
+body {
+  font-family: "Roboto", sans-serif !important; 
+}
+
 input[type="text"],
 textarea {
   font-size: 16px !important; /* Minimum 16px prevents iOS zoom */

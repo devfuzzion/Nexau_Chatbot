@@ -69,9 +69,9 @@ const ProfileOverlay = ({
     <div className={`profile-overlay ${isDarkMode ? "dark" : ""}`}>
       <div className="profile-header">
         <h2 className="profile-title">Perfil</h2>
-        <button className="bk-button" onClick={onClose}>
+        {/* <button className="bk-button" onClick={onClose}>
           <X size={24} />
-        </button>
+        </button> */}
       </div>
 
       <form className="profile-form" onSubmit={handleSubmit}>

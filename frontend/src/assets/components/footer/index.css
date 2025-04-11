@@ -11,7 +11,7 @@
   background-color: white;
   width: 100%;
   border-radius: 0px 0px 5px 5px;
-  font-family: Inter, sans-serif;
+  /* font-family: Inter, sans-serif; */
   text-align: center;
   transition: background-color 0.3s ease-in-out, color 0.3s ease-in-out;
   /* box-shadow: 0 -4px 6px rgba(0, 0, 0, 0.1); Add shadow for depth */
@@ -25,14 +25,14 @@
   width: 90%;
   border-radius: 5px;
   /* background-color: rgba(232, 235, 241, 255); */
-  font-family: Inter, sans-serif;
+  /* font-family: Inter, sans-serif; */
 }
 
 .footer-input {
   display: flex;
   justify-content: center;
   width: 80%;
-  font-family: Inter, sans-serif;
+  /* font-family: Inter, sans-serif; */
   padding: 10px;
   border: none;
   border-radius: 5px;
@@ -107,14 +107,14 @@
 
 /* Dark Mode Styles */
 .dark-mode .footer-container {
-  background-color: #1e1e1e;
+  background-color: #2d303a;
   color: white;
   transition: background-color 0.3s ease-in-out, color 0.3s ease-in-out;
   /* box-shadow: 0 -4px 6px rgba(255, 255, 255, 0.1); Adjust shadow for dark mode */
 }
 
 .dark-mode .footer-input {
-  background-color: #2c2c2c;
+  background-color: #464c59;
   color: white;
   border: 1px solid #444;
 }
@@ -125,7 +125,7 @@
 }
 
 .dark-mode .footer-button {
-  background-color: #2c2c2c;
+  background-color: #464c59;
   border: 1px solid #444;
 }
 

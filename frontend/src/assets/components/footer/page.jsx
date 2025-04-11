@@ -50,8 +50,8 @@ const Footer = ({ onSendMessage, isDarkMode, isExpanded, isDisabled }) => {
           id="file-input"
           disabled={isDisabled}
         />
-        <button 
-          type='button' 
+        <button
+          type='button'
           className={`footer-button ${isDarkMode ? 'dark-mode' : ''} ${selectedFile ? 'file-selected' : ''} ${isDisabled ? 'disabled' : ''}`}
           onClick={() => !isDisabled && fileInputRef.current?.click()}
           title={selectedFile ? `Selected: ${selectedFile.name}` : 'Attach file'}
@@ -59,8 +59,8 @@ const Footer = ({ onSendMessage, isDarkMode, isExpanded, isDisabled }) => {
         >
           {selectedFile ? <FileCheck size={20} /> : <FileInput size={20} />}
         </button>
-        <button 
-          type='submit' 
+        <button
+          type='submit'
           className={`footer-button ${isDarkMode ? 'dark-mode' : ''} ${isDisabled ? 'disabled' : ''}`}
           disabled={isDisabled || !message.trim()}
         >
@@ -69,11 +69,11 @@ const Footer = ({ onSendMessage, isDarkMode, isExpanded, isDisabled }) => {
       </form>
       {selectedFile && (
         <div className={`selected-file ${isDarkMode ? 'dark-mode' : ''}`}>
-         Seleccionada: {selectedFile.name}
+          Seleccionada: {selectedFile.name}
         </div>
       )}
       <div className={`powered-by ${isDarkMode ? 'dark-mode' : ''}`}>
-      Desarrollado por <strong>Nexau</strong>
+        Powered by <strong onClick={() => window.open('https://nexau.es', '_blank')} style={{cursor: 'pointer'}}>Nexau</strong>
       </div>
     </div>
   );

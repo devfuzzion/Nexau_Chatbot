@@ -27,6 +27,8 @@ const LeftColumn = ({
   selectedThread,
   deleteThreadById,
   updateThreadTitleById,
+  isProfileOpen,
+  onCloseProfile,
 }) => {
   const [showDeletePopup, setShowDeletePopup] = useState(false);
   const [threadToDelete, setThreadToDelete] = useState(null);
@@ -92,6 +94,7 @@ const LeftColumn = ({
                 onRenameThread={updateThreadTitleById}
                 onDeleteThread={handleDeleteWithConfirmation}
                 isDarkMode={isDarkMode}
+                onCloseProfile={onCloseProfile}
               />
             ))
           ) : (
@@ -123,6 +126,7 @@ const HistoryItem = ({
   onRenameThread,
   onDeleteThread,
   isDarkMode,
+  onCloseProfile,
 }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isRenaming, setIsRenaming] = useState(false);
@@ -132,6 +136,7 @@ const HistoryItem = ({
   useEffect(() => {
     setNewTitle(thread.threadTitle);
   }, [thread.threadTitle]);
+
   const toggleMenu = (e) => {
     e.stopPropagation();
     setIsMenuOpen(!isMenuOpen);
@@ -171,15 +176,24 @@ const HistoryItem = ({
     }
   };
 
+  const handleThreadClick = async () => {
+    // Close any open menus first
+    setIsMenuOpen(false);
+    
+    // Change thread and handle profile closing
+    await changeThread(thread.threadid);
+  };
+
   useEffect(() => {
     if (isRenaming && inputRef.current) {
       inputRef.current.focus();
       inputRef.current.select();
     }
   }, [isRenaming]);
+
   return (
     <li
-      onClick={() => changeThread(thread.threadid)}
+      onClick={handleThreadClick}
       className={`history-item ${
         selectedThread === thread.threadid ? "selected-item" : ""
       }`}
