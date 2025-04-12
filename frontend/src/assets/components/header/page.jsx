@@ -66,23 +66,23 @@ const Header = ({
   useEffect(() => {
     console.log(chatState, "header");
   }, [chatState]);
-  const handleExpand = () => {
-    // Get the current URL and construct the expanded URL
-    const currentUrl = window.location.href;
-    localStorage.setItem("isExpanded", !isExpanded);
-    const baseUrl = currentUrl.split('/').slice(0, 3).join('/'); // Get protocol and domain
-    
-    let expandedUrl;
+    const handleExpand = () => {
+      // Get the current URL and construct the expanded URL
+      const currentUrl = window.location.href;
+      localStorage.setItem("isExpanded", !isExpanded);
+      const baseUrl = currentUrl.split('/').slice(0, 3).join('/'); // Get protocol and domain
+      
+      let expandedUrl;
 
-    if(!isExpanded){
-      expandedUrl = `${baseUrl}/expanded`;
-    }else{
-       expandedUrl = `${baseUrl}/`;
-    }
-    
-    // Redirect to the expanded URL
-    window.location.href = expandedUrl;
-  };
+      if(!isExpanded){
+        expandedUrl = `${baseUrl}/expanded`;
+      }else{
+        expandedUrl = `${baseUrl}/`;
+      }
+      
+      // Redirect to the expanded URL into new tab
+      window.open(expandedUrl, '_blank');
+    };
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
@@ -208,7 +208,7 @@ const Header = ({
       {/* Right Section */}
       <div className="right-section">
         <button className="expand-icon" onClick={handleExpand}>
-          {isExpanded ? <Minimize size={20} /> : <Expand size={20} />}
+          {!isExpanded ? <Expand size={20} /> : '' }
         </button>
         <button className="chevron-down-button" onClick={onToggleVisibility}>
           <ChevronDown size={20} />
