@@ -6,9 +6,6 @@ dotenv.config();
 const openai = new OpenAI();
 const ASSISTANT_ID = process.env.ASSISTANT_ID;
 
-
-
-
 export const processFileContent = async (file) => {
   // Convert file buffer to text
   console.log("file", file);
@@ -87,6 +84,8 @@ export const getThreadDataFromOpenAi = async (threadId) => {
 export const createRun = async (threadId) => {
   const run = await openai.beta.threads.runs.createAndPoll(threadId, {
     assistant_id: ASSISTANT_ID,
+    include: ["step_details.tool_calls[*].file_search.results[*].content"],
+    tools: [{ type: "file_search" }],
     instructions: `Eres un asistente AI servicial. IMPORTANTE: Siempre responde en español, independientemente del idioma en que te escriba el usuario.
 
 Siempre formatea tus respuestas en formato markdown. Utiliza la sintaxis markdown apropiada para:
