@@ -124,6 +124,7 @@
 .dark-mode .form-input,
 .dark-mode .form-textarea {
   background-color: #464c59;
+  font-family: 'Roboto', sans-serif;
   border-color: #444;
   color: white;
 }
