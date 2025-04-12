@@ -57,6 +57,10 @@ const LeftColumn = ({
     setThreadToDelete(null);
   };
 
+  const handleThemeToggle = () => {
+    toggleTheme(!isDarkMode);
+  };
+
   return (
     <div className={`left-column ${isDarkMode ? "dark" : ""}`}>
       {/* Delete Confirmation Popup */}
@@ -110,7 +114,7 @@ const LeftColumn = ({
           <User size={20} />
           <span>Perfil</span>
         </button>
-        <button className="theme-toggle-button" onClick={toggleTheme}>
+        <button className="theme-toggle-button" onClick={handleThemeToggle}>
           {isDarkMode ? <Sun size={20} /> : <Moon size={20} />}
           <span>{isDarkMode ? "Modo Claro" : "Modo Oscuro"}</span>
         </button>

@@ -22,6 +22,10 @@ const Chatbot = ({ userData, setUserData }) => {
   const [selectedThread, setSelectedThread] = useState("");
 
   const [chatState, setChatState] = useState("minimized");
+  const [isDarkMode, setIsDarkMode] = useState(() => {
+    return localStorage.getItem("isDarkMode") === "true";
+  });
+
   // Function to create a new thread - moved from LeftColumn component
   const createThread = async () => {
     try {
@@ -160,11 +164,24 @@ const Chatbot = ({ userData, setUserData }) => {
   const handleProfileOpen = () => {
     setIsProfileOpen((prev) => !prev);
   };
+
+  const toggleTheme = (darkMode) => {
+    setIsDarkMode(darkMode);
+    localStorage.setItem("isDarkMode", darkMode);
+    // Update body class for global theme
+    document.body.classList.toggle('dark-mode', darkMode);
+  };
+
+  // Apply theme on mount
+  useEffect(() => {
+    document.body.classList.toggle('dark-mode', isDarkMode);
+  }, []);
+
   return (
     <>
       {/* Infinity Button (visible only when chatbot is hidden) */}
       {!isVisible && (
-        <button className="infinity-button" onClick={toggleVisibility}>
+        <button className={`infinity-button ${isDarkMode ? 'dark' : ''}`} onClick={toggleVisibility}>
           <img src="/images/chat_icon.png" alt="logo" className="chat-logo" />
         </button>
       )}
@@ -173,7 +190,7 @@ const Chatbot = ({ userData, setUserData }) => {
       <div
         className={`chatbot-container ${isExpanded ? "expanded" : ""} ${
           isVisible ? "" : "hidden"
-        }`}
+        } ${isDarkMode ? "dark" : ""}`}
       >
         <Header
           chatState={chatState}
@@ -189,6 +206,8 @@ const Chatbot = ({ userData, setUserData }) => {
           createThread={createThread}
           deleteThreadById={deleteThreadById}
           updateThreadTitleById={updateThreadTitleById}
+          isDarkMode={isDarkMode}
+          toggleTheme={toggleTheme}
         />
         <Body
           userData={userData}
@@ -203,6 +222,8 @@ const Chatbot = ({ userData, setUserData }) => {
           createThread={createThread}
           deleteThreadById={deleteThreadById}
           updateThreadTitleById={updateThreadTitleById}
+          isDarkMode={isDarkMode}
+          toggleTheme={toggleTheme}
         />
       </div>
     </>

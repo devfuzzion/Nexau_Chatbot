@@ -5,7 +5,7 @@
   width: 250px;
   background-color: rgba(230, 233, 237, 255);
   padding: 12px;
-  border-right: 1px solid #ddd;
+  /* border-right: 1px solid #ddd; */
   display: flex;
   color: black;
   /* font-family: Inter, sans-serif; */
@@ -424,7 +424,7 @@ body.dark-mode {
 
 .dark-mode .left-column {
   background-color: #1f202b;
-  border-right: 1px solid #333;
+  /* border-right: 1px solid #333; */
   color: white;
 }
 
@@ -471,13 +471,14 @@ body.dark-mode {
 .main-content {
   flex: 1;
   display: flex;
+  padding:0.5%;
   flex-direction: column;
   overflow: hidden;
-  background-color:white;
+  background-color:rgba(230, 233, 237, 255);
 }
 
 .dark-mode .main-content {
-  background-color: #2d303a;
+  background-color: #1f202b;
 }
 
 .dark-mode .divider {

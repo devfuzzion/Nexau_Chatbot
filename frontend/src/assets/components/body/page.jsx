@@ -7,7 +7,6 @@ import {
   sendMessage,
   appendFeedbackMessage,
 } from "../../../api/chatService.js";
-import { useTheme } from "../../../hooks/useTheme.js";
 import MessageList from "../messageList/messageList.page.jsx";
 import ProfileOverlay from "../profile/page.jsx";
 
@@ -24,9 +23,9 @@ const Body = ({
   createThread,
   deleteThreadById,
   updateThreadTitleById,
+  isDarkMode,
+  toggleTheme,
 }) => {
-  const { isDarkMode, toggleTheme } = useTheme();
-
   // Message state
   const [messages, setMessages] = useState([]);
   const [typingState, setTypingState] = useState({
@@ -66,10 +65,7 @@ const Body = ({
       handleProfileOpen();
     }
 
-    // Clear messages before setting new thread to prevent flash of old messages
-    setMessages([]);
-
-    // Then set the new thread
+    // Set the new thread first
     setSelectedThread(threadId);
 
     // Load messages for the new thread
@@ -97,7 +93,10 @@ const Body = ({
     const loadMessages = async () => {
       try {
         const messageData = await fetchMessages(selectedThread);
-        setMessages(messageData.map((msg) => ({ ...msg, isNew: false })));
+        // Only update messages if we're still on the same thread
+        if (selectedThread === messageData[0]?.threadId) {
+          setMessages(messageData.map((msg) => ({ ...msg, isNew: false })));
+        }
       } catch (error) {
         console.error("Failed to load messages:", error);
         setMessages([
@@ -314,6 +313,8 @@ const Body = ({
               isWaitingForResponse={isWaitingForResponse}
               selectedThread={selectedThread}
               handleFeedback={handleFeedback}
+              onSendMessage={handleSendMessage}
+              toggleTheme={toggleTheme}
             />
             <Footer
               onSendMessage={handleSendMessage}

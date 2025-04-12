@@ -211,7 +211,7 @@ const Header = ({
           {!isExpanded ? <Expand size={20} /> : '' }
         </button>
         <button className="chevron-down-button" onClick={onToggleVisibility}>
-          <ChevronDown size={20} />
+          {!isExpanded ? <ChevronDown size={20} /> : '' }
         </button>
       </div>
       {/* Mobile Menu */}

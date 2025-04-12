@@ -69,14 +69,14 @@ const ProfileOverlay = ({
     <div className={`profile-overlay ${isDarkMode ? "dark" : ""}`}>
       <div className="profile-header">
         <h2 className="profile-title">Perfil</h2>
-        {/* <button className="bk-button" onClick={onClose}>
+        <button className="bk-button" onClick={onClose}>
           <X size={24} />
-        </button> */}
+        </button>
       </div>
 
       <form className="profile-form" onSubmit={handleSubmit}>
         <div className="form-section">
-          <h3 className="section-title">información de tu ecommerce</h3>
+          <h3 className="section-title">Información de tu ecommerce</h3>
           <input
             type="text"
             name="storeName"
