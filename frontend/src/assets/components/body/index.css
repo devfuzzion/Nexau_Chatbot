@@ -730,11 +730,12 @@ body.dark-mode {
 
 /* Mobile Responsive Styles */
 @media (max-width: 768px) {
-  .sections-container {
+  /* .sections-container {
     flex-direction: column;
-  }
+  } */
 
   .section {
+    justify-content: start !important;
     width: 100%;
   }
 
@@ -749,6 +750,18 @@ body.dark-mode {
 }
 
 @media (max-width: 480px) {
+  .sections-container {
+    gap: 2rem;
+  }
+  .example-btn {
+    width: 100%;
+  }
+  .expanded .messages-container {
+    border-radius: 0;
+  }
+  .footer-container {
+    border-radius: 0 !important;
+  }
   .initial-ui-container {
     padding: 1rem;
   }
@@ -780,9 +793,9 @@ body.dark-mode {
   color: white;
 }
 
-.dark .bot-message-container {
-  /* color: white; */
-}
+/* .dark .bot-message-container {
+  color: white;
+} */
 
 .dark .client-message-container {
   background-color: rgba(70,77,88,255);
