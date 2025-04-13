@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { FileInput, SendHorizonal, FileCheck } from 'lucide-react';
+import { FileInput, SendHorizonal, FileCheck, X } from 'lucide-react';
 import './index.css';
 
 const Footer = ({ onSendMessage, isDarkMode, isExpanded, isDisabled }) => {
@@ -19,7 +19,10 @@ const Footer = ({ onSendMessage, isDarkMode, isExpanded, isDisabled }) => {
     e.preventDefault();
     if (message.trim() && !isDisabled) {
       console.log('Sending message with file:', selectedFile?.name);
-      await onSendMessage(message, selectedFile);
+      const messageText = selectedFile 
+        ? `document:${selectedFile.name}\nUser message: ${message}`
+        : message;
+      await onSendMessage(messageText, selectedFile);
       setMessage('');
       setSelectedFile(null);
       if (fileInputRef.current) {
@@ -28,8 +31,32 @@ const Footer = ({ onSendMessage, isDarkMode, isExpanded, isDisabled }) => {
     }
   };
 
+  const handleRemoveFile = () => {
+    setSelectedFile(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
   return (
     <div className={`footer-container ${isDarkMode ? 'dark-mode' : ''} ${isExpanded ? 'expanded' : ''}`}>
+      {selectedFile && (
+        <div className='file-preview-container'>
+          <div className={`file-preview ${isDarkMode ? 'dark-mode' : ''}`}>
+            <div className="file-info">
+              <FileCheck size={16} />
+              <span className="file-name">{selectedFile.name}</span>
+              <button
+                className="remove-file-btn"
+                onClick={handleRemoveFile}
+                aria-label="Remove file"
+              >
+                <X size={16} />
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
       <form className='footer-form' onSubmit={handleSubmit}>
         <input
           type='text'
@@ -54,10 +81,10 @@ const Footer = ({ onSendMessage, isDarkMode, isExpanded, isDisabled }) => {
           type='button'
           className={`footer-button ${isDarkMode ? 'dark-mode' : ''} ${selectedFile ? 'file-selected' : ''} ${isDisabled ? 'disabled' : ''}`}
           onClick={() => !isDisabled && fileInputRef.current?.click()}
-          title={selectedFile ? `Selected: ${selectedFile.name}` : 'Attach file'}
+          title="Attach file"
           disabled={isDisabled}
         >
-          {selectedFile ? <FileCheck size={20} /> : <FileInput size={20} />}
+          <FileInput size={20} />
         </button>
         <button
           type='submit'
@@ -67,13 +94,8 @@ const Footer = ({ onSendMessage, isDarkMode, isExpanded, isDisabled }) => {
           <SendHorizonal size={20} />
         </button>
       </form>
-      {selectedFile && (
-        <div className={`selected-file ${isDarkMode ? 'dark-mode' : ''}`}>
-          Seleccionada: {selectedFile.name}
-        </div>
-      )}
       <div className={`powered-by ${isDarkMode ? 'dark-mode' : ''}`}>
-        Powered by <strong onClick={() => window.open('https://nexau.es', '_blank')} style={{cursor: 'pointer'}}>Nexau</strong>
+        Powered by <strong onClick={() => window.open('https://nexau.es', '_blank')} style={{ cursor: 'pointer' }}>Nexau</strong>
       </div>
     </div>
   );

@@ -1,0 +1,76 @@
+.client-message-content {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.document-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px;
+  background-color: #2d2d2d;
+  border-radius: 15px;
+  font-size: 14px;
+  color: #ffffff;
+  max-width: fit-content;
+  margin-bottom: 4px;
+}
+
+.document-pill svg {
+  color: #ffffff;
+}
+
+.document-name {
+  color: #ffffff;
+  text-decoration: none;
+  font-weight: 400;
+}
+
+.client-message-text {
+  color: inherit;
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+/* Remove old styles */
+.document-attachment {
+  display: none;
+}
+
+.client-message-container {
+  display: flex;
+  flex-direction: column;
+  padding: 16px;
+  gap: 8px;
+} 
+
+.client-container{
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.document-pill{
+  /* border: 1px solid #e5e5e5; */
+  margin-right: 3%;
+  margin-left: auto;
+}
+
+.expanded .document-pill {
+  margin-right: calc(10rem + 2%) ;
+}
+
+.document-container{
+  display: flex;
+  gap: 10px;
+  width: 100%;
+  /* border: 1px solid #e5e5e5; */
+}
+
+
+@media (max-width: 480px) {
+  .document-pill{
+    margin-right: 0 !important;
+  }
+}

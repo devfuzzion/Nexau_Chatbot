@@ -10,6 +10,7 @@ const base = new Airtable({ apiKey: process.env.AIRTABLE_API_KEY }).base(
 const CONVERSATIONS_TABLE_NAME = process.env.AIRTABLE_CONVERSATIONS_TABLE_NAME;
 const FEEDBACKS_TABLE_NAME = process.env.AIRTABLE_FEEDBACKS_TABLE_NAME;
 const USER_DATA_TABLE_NAME = process.env.AIRTABLE_USER_DATA_TABLE_NAME;
+const DOCUMENTS_UPLOADS_TABLE_NAME = process.env.AIRTABLE_DOCUMENTS_UPLOADS_TABLE_NAME;
 
 export const logConversation = async ({
   userId,
@@ -164,6 +165,51 @@ export const logUserData = async ({
     return { success: true, recordId: record.id };
   } catch (error) {
     console.error("Error saving user data to Airtable:", error);
+    return { success: false, error: error.message };
+  }
+};
+
+export const logDocumentUpload = async ({
+  userId,
+  threadId,
+  messageId,
+  documentId,
+  documentName,
+}) => {
+  try {
+    console.log("Logging document upload to Airtable",DOCUMENTS_UPLOADS_TABLE_NAME);
+    const record = await base(DOCUMENTS_UPLOADS_TABLE_NAME).create({
+      user_id: userId,
+      thread_id: threadId || "",
+      message_id: messageId || "",
+      document_id: documentId,
+      document_name: documentName,
+    });
+
+    return { success: true, recordId: record.id };
+  } catch (error) {
+    console.error("Error saving document upload to Airtable:", error);
+    return { success: false, error: error.message };
+  }
+};
+
+export const getDocumentUploads = async (threadId) => {
+  try {
+    const records = await base(DOCUMENTS_UPLOADS_TABLE_NAME)
+      .select({
+        filterByFormula: `{thread_id} = '${threadId}'`,
+      })
+      .all();
+
+    const documentUploads = records.map((record) => ({
+      messageId: record.fields.message_id,
+      documentId: record.fields.document_id,
+      documentName: record.fields.document_name,
+    }));
+
+    return { success: true, documentUploads };
+  } catch (error) {
+    console.error("Error fetching document uploads from Airtable:", error);
     return { success: false, error: error.message };
   }
 };

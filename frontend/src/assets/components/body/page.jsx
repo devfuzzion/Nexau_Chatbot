@@ -152,18 +152,12 @@ const Body = ({
   const handleSendMessage = async (message, file = null) => {
     if (!selectedThread) return;
 
-    let documentName = null;
-    if (file) {
-      documentName = file.name;
-    }
-
     setMessages((prev) => [
       ...prev,
       {
         text: message,
         isBot: false,
         isNew: true,
-        documentName: documentName
       },
     ]);
     setIsWaitingForResponse(true);
@@ -188,10 +182,10 @@ const Body = ({
         console.error("Thread not found");
         return;
       }
-      const threadFeedback = thread.feedback ?? "";
-
-      let formData = new FormData();
-      formData.append('message', `User Info:
+      const threadFeedback = thread.feedback ?? ""; // Get the existing feedback
+      // console.log(thread);
+      // console.log(threadFeedback, 4444);
+      const formattedMessage = `User Info:
       You can use this to generate the response but no need to mention it to the user that you know this without him asking
       - Store Name: ${userData?.storename || "N/A"}
       - Website: ${userData?.website || "N/A"}
@@ -199,20 +193,13 @@ const Body = ({
       - Story: ${userData?.story || "N/A"}
 
       User feedback: ${threadFeedback}
-      User message: ${message}`);
-      
-      if (file) {
-        formData.append('file', file);
-        formData.append('userId', userData?.id || '123');
-        formData.append('threadId', selectedThread);
-      }
+      User message: ${message}`;
 
       const botResponse = await sendMessage(
         selectedThread,
-        formData,
-        true // isFormData flag
+        formattedMessage,
+        file,
       );
-
       setTypingState((prev) => ({ ...prev, showIndicator: false }));
       setMessages((prev) => [
         ...prev,

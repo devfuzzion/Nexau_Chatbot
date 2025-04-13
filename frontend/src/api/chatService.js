@@ -1,5 +1,5 @@
-const backendUrl = "https://ejitukppt8.execute-api.eu-west-3.amazonaws.com/dev";
-// const backendUrl = "http://localhost:3000";
+// const backendUrl = "https://ejitukppt8.execute-api.eu-west-3.amazonaws.com/dev";
+const backendUrl = "http://localhost:3000";
 
 export const fetchThreads = async () => {
   try {
@@ -37,24 +37,50 @@ export const fetchMessages = async (threadId) => {
   }
 };
 
-export const sendMessage = async (threadId, formData, isFormData = false) => {
+export const sendMessage = async (threadId, userMessage, file = null) => {
   try {
+    const formData = new FormData();
+    formData.append("userMessage", userMessage);
+    console.log("file", file);
+
+    if (file) {
+      console.log("Adding file to FormData:", file.name);
+      formData.append("file", file);
+
+      // Log the actual file object
+      console.log("File object:", file);
+      console.log("File type:", file.type);
+      console.log("File size:", file.size);
+    }
+
+    // Log the complete FormData contents
+    for (let pair of formData.entries()) {
+      console.log(pair[0] + ": " + pair[1]);
+    }
+
     const response = await fetch(`${backendUrl}/run/${threadId}`, {
-      method: 'POST',
-      body: isFormData ? formData : JSON.stringify({ message: formData }),
-      headers: isFormData ? {} : {
-        'Content-Type': 'application/json',
-      },
+      method: "POST",
+      body: formData,
+      // Remove Content-Type header to let browser set it with boundary
     });
 
     if (!response.ok) {
-      throw new Error('Network response was not ok');
+      const errorData = await response.json();
+      throw new Error(errorData.error || "Failed to send message");
     }
 
     const data = await response.json();
-    return data;
+
+    if (!data.success || !data.botMessage) {
+      throw new Error(data.message || "Error processing request");
+    }
+
+    return {
+      botMessage: data.botMessage.content[0].text.value,
+      messageId: data.botMessage.id,
+    };
   } catch (error) {
-    console.error('Error sending message:', error);
+    console.error("Error in sendMessage:", error);
     throw error;
   }
 };

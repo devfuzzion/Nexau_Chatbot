@@ -25,6 +25,8 @@ import {
   logUserData,
   storeFeedbackState,
   getFeedbackStates,
+  logDocumentUpload,
+  getDocumentUploads,
 } from "./airtable.utils.js";
 import {
   getAllThreads,
@@ -113,7 +115,7 @@ app.post("/run/:threadId", async (req, res) => {
         console.error("Multer error:", err);
         return res.status(400).json({
           success: false,
-          error: "File uplcoad error: " + err.message,
+          error: "File upload error: " + err.message,
         });
       } else if (err) {
         console.error("Unknown error:", err);
@@ -132,6 +134,18 @@ app.post("/run/:threadId", async (req, res) => {
           req.file,
         );
         console.log("Message appended successfully");
+
+        // Log document upload if a file was included
+        if (req.file) {
+          await logDocumentUpload({
+            userId: "123",
+            threadId: req.params.threadId,
+            messageId: message.id,
+            documentId: `doc_${Date.now()}`,
+            documentName: req.file.originalname,
+          });
+          console.log("Document upload logged successfully");
+        }
 
         console.log("Creating run...");
         const run = await createRun(req.params.threadId);
@@ -345,6 +359,35 @@ app.get("/feedback/states/:threadId", async (req, res) => {
     }
   } catch (error) {
     console.error("Error fetching feedback states:", error);
+    res.status(500).json({
+      success: false,
+      error: "Internal server error",
+      details: error.message,
+    });
+  }
+});
+
+// New endpoint to fetch document uploads for a thread
+app.get("/documents/:threadId", async (req, res) => {
+  try {
+    const { threadId } = req.params;
+
+    if (!threadId) {
+      return res.status(400).json({
+        success: false,
+        error: "Thread ID is required",
+      });
+    }
+
+    const result = await getDocumentUploads(threadId);
+
+    if (result.success) {
+      res.json({ success: true, documentUploads: result.documentUploads });
+    } else {
+      throw new Error(result.error);
+    }
+  } catch (error) {
+    console.error("Error fetching document uploads:", error);
     res.status(500).json({
       success: false,
       error: "Internal server error",

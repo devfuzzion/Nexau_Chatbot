@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { ThumbsUp, ThumbsDown, Edit, Copy, Check, Send, Sun, Moon, Zap, FileText } from "lucide-react";
 import TypingIndicator from "../typingIndicator/typingIndicator.page.jsx";
 import MarkdownPreview from "@uiw/react-markdown-preview";
+import "./messageList.css";
 
 const MessageList = ({
   messages,
@@ -18,6 +19,7 @@ const MessageList = ({
 }) => {
   const { isTyping, typingMessage } = typingState;
   const [feedbackStates, setFeedbackStates] = useState([]);
+  const [documentUploads, setDocumentUploads] = useState([]);
   const [copiedIndex, setCopiedIndex] = useState(null);
   const [editingIndex, setEditingIndex] = useState(null);
   const [feedbackText, setFeedbackText] = useState("");
@@ -27,7 +29,6 @@ const MessageList = ({
   const thinkingTimeoutRef = useRef(null);
   const thinkingIndicatorRef = useRef(null);
   const containerRef = useRef(null);
-  const [documentInfo, setDocumentInfo] = useState({});
 
   // Reset showInitialUI when thread changes
   useEffect(() => {
@@ -43,9 +44,9 @@ const MessageList = ({
       setIsLoading(false);
       return;
     }
-    
+
     setIsLoading(true);
-    
+
     // Set loading to false when messages are loaded
     if (messages.length > 0 || (!isWaitingForResponse && !typingState.isTyping)) {
       setIsLoading(false);
@@ -57,7 +58,8 @@ const MessageList = ({
     const fetchFeedbackStates = async () => {
       try {
         const response = await fetch(
-          `https://ejitukppt8.execute-api.eu-west-3.amazonaws.com/dev/feedback/states/${threadId}`,
+          // `https://ejitukppt8.execute-api.eu-west-3.amazonaws.com/dev/feedback/states/${threadId}`,
+          `http://localhost:3000/feedback/states/${threadId}`,
         );
         const data = await response.json();
         if (data.success) {
@@ -73,34 +75,26 @@ const MessageList = ({
     }
   }, [threadId]);
 
-  // Fetch document information when component mounts or threadId changes
+  // Update documentUploads when new messages arrive
   useEffect(() => {
-    const fetchDocumentInfo = async () => {
-      if (!threadId || !userId) return;
-      
+    const updateDocumentUploads = async () => {
       try {
         const response = await fetch(
-          `https://ejitukppt8.execute-api.eu-west-3.amazonaws.com/dev/documents/${userId}/${threadId}`,
+          `http://localhost:3000/documents/${threadId}`,
         );
         const data = await response.json();
         if (data.success) {
-          // Create a map of messageId to document info
-          const docMap = {};
-          data.documents.forEach(doc => {
-            docMap[doc.message_id] = {
-              documentId: doc.document_id,
-              documentName: doc.document_name
-            };
-          });
-          setDocumentInfo(docMap);
+          setDocumentUploads(data.documentUploads);
         }
       } catch (error) {
-        console.error("Error fetching document info:", error);
+        console.error("Error fetching document uploads:", error);
       }
     };
 
-    fetchDocumentInfo();
-  }, [threadId, userId]);
+    if (threadId && messages.length > 0) {
+      updateDocumentUploads();
+    }
+  }, [threadId, messages]); // Add messages as a dependency
 
   useEffect(() => {
     return () => {
@@ -142,6 +136,28 @@ const MessageList = ({
     return feedbackStates.find((state) => state.messageId === messageId);
   };
 
+  // Function to get document info for a message
+  const getMessageDocument = (messageId, messageText) => {
+    // First check in documentUploads for historical messages
+    const storedDocument = documentUploads.find((doc) => doc.messageId === messageId);
+    if (storedDocument) {
+      return storedDocument;
+    }
+
+    // For new messages, check if there's document info in the message text
+    if (messageText && messageText.includes("User message:")) {
+      const parts = messageText.split("User message:");
+      if (parts[0] && parts[0].includes("document:")) {
+        const documentInfo = parts[0].split("document:")[1].trim();
+        return {
+          documentName: documentInfo,
+          messageId: messageId
+        };
+      }
+    }
+    return null;
+  };
+
   // Function to handle like/dislike
   const handleLikeDislike = async (messageId, type) => {
     const isLiked = type === "I liked this message";
@@ -167,7 +183,8 @@ const MessageList = ({
 
       // Store in Airtable
       const response = await fetch(
-        "https://ejitukppt8.execute-api.eu-west-3.amazonaws.com/dev/feedback/state",
+        // "https://ejitukppt8.execute-api.eu-west-3.amazonaws.com/dev/feedback/state",
+        "http://localhost:3000/feedback/state",
         {
           method: "POST",
           headers: {
@@ -240,10 +257,10 @@ const MessageList = ({
       ref={containerRef}
       style={{ overflowY: "auto" }}
     >
-      {!isLoading && showInitialUI && messages.length === 0 ? (
+      {!isLoading && isExpanded && showInitialUI && messages.length === 0 ? (
         <div className="initial-ui-container">
           <h2 className="initial-ui-title">Consultor IA</h2>
-          
+
           <div className="sections-container">
             <div className={`section examples ${isExpanded ? "expanded" : ""}`}>
               <div className="section-header">
@@ -251,19 +268,19 @@ const MessageList = ({
                 <h3>Ejemplos</h3>
               </div>
               <div className="section-content">
-                <button 
+                <button
                   className="example-btn"
                   onClick={() => handleExampleClick("Estas son las métricas de mi ecommerce, ¿cómo puedo mejorarlas?")}
                 >
                   "Estas son las métricas de mi ecommerce, ¿cómo puedo mejorarlas?"
                 </button>
-                <button 
+                <button
                   className="example-btn"
                   onClick={() => handleExampleClick("¿Cómo puedo diseñar la historia de mi ecommerce?")}
                 >
                   "¿Cómo puedo diseñar la historia de mi ecommerce?"
                 </button>
-                <button 
+                <button
                   className="example-btn"
                   onClick={() => handleExampleClick("Dame 10 ideas para crear mi email semanal")}
                 >
@@ -292,14 +309,14 @@ const MessageList = ({
           </div>
 
           <div className="theme-selector">
-            <button 
+            <button
               className={`theme-btn ${!isDarkMode ? 'active' : ''}`}
               onClick={() => toggleTheme(false)}
             >
               <Sun size={16} />
               Modo Claro
             </button>
-            <button 
+            <button
               className={`theme-btn ${isDarkMode ? 'active' : ''}`}
               onClick={() => toggleTheme(true)}
             >
@@ -310,18 +327,23 @@ const MessageList = ({
         </div>
       ) : (
         <>
-          { messages.length > 0 && messages.map((msg, index) => {
+          {messages.length > 0 && messages.map((msg, index) => {
             const messageFeedback = getMessageFeedbackState(msg.id);
-            const docInfo = documentInfo[msg.id];
+            const messageDocument = getMessageDocument(msg.id, msg.text);
 
             return (
               <React.Fragment key={index}>
+                {messageDocument && (
+                  <div className="document-container">
+                    <div className={`document-pill ${isExpanded ? "expanded" : ""}`}>
+                      <FileText size={16} />
+                      <span className="document-name">{messageDocument.documentName}</span>
+                    </div>
+                  </div>
+                )}
                 <div
                   className={`message-container 
-                    ${msg.isBot
-                      ? "bot-message-container"
-                      : "client-message-container"
-                    }
+                    ${msg.isBot ? "bot-message-container" : "client-message-container"}
                     ${isDarkMode ? "dark" : ""}
                     ${isExpanded ? "expanded" : ""}`}
                 >
@@ -340,19 +362,13 @@ const MessageList = ({
                       )}
                     </div>
                   ) : (
-                    <>
+                    <div className="client-message-content">
                       <div className="client-message-text">
                         {msg.text.split("User message:")[1]
                           ? msg.text.split("User message: ")[1]
                           : msg.text}
                       </div>
-                      {(docInfo || msg.documentName) && (
-                        <div className={`document-info ${isDarkMode ? "dark" : ""}`}>
-                          <FileText size={16} />
-                          <span>{docInfo?.documentName || msg.documentName}</span>
-                        </div>
-                      )}
-                    </>
+                    </div>
                   )}
                 </div>
                 {msg.isBot && !isTyping && (
@@ -449,3 +465,31 @@ const MessageList = ({
 };
 
 export default MessageList;
+
+// Add these styles to your CSS
+const styles = `
+.document-attachment {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+  padding: 6px 12px;
+  background-color: rgba(0, 0, 0, 0.05);
+  border-radius: 6px;
+  font-size: 14px;
+}
+
+.document-attachment.dark {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.document-name {
+  color: inherit;
+  text-decoration: none;
+}
+
+.client-message-container {
+  display: flex;
+  flex-direction: column;
+}
+`;
