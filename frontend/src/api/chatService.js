@@ -37,50 +37,24 @@ export const fetchMessages = async (threadId) => {
   }
 };
 
-export const sendMessage = async (threadId, userMessage, file = null) => {
+export const sendMessage = async (threadId, formData, isFormData = false) => {
   try {
-    const formData = new FormData();
-    formData.append("userMessage", userMessage);
-    console.log("file", file);
-
-    if (file) {
-      console.log("Adding file to FormData:", file.name);
-      formData.append("file", file);
-
-      // Log the actual file object
-      console.log("File object:", file);
-      console.log("File type:", file.type);
-      console.log("File size:", file.size);
-    }
-
-    // Log the complete FormData contents
-    for (let pair of formData.entries()) {
-      console.log(pair[0] + ": " + pair[1]);
-    }
-
     const response = await fetch(`${backendUrl}/run/${threadId}`, {
-      method: "POST",
-      body: formData,
-      // Remove Content-Type header to let browser set it with boundary
+      method: 'POST',
+      body: isFormData ? formData : JSON.stringify({ message: formData }),
+      headers: isFormData ? {} : {
+        'Content-Type': 'application/json',
+      },
     });
 
     if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.error || "Failed to send message");
+      throw new Error('Network response was not ok');
     }
 
     const data = await response.json();
-
-    if (!data.success || !data.botMessage) {
-      throw new Error(data.message || "Error processing request");
-    }
-
-    return {
-      botMessage: data.botMessage.content[0].text.value,
-      messageId: data.botMessage.id,
-    };
+    return data;
   } catch (error) {
-    console.error("Error in sendMessage:", error);
+    console.error('Error sending message:', error);
     throw error;
   }
 };

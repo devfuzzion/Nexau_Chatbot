@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { ThumbsUp, ThumbsDown, Edit, Copy, Check, Send, Sun, Moon, Zap } from "lucide-react";
+import { ThumbsUp, ThumbsDown, Edit, Copy, Check, Send, Sun, Moon, Zap, FileText } from "lucide-react";
 import TypingIndicator from "../typingIndicator/typingIndicator.page.jsx";
 import MarkdownPreview from "@uiw/react-markdown-preview";
 
@@ -27,6 +27,7 @@ const MessageList = ({
   const thinkingTimeoutRef = useRef(null);
   const thinkingIndicatorRef = useRef(null);
   const containerRef = useRef(null);
+  const [documentInfo, setDocumentInfo] = useState({});
 
   // Reset showInitialUI when thread changes
   useEffect(() => {
@@ -71,6 +72,35 @@ const MessageList = ({
       fetchFeedbackStates();
     }
   }, [threadId]);
+
+  // Fetch document information when component mounts or threadId changes
+  useEffect(() => {
+    const fetchDocumentInfo = async () => {
+      if (!threadId || !userId) return;
+      
+      try {
+        const response = await fetch(
+          `https://ejitukppt8.execute-api.eu-west-3.amazonaws.com/dev/documents/${userId}/${threadId}`,
+        );
+        const data = await response.json();
+        if (data.success) {
+          // Create a map of messageId to document info
+          const docMap = {};
+          data.documents.forEach(doc => {
+            docMap[doc.message_id] = {
+              documentId: doc.document_id,
+              documentName: doc.document_name
+            };
+          });
+          setDocumentInfo(docMap);
+        }
+      } catch (error) {
+        console.error("Error fetching document info:", error);
+      }
+    };
+
+    fetchDocumentInfo();
+  }, [threadId, userId]);
 
   useEffect(() => {
     return () => {
@@ -282,6 +312,7 @@ const MessageList = ({
         <>
           { messages.length > 0 && messages.map((msg, index) => {
             const messageFeedback = getMessageFeedbackState(msg.id);
+            const docInfo = documentInfo[msg.id];
 
             return (
               <React.Fragment key={index}>
@@ -309,11 +340,19 @@ const MessageList = ({
                       )}
                     </div>
                   ) : (
-                    <div className="client-message-text">
-                      {msg.text.split("User message:")[1]
-                        ? msg.text.split("User message: ")[1]
-                        : msg.text}
-                    </div>
+                    <>
+                      <div className="client-message-text">
+                        {msg.text.split("User message:")[1]
+                          ? msg.text.split("User message: ")[1]
+                          : msg.text}
+                      </div>
+                      {(docInfo || msg.documentName) && (
+                        <div className={`document-info ${isDarkMode ? "dark" : ""}`}>
+                          <FileText size={16} />
+                          <span>{docInfo?.documentName || msg.documentName}</span>
+                        </div>
+                      )}
+                    </>
                   )}
                 </div>
                 {msg.isBot && !isTyping && (

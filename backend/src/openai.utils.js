@@ -58,6 +58,7 @@ export const appendMessageInThread = async (
     );
     return message;
   } catch (error) {
+    console.log(messageOptions, 111);
     console.error("Error appending message to thread:", error);
     throw error;
   }

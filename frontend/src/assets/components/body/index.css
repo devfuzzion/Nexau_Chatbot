@@ -822,3 +822,28 @@ body.dark-mode {
 .infinity-button.dark {
   background-color: #2d2e3d;
 }
+
+.document-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 8px;
+  margin-top: 8px;
+  background-color: #f5f5f5;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.document-info.dark {
+  background-color: #2a2b32;
+  color: #ccc;
+}
+
+.document-info svg {
+  color: #666;
+}
+
+.document-info.dark svg {
+  color: #ccc;
+}
