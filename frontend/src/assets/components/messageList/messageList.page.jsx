@@ -58,8 +58,8 @@ const MessageList = ({
     const fetchFeedbackStates = async () => {
       try {
         const response = await fetch(
-          // `https://ejitukppt8.execute-api.eu-west-3.amazonaws.com/dev/feedback/states/${threadId}`,
-          `http://localhost:3000/feedback/states/${threadId}`,
+          `https://ejitukppt8.execute-api.eu-west-3.amazonaws.com/dev/feedback/states/${threadId}`,
+          // `http://localhost:3000/feedback/states/${threadId}`,
         );
         const data = await response.json();
         if (data.success) {
@@ -80,7 +80,8 @@ const MessageList = ({
     const updateDocumentUploads = async () => {
       try {
         const response = await fetch(
-          `http://localhost:3000/documents/${threadId}`,
+          // `http://localhost:3000/documents/${threadId}`,
+          `https://ejitukppt8.execute-api.eu-west-3.amazonaws.com/dev/documents/${threadId}`,
         );
         const data = await response.json();
         if (data.success) {
@@ -183,8 +184,8 @@ const MessageList = ({
 
       // Store in Airtable
       const response = await fetch(
-        // "https://ejitukppt8.execute-api.eu-west-3.amazonaws.com/dev/feedback/state",
-        "http://localhost:3000/feedback/state",
+        "https://ejitukppt8.execute-api.eu-west-3.amazonaws.com/dev/feedback/state",
+        // "http://localhost:3000/feedback/state",
         {
           method: "POST",
           headers: {

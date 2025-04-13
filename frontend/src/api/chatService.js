@@ -1,5 +1,5 @@
-// const backendUrl = "https://ejitukppt8.execute-api.eu-west-3.amazonaws.com/dev";
-const backendUrl = "http://localhost:3000";
+const backendUrl = "https://ejitukppt8.execute-api.eu-west-3.amazonaws.com/dev";
+// const backendUrl = "http://localhost:3000";
 
 export const fetchThreads = async () => {
   try {
