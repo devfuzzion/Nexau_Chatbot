@@ -146,8 +146,8 @@ const MessageList = ({
     }
 
     // For new messages, check if there's document info in the message text
-    if (messageText && messageText.includes("User message:")) {
-      const parts = messageText.split("User message:");
+    if (messageText && messageText.includes("document:")) {
+      const parts = messageText.split("\nUser message:");
       if (parts[0] && parts[0].includes("document:")) {
         const documentInfo = parts[0].split("document:")[1].trim();
         return {
@@ -157,6 +157,22 @@ const MessageList = ({
       }
     }
     return null;
+  };
+
+  // Function to clean message text
+  const getCleanMessageText = (messageText) => {
+    if (!messageText) return "";
+    
+    // If message contains document info, extract only the user message part
+    if (messageText.includes("document:") && messageText.includes("\nUser message:")) {
+      const parts = messageText.split("\nUser message:");
+      return parts[1] ? parts[1].trim() : messageText;
+    }
+    
+    // For messages without document info or regular messages
+    return messageText.split("User message:")[1]
+      ? messageText.split("User message:")[1].trim()
+      : messageText;
   };
 
   // Function to handle like/dislike
@@ -365,9 +381,7 @@ const MessageList = ({
                   ) : (
                     <div className="client-message-content">
                       <div className="client-message-text">
-                        {msg.text.split("User message:")[1]
-                          ? msg.text.split("User message: ")[1]
-                          : msg.text}
+                        {getCleanMessageText(msg.text)}
                       </div>
                     </div>
                   )}

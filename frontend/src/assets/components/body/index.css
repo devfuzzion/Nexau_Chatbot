@@ -396,6 +396,7 @@ body.dark-mode {
   /* padding: 25px; */
   border-top-left-radius: 15px;
   border-top-right-radius: 15px;
+  padding-top:2%;
   /* padding-right: 1%; */
 }
 .expanded .client-message-container {
