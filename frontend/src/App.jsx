@@ -10,9 +10,6 @@ const App = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const data = await getUserData(1);
-        setUserData(data);
-
         const cookieName = "hubspotutk";
         const cookies = document.cookie.split("; ");
         const userIdCookie = cookies.find((cookie) => cookie.startsWith(cookieName));
@@ -25,9 +22,23 @@ const App = () => {
         // setLoading(false);
       }
     };
-
     fetchData();
   }, []);
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const data = await getUserData(userId);
+        setUserData(data);
+      } catch (err) { 
+        console.error("Failed to fetch user data", err);
+      } finally {
+        // setLoading(false);
+      }
+    };
+    fetchUserData();
+  }, [userId]);
+  
 
   // if (loading) return <div>Loading...</div>;
 

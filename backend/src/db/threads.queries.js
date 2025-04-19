@@ -3,9 +3,10 @@ import sql from "./db.js";
 export const getAllThreads = async (userId) => {
   try {
     const { rows } = await sql.query(
-      "SELECT * FROM threads WHERE 'userId' = $1 ORDER BY createdAt DESC",
+      "SELECT * FROM threads WHERE \"userId\" = $1 ORDER BY createdAt DESC",
       [userId],
     );
+    console.log("rows", rows, userId);
     return rows;
   } catch (err) {
     console.error("Error fetching threads:", err);

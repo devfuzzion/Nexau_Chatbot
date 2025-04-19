@@ -1,5 +1,6 @@
 import { updateUser, getUserById } from "../db/user.queries.js";
 import { logUserData } from "../airtable.utils.js";
+
 export const saveUserDatainDb = async (req, res) => {
   try {
     const { storeName, website, products, story } = req.body;
@@ -11,23 +12,18 @@ export const saveUserDatainDb = async (req, res) => {
         .json({ success: false, message: "Missing required fields." });
     }
 
-    const result = await updateUser(userId, {
-      storeName,
-      website,
-      products,
-      story,
-    });
+    // const result = await updateUser(userId, {
+    //   storeName,
+    //   website,
+    //   products,
+    //   story,
+    // });
 
-    if (result.success) {
-      logUserData({ userId, storeName, website, products, story });
-      return res
-        .status(201)
-        .json({ success: true, message: "User Data Updated successfully." });
-    } else {
-      return res
-        .status(500)
-        .json({ success: false, message: "Failed to update user data." });
-    }
+    logUserData({ userId, storeName, website, products, story });
+    return res
+      .status(201)
+      .json({ success: true, message: "User Data Updated successfully." });
+
   } catch (error) {
     console.error("Error updating user data:", error);
     res.status(500).json({ success: false, message: "Internal server error." });

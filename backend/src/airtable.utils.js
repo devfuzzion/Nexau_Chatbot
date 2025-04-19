@@ -162,7 +162,7 @@ export const logUserData = async ({
       });
     }
 
-    return { success: true, recordId: record.id };
+    return { success: true };
   } catch (error) {
     console.error("Error saving user data to Airtable:", error);
     return { success: false, error: error.message };

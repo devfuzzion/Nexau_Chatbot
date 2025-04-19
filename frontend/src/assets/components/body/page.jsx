@@ -253,6 +253,7 @@ const Body = ({
       const updatedFeedback = await appendFeedbackMessage(
         selectedThread, // Thread ID
         messageId, // Message ID
+        userId,
         feedback, // New feedback
         originalFeedback, // Previous feedback
       );

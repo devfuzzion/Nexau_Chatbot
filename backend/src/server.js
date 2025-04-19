@@ -308,6 +308,7 @@ app.post("/threads/:threadId/:messageId", async (req, res) => {
 // New endpoint to store like/dislike state
 app.post("/feedback/state", async (req, res) => {
   try {
+    console.log("req.body", req.body);
     const { userId, messageId, threadId, isLiked } = req.body;
 
     if (!userId || !messageId || !threadId || isLiked === undefined) {

@@ -29,8 +29,8 @@ const ExpandedChatbot = () => {
   const createThread = async () => {
     try {
       const response = await fetch(
-        // "http://localhost:3000/create-thread",
-        "https://ejitukppt8.execute-api.eu-west-3.amazonaws.com/dev/create-thread",
+        "http://localhost:3000/create-thread",
+        // "https://ejitukppt8.execute-api.eu-west-3.amazonaws.com/dev/create-thread",
         {
           method: "POST",
           headers: {
@@ -91,6 +91,7 @@ const ExpandedChatbot = () => {
     const loadThreads = async () => {
       try {
         const threadsData = await fetchThreads(userId);
+        console.log("threadsData", threadsData);
         if (threadsData.length > 0) {
           setThreads(threadsData);
           setSelectedThread(threadsData[0].threadid);

@@ -17,6 +17,15 @@ const ProfileOverlay = ({
     story: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [userId, setUserId] = useState(null);
+
+  useEffect(() => {
+    const cookieName = "hubspotutk";
+    const cookies = document.cookie.split("; ");
+    const userIdCookie = cookies.find((cookie) => cookie.startsWith(cookieName));
+    setUserId(userIdCookie ? userIdCookie.split("=")[1] : null);
+  }, []);
+
   // console.log(userData, 11);
   useEffect(() => {
     // console.log("Fron parent");
@@ -31,6 +40,7 @@ const ProfileOverlay = ({
       });
     }
   }, [userData]);
+  
   const handleChange = (e) => {
     const { name, value } = e.target;
     setStoreInfo((prev) => ({ ...prev, [name]: value }));
@@ -41,7 +51,7 @@ const ProfileOverlay = ({
     setIsSubmitting(true);
 
     try {
-      const response = await updateUserData(1, storeInfo);
+      const response = await updateUserData(userId, storeInfo);
       if (response.success) {
         setUserData({
           ...userData,

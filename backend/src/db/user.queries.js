@@ -1,10 +1,10 @@
 import sql from "./db.js";
 
-export const createUser = async ({ storeName, website, products, story }) => {
+export const createUser = async ({ userId, storeName, website, products, story }) => {
   try {
     const { rowCount } = await sql.query(
-      'INSERT INTO users ("storename", "website", "products", "story") VALUES ($1, $2, $3, $4)',
-      [storeName, website, products, story],
+      'INSERT INTO users ("userid", "storename", "website", "products", "story") VALUES ($1, $2, $3, $4, $5 )',
+      [userId, storeName, website, products, story],
     );
 
     if (rowCount > 0) {
