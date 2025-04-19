@@ -1,9 +1,10 @@
 import sql from "./db.js";
 
-export const getAllThreads = async () => {
+export const getAllThreads = async (userId) => {
   try {
     const { rows } = await sql.query(
-      "SELECT * FROM threads ORDER BY createdAt DESC",
+      "SELECT * FROM threads WHERE 'userId' = $1 ORDER BY createdAt DESC",
+      [userId],
     );
     return rows;
   } catch (err) {
@@ -27,11 +28,11 @@ export const getThreadById = async (id) => {
   }
 };
 
-export const createThreadInDb = async (threadId, threadTitle) => {
+export const createThreadInDb = async (threadId, threadTitle, userId) => {
   try {
     const { rows } = await sql.query(
-      'INSERT INTO threads ("threadid","threadTitle") VALUES ($1,$2) RETURNING *',
-      [threadId, threadTitle],
+      'INSERT INTO threads ("threadid","threadTitle", "userId") VALUES ($1,$2, $3) RETURNING *',
+      [threadId, threadTitle, userId],
     );
     return rows[0];
   } catch (err) {

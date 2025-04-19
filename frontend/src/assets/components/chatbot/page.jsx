@@ -25,6 +25,31 @@ const Chatbot = ({ userData, setUserData }) => {
   const [isDarkMode, setIsDarkMode] = useState(() => {
     return localStorage.getItem("isDarkMode") === "true";
   });
+  const [userId, setUserId] = useState("guest");
+
+  useEffect(() => {
+    const cookieName = "hubspotutk";
+    const cookies = document.cookie.split("; ");
+    const userIdCookie = cookies.find((cookie) => cookie.startsWith(cookieName));
+    setUserId(userIdCookie ? userIdCookie.split("=")[1] : null);
+  }, []);
+
+  useEffect(() => {
+    const loadThreads = async () => {
+      try {
+        console.log("userId", userId);
+        const threadsData = await fetchThreads(userId);
+        if (threadsData.length > 0) {
+          setThreads(threadsData);
+          setSelectedThread(threadsData[0].threadid);
+        }
+      } catch (error) {
+        console.error("Failed to load threads:", error);
+        // Could add UI error state here
+      }
+    };
+    loadThreads();
+  }, [userId]);
 
   // Function to create a new thread - moved from LeftColumn component
   const createThread = async () => {
@@ -37,7 +62,10 @@ const Chatbot = ({ userData, setUserData }) => {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ threadTitle: "Nuevo Chat" }),
+          body: JSON.stringify({ 
+            threadTitle: "Nuevo Chat",
+            userId: userId || "guest",
+          }),
         },
       );
 
@@ -45,7 +73,9 @@ const Chatbot = ({ userData, setUserData }) => {
 
       if (data.success) {
         // Refresh threads after creating a new one
-        const threadsData = await fetchThreads();
+        const threadsData = await fetchThreads(
+          userId || "guest",
+        );
         setThreads(threadsData);
 
         // Select the newly created thread
@@ -63,9 +93,8 @@ const Chatbot = ({ userData, setUserData }) => {
     try {
       const response = await deleteThread(id);
       if (response.success) {
-        const threadsData = await fetchThreads();
+        const threadsData = await fetchThreads(userId);
         setThreads(threadsData);
-        console.log(2);
         if (threadsData.length > 0) {
           setSelectedThread(threadsData[0].threadid);
         }
@@ -91,23 +120,6 @@ const Chatbot = ({ userData, setUserData }) => {
       throw err;
     }
   };
-  // Fetch threads on component mount
-  useEffect(() => {
-    const loadThreads = async () => {
-      try {
-        const threadsData = await fetchThreads();
-        if (threadsData.length > 0) {
-          setThreads(threadsData);
-          setSelectedThread(threadsData[0].threadid);
-        }
-      } catch (error) {
-        console.error("Failed to load threads:", error);
-        // Could add UI error state here
-      }
-    };
-
-    loadThreads();
-  }, []);
   // Persist states to localStorage when they change
   useEffect(() => {
     localStorage.setItem("isExpanded", isExpanded);

@@ -58,8 +58,8 @@ const MessageList = ({
     const fetchFeedbackStates = async () => {
       try {
         const response = await fetch(
-          `https://ejitukppt8.execute-api.eu-west-3.amazonaws.com/dev/feedback/states/${threadId}`,
-          // `http://localhost:3000/feedback/states/${threadId}`,
+          `https://ejitukppt8.execute-api.eu-west-3.amazonaws.com/dev/feedback/states/${threadId}/${userId}`,
+          // `http://localhost:3000/feedback/states/${threadId}/${userId}`,
         );
         const data = await response.json();
         if (data.success) {
@@ -80,7 +80,7 @@ const MessageList = ({
     const updateDocumentUploads = async () => {
       try {
         const response = await fetch(
-          // `http://localhost:3000/documents/${threadId}`,
+          // `http://localhost:3000/documents/${threadId}/${userId}`,
           `https://ejitukppt8.execute-api.eu-west-3.amazonaws.com/dev/documents/${threadId}`,
         );
         const data = await response.json();

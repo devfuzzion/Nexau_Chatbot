@@ -35,6 +35,8 @@ const Body = ({
   });
   const [isWaitingForResponse, setIsWaitingForResponse] = useState(false);
 
+  const [userId, setUserId] = useState(null);
+
   const messagesEndRef = useRef(null);
   const typingIntervalRef = useRef(null);
   const thinkingTimeoutRef = useRef(null);
@@ -42,6 +44,11 @@ const Body = ({
   // Load messages when selected thread changes
 
   useEffect(() => {
+    const cookieName = "hubspotutk";
+    const cookies = document.cookie.split("; ");
+    const userIdCookie = cookies.find((cookie) => cookie.startsWith(cookieName));
+    const userId = userIdCookie ? userIdCookie.split("=")[1] : null;
+    setUserId(userId);
     return () => {
       clearInterval(typingIntervalRef.current);
       clearTimeout(thinkingTimeoutRef.current);
@@ -198,6 +205,7 @@ const Body = ({
       const botResponse = await sendMessage(
         selectedThread,
         formattedMessage,
+        userId,
         file,
       );
       setTypingState((prev) => ({ ...prev, showIndicator: false }));
@@ -304,7 +312,7 @@ const Body = ({
           <>
             <MessageList
               messages={messages}
-              userId={"123"}
+              userId={userId}
               threadId={selectedThread}
               isDarkMode={isDarkMode}
               isExpanded={isExpanded}

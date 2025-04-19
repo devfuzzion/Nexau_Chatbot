@@ -105,11 +105,11 @@ export const storeFeedbackState = async ({
 };
 
 // New function to fetch feedback states for a thread
-export const getFeedbackStates = async (threadId) => {
+export const getFeedbackStates = async (threadId, userId) => {
   try {
     const records = await base(FEEDBACKS_TABLE_NAME)
       .select({
-        filterByFormula: `{thread_id} = '${threadId}'`,
+        filterByFormula: `AND({thread_id} = '${threadId}', {user_id} = '${userId}')`,
       })
       .all();
 
@@ -193,11 +193,11 @@ export const logDocumentUpload = async ({
   }
 };
 
-export const getDocumentUploads = async (threadId) => {
+export const getDocumentUploads = async (threadId, userId) => {
   try {
     const records = await base(DOCUMENTS_UPLOADS_TABLE_NAME)
       .select({
-        filterByFormula: `{thread_id} = '${threadId}'`,
+        filterByFormula: `AND({thread_id} = '${threadId}', {user_id} = '${userId}')`,
       })
       .all();
 

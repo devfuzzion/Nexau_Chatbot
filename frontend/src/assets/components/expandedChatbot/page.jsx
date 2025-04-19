@@ -15,6 +15,15 @@ const ExpandedChatbot = () => {
   const [selectedThread, setSelectedThread] = useState("");
   const [chatState, setChatState] = useState("maximized");
   const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [userId, setUserId] = useState(null);
+
+  useEffect(() => {
+    const cookieName = "hubspotutk";
+    const cookies = document.cookie.split("; ");
+    const userIdCookie = cookies.find((cookie) => cookie.startsWith(cookieName));
+    const userId = userIdCookie ? userIdCookie.split("=")[1] : null;
+    setUserId(userId);
+  }, []);
 
   // Function to create a new thread
   const createThread = async () => {
@@ -27,14 +36,14 @@ const ExpandedChatbot = () => {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ threadTitle: "Nuevo Chat" }),
+          body: JSON.stringify({ threadTitle: "Nuevo Chat", userId: userId || "guest" }),
         },
       );
 
       const data = await response.json();
 
       if (data.success) {
-        const threadsData = await fetchThreads();
+        const threadsData = await fetchThreads(userId);
         setThreads(threadsData);
         if (data.thread && data.thread.id) {
           setSelectedThread(data.thread.id);
@@ -49,7 +58,7 @@ const ExpandedChatbot = () => {
     try {
       const response = await deleteThread(id);
       if (response.success) {
-        const threadsData = await fetchThreads();
+        const threadsData = await fetchThreads(userId);
         setThreads(threadsData);
         if (threadsData.length > 0) {
           setSelectedThread(threadsData[0].threadid);
@@ -81,7 +90,7 @@ const ExpandedChatbot = () => {
   useEffect(() => {
     const loadThreads = async () => {
       try {
-        const threadsData = await fetchThreads();
+        const threadsData = await fetchThreads(userId);
         if (threadsData.length > 0) {
           setThreads(threadsData);
           setSelectedThread(threadsData[0].threadid);
@@ -92,7 +101,7 @@ const ExpandedChatbot = () => {
     };
 
     loadThreads();
-  }, []);
+  }, [userId]);
 
   const handleProfileOpen = () => {
     setIsProfileOpen((prev) => !prev);

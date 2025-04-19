@@ -20,8 +20,6 @@ import DeleteConfirmationPopup from "../deletePopup/deletePopup.page.jsx";
 
 const Header = ({
   chatState,
-  setChatState,
-  isProfileOpen,
   handleProfileOpen,
   onExpand,
   isExpanded,

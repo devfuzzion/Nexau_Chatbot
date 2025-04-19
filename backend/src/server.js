@@ -80,9 +80,10 @@ app.get("/", (req, res) => {
   res.send("Love");
 });
 
-app.get("/threads", async (req, res) => {
+app.post("/threads", async (req, res) => {
   try {
-    const threads = await getAllThreads();
+    console.log("userId", req.body.userId);
+    const threads = await getAllThreads(req.body.userId);
     res.json({ success: true, threads });
   } catch (err) {
     console.log(err);
@@ -138,7 +139,7 @@ app.post("/run/:threadId", async (req, res) => {
         // Log document upload if a file was included
         if (req.file) {
           await logDocumentUpload({
-            userId: "123",
+            userId: req.body.userId,
             threadId: req.params.threadId,
             messageId: message.id,
             documentId: `doc_${Date.now()}`,
@@ -162,7 +163,7 @@ app.post("/run/:threadId", async (req, res) => {
         }
 
         await logConversation({
-          userId: "123",
+          userId: req.body.userId,
           threadId: req.params.threadId,
           messageId: run.id,
           question: req.body.userMessage.split("User message:")[1]?.trim(),
@@ -195,7 +196,7 @@ app.post("/run/:threadId", async (req, res) => {
 app.post("/create-thread", async (req, res) => {
   try {
     const thread = await createThread();
-    const dbThread = await createThreadInDb(thread.id, req.body.threadTitle);
+    const dbThread = await createThreadInDb(thread.id, req.body.threadTitle, req.body.userId);
     console.log(dbThread);
     res.json({ success: true, thread });
   } catch (err) {
@@ -253,7 +254,7 @@ app.post("/threads/:threadId/:messageId", async (req, res) => {
 
     if (feedback) {
       logFeedback({
-        userId: "123",
+        userId: req.body.userId,
         feedback: feedback,
         threadId: threadId,
         messageId: messageId,
@@ -339,9 +340,9 @@ app.post("/feedback/state", async (req, res) => {
 });
 
 // New endpoint to fetch feedback states for a thread
-app.get("/feedback/states/:threadId", async (req, res) => {
+app.get("/feedback/states/:threadId/:userId", async (req, res) => {
   try {
-    const { threadId } = req.params;
+    const { threadId, userId } = req.params;
 
     if (!threadId) {
       return res.status(400).json({
@@ -350,7 +351,7 @@ app.get("/feedback/states/:threadId", async (req, res) => {
       });
     }
 
-    const result = await getFeedbackStates(threadId);
+    const result = await getFeedbackStates(threadId, userId);
 
     if (result.success) {
       res.json({ success: true, feedbackStates: result.feedbackStates });
@@ -368,9 +369,9 @@ app.get("/feedback/states/:threadId", async (req, res) => {
 });
 
 // New endpoint to fetch document uploads for a thread
-app.get("/documents/:threadId", async (req, res) => {
+app.get("/documents/:threadId/:userId", async (req, res) => {
   try {
-    const { threadId } = req.params;
+    const { threadId, userId } = req.params;
 
     if (!threadId) {
       return res.status(400).json({
@@ -379,7 +380,7 @@ app.get("/documents/:threadId", async (req, res) => {
       });
     }
 
-    const result = await getDocumentUploads(threadId);
+    const result = await getDocumentUploads(threadId, userId);
 
     if (result.success) {
       res.json({ success: true, documentUploads: result.documentUploads });

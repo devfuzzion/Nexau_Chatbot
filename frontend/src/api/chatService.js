@@ -1,9 +1,16 @@
 const backendUrl = "https://ejitukppt8.execute-api.eu-west-3.amazonaws.com/dev";
 // const backendUrl = "http://localhost:3000";
 
-export const fetchThreads = async () => {
+export const fetchThreads = async (userId) => {
   try {
-    const response = await fetch(`${backendUrl}/threads`);
+    console.log("userId", userId);
+    const response = await fetch(`${backendUrl}/threads`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ userId }),
+    });
     const data = await response.json();
 
     if (!data.success) {
@@ -37,10 +44,11 @@ export const fetchMessages = async (threadId) => {
   }
 };
 
-export const sendMessage = async (threadId, userMessage, file = null) => {
+export const sendMessage = async (threadId, userMessage, userId, file = null) => {
   try {
     const formData = new FormData();
     formData.append("userMessage", userMessage);
+    formData.append("userId", userId || "guest");
     console.log("file", file);
 
     if (file) {
@@ -133,12 +141,13 @@ export const updateThreadTitle = async (id, newTitle, aiTitle) => {
 export const appendFeedbackMessage = async (
   threadId,
   messageId,
+  userId,
   feedback,
   originalFeedback,
 ) => {
   try {
     // Ensure required parameters are provided
-    if (!threadId || !messageId || !feedback) {
+    if (!threadId || !messageId || !feedback || !userId) {
       throw new Error("Thread ID, Message ID, and Feedback are required.");
     }
 
@@ -149,7 +158,7 @@ export const appendFeedbackMessage = async (
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ feedback, originalFeedback }),
+        body: JSON.stringify({ feedback, originalFeedback, userId}),
       },
     );
 
