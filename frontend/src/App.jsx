@@ -17,13 +17,6 @@ const App = () => {
       // Store it in state or use it as needed
     }
   }, []);
-  
-    window.addEventListener("message", handleMessage);
-  
-    return () => {
-      window.removeEventListener("message", handleMessage); // Cleanup on unmount
-    };
-  });
 
   
 
