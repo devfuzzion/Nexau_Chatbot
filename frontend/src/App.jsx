@@ -24,7 +24,7 @@ const App = () => {
     return () => {
       window.removeEventListener("message", handleMessage); // Cleanup on unmount
     };
-  }, []);
+  });
 
   
 
