@@ -8,16 +8,15 @@ const App = () => {
   // const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const handleMessage = (event) => {
-      if (event.origin !== "https://242456567.hs-sites-na2.com") return;
-  
-      if (event.data.type === "hubspot_cookies") {
-        const cookies = event.data.data;
-        console.log("✅ Received cookies from HubSpot parent:", cookies);
-      }else{
-        console.log("No event found", event.data);
-      }
-    };
+    // Get the current URL search parameters
+    const queryParams = new URLSearchParams(window.location.search);
+    const cookieValue = queryParams.get('cookieValue');
+    
+    if (cookieValue) {
+      console.log('Received cookie value:', cookieValue);
+      // Store it in state or use it as needed
+    }
+  }, []);
   
     window.addEventListener("message", handleMessage);
   
