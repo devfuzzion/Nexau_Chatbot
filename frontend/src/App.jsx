@@ -8,6 +8,18 @@ const App = () => {
   // const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    window.addEventListener("message", (event) => {
+      if (event.origin !== "https://242456567.hs-sites-na2.com") return;
+    
+      if (event.data.type === "hubspot_cookies") {
+        const cookies = event.data.data;
+        console.log("Received cookies from HubSpot parent:", cookies);
+        // Now you can use cookies in your chatbot logic
+      }
+    });    
+  })
+
+  useEffect(() => {
     const fetchData = async () => {
       try {
         const cookieName = "hubspotutk";
