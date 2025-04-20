@@ -81,7 +81,7 @@ const MessageList = ({
       try {
         const response = await fetch(
           // `http://localhost:3000/documents/${threadId}/${userId}`,
-          `https://ejitukppt8.execute-api.eu-west-3.amazonaws.com/dev/documents/${threadId}`,
+          `https://ejitukppt8.execute-api.eu-west-3.amazonaws.com/dev/documents/${threadId}/${userId}`,
         );
         const data = await response.json();
         if (data.success) {
@@ -208,7 +208,7 @@ const MessageList = ({
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            userId: userId,
+            userId: localStorage.getItem('userId') || "guest",
             messageId: messageId,
             threadId: threadId,
             isLiked: isLiked,

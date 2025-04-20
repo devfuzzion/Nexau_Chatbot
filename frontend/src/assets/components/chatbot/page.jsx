@@ -65,7 +65,7 @@ const Chatbot = ({ userData, setUserData }) => {
           },
           body: JSON.stringify({ 
             threadTitle: "Nuevo Chat",
-            userId: userId || "guest",
+            userId: localStorage.getItem('userId') || "guest",
           }),
         },
       );

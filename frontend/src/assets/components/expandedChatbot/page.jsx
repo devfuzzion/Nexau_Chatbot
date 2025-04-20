@@ -36,7 +36,7 @@ const ExpandedChatbot = () => {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ threadTitle: "Nuevo Chat", userId: userId || "guest" }),
+          body: JSON.stringify({ threadTitle: "Nuevo Chat", userId: localStorage.getItem('userId') || "guest" }),
         },
       );
 

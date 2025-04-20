@@ -35,25 +35,11 @@ const Body = ({
   });
   const [isWaitingForResponse, setIsWaitingForResponse] = useState(false);
 
-  const [userId, setUserId] = useState(null);
+  const [userId, setUserId] = useState(localStorage.getItem('userId') || "guest");
 
   const messagesEndRef = useRef(null);
   const typingIntervalRef = useRef(null);
   const thinkingTimeoutRef = useRef(null);
-
-  // Load messages when selected thread changes
-
-  useEffect(() => {
-    const cookieName = "hubspotutk";
-    const cookies = document.cookie.split("; ");
-    const userIdCookie = cookies.find((cookie) => cookie.startsWith(cookieName));
-    const userId = userIdCookie ? userIdCookie.split("=")[1] : null;
-    setUserId(userId);
-    return () => {
-      clearInterval(typingIntervalRef.current);
-      clearTimeout(thinkingTimeoutRef.current);
-    };
-  }, []);
 
   const handleThreadChange = async (threadId) => {
     // First clear any existing intervals and timeouts

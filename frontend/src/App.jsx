@@ -14,30 +14,8 @@ const App = () => {
     
     if (cookieValue) {
       console.log('Received cookie value:', cookieValue);
-      // Store it in state or use it as needed
+      localStorage.setItem('userId', cookieValue);
     }
-  }, []);
-
-  
-
-
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const cookieName = "hubspotutk";
-        const cookies = document.cookie.split("; ");
-        const userIdCookie = cookies.find((cookie) => cookie.startsWith(cookieName));
-        const userId = userIdCookie ? userIdCookie.split("=")[1] : null;
-        setUserId(userId);
-        console.log(userId);
-      } catch (err) {
-        console.error("Failed to fetch user data", err);
-      } finally {
-        // setLoading(false);
-      }
-    };
-    fetchData();
   }, []);
 
   useEffect(() => {
