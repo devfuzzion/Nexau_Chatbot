@@ -14,6 +14,8 @@ const App = () => {
       if (event.data.type === "hubspot_cookies") {
         const cookies = event.data.data;
         console.log("✅ Received cookies from HubSpot parent:", cookies);
+      }else{
+        console.log("No event found", event.data);
       }
     };
   
