@@ -6,6 +6,7 @@ import {
   fetchThreads,
   deleteThread,
   updateThreadTitle,
+  getUserData,
 } from "../../../api/chatService.js";
 
 const ExpandedChatbot = () => {
@@ -15,14 +16,18 @@ const ExpandedChatbot = () => {
   const [selectedThread, setSelectedThread] = useState("");
   const [chatState, setChatState] = useState("maximized");
   const [isProfileOpen, setIsProfileOpen] = useState(false);
-  const [userId, setUserId] = useState(null);
+  const [userId, setUserId] = useState(localStorage.getItem('userId') || "guest");
+  const [userData, setUserData] = useState(null);
+
+
 
   useEffect(() => {
-    const cookieName = "hubspotutk";
-    const cookies = document.cookie.split("; ");
-    const userIdCookie = cookies.find((cookie) => cookie.startsWith(cookieName));
-    const userId = userIdCookie ? userIdCookie.split("=")[1] : null;
-    setUserId(userId);
+    const fetchUserData = async () => {
+      const userData = await getUserData(userId);
+      setUserData(userData);
+      console.log("userData", userData);
+    };
+    fetchUserData();
   }, []);
 
   // Function to create a new thread
@@ -139,6 +144,7 @@ const ExpandedChatbot = () => {
         isProfileOpen={isProfileOpen}
         handleProfileOpen={handleProfileOpen}
         isExpanded={isExpanded}
+        userData={userData}
         threads={threads}
         setThreads={setThreads}
         selectedThread={selectedThread}

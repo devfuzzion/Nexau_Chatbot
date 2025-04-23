@@ -25,19 +25,12 @@ const Chatbot = ({ userData, setUserData }) => {
   const [isDarkMode, setIsDarkMode] = useState(() => {
     return localStorage.getItem("isDarkMode") === "true";
   });
-  const [userId, setUserId] = useState("guest");
+  const [userId, setUserId] = useState( localStorage.getItem('userId') || "guest" );
 
-  useEffect(() => {
-    const cookieName = "hubspotutk";
-    const cookies = document.cookie.split("; ");
-    const userIdCookie = cookies.find((cookie) => cookie.startsWith(cookieName));
-    setUserId(userIdCookie ? userIdCookie.split("=")[1] : null);
-  }, []);
 
   useEffect(() => {
     const loadThreads = async () => {
       try {
-        console.log("userId", userId);
         const threadsData = await fetchThreads(userId);
         console.log("threadsData", threadsData);
         if (threadsData.length > 0) {

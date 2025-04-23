@@ -17,29 +17,20 @@ const ProfileOverlay = ({
     story: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [userId, setUserId] = useState(null);
+  const [userId, setUserId] = useState(localStorage.getItem('userId') || "guest");
 
   useEffect(() => {
-    const cookieName = "hubspotutk";
-    const cookies = document.cookie.split("; ");
-    const userIdCookie = cookies.find((cookie) => cookie.startsWith(cookieName));
-    setUserId(userIdCookie ? userIdCookie.split("=")[1] : null);
-  }, []);
-
-  // console.log(userData, 11);
-  useEffect(() => {
-    // console.log("Fron parent");
-    // console.log(storeInfo);
-    if (!userData?.userid) return;
+    if (!userData?.user_id) return;
     if (userData) {
       setStoreInfo({
-        storeName: userData.storename || "",
+        storeName: userData.store_name || "",
         website: userData.website || "",
         products: userData.products || "",
         story: userData.story || "",
       });
     }
-  }, [userData]);
+
+  }, []);
   
   const handleChange = (e) => {
     const { name, value } = e.target;

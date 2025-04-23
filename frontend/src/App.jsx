@@ -11,7 +11,7 @@ const App = () => {
     // Get the current URL search parameters
     const queryParams = new URLSearchParams(window.location.search);
     const cookieValue = queryParams.get('cookieValue');
-    
+
     if (cookieValue) {
       console.log('Received cookie value:', cookieValue);
       localStorage.setItem('userId', cookieValue);
@@ -23,6 +23,7 @@ const App = () => {
       try {
         const data = await getUserData(userId);
         setUserData(data);
+        console.log("userData", data);
       } catch (err) { 
         console.error("Failed to fetch user data", err);
       } finally {

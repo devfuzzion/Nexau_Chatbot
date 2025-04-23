@@ -27,6 +27,8 @@ import {
   getFeedbackStates,
   logDocumentUpload,
   getDocumentUploads,
+  getUserData,
+  updateUserData
 } from "./airtable.utils.js";
 import {
   getAllThreads,
@@ -428,3 +430,44 @@ app.put("/threads/:id", async (req, res) => {
     res.status(500).json({ success: false, message: "Internal server error." });
   }
 });
+
+//Get the user data from airtable and return it
+app.get("/users/:userId", async (req, res) => {
+  const { userId } = req.params;
+  console.log("userId", userId);
+  if (!userId) {  
+    return res.status(400).json({ success: false, message: "User ID is required." });
+  }
+
+  const result = await getUserData(userId);
+
+  if (result.success) {
+    res.json({ success: true, userData: result.userData });
+  } else {
+    res.status(404).json({ success: false, message: "User data not found." });
+  }
+});
+
+app.post("/users/:userId/user-questions-data", async (req, res) => {
+  try {
+    console.log("userId", req.params.userId);
+    const { userId } = req.params;
+    const { userQuestionsData } = req.body;
+
+    if (!userId || !userQuestionsData) {
+      return res.status(400).json({ success: false, message: "User ID and user questions data are required." });
+    }
+
+    const result = await updateUserData(userId, userQuestionsData);
+
+    if (result.success) {
+      res.json({ success: true, message: "User questions data updated successfully." });
+    } else {
+      throw new Error(result.message);
+    }
+  } catch (error) {
+    console.error("Error updating user questions data:", error);
+    res.status(500).json({ success: false, message: "Internal server error." });
+  }
+});
+

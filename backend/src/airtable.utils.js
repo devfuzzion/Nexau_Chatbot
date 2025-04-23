@@ -154,7 +154,7 @@ export const logUserData = async ({
     } else {
       // 🆕 Create new record
       const created = await base(USER_DATA_TABLE_NAME).create({
-        user_id: parseInt(userId),
+        user_id: userId,
         store_name: storeName || "",
         website: website || "",
         products: products || "",
@@ -210,6 +210,58 @@ export const getDocumentUploads = async (threadId, userId) => {
     return { success: true, documentUploads };
   } catch (error) {
     console.error("Error fetching document uploads from Airtable:", error);
+    return { success: false, error: error.message };
+  }
+};
+
+
+export const getUserData = async (userId) => {
+  try {
+    const records = await base(USER_DATA_TABLE_NAME)
+      .select({
+        filterByFormula: `{user_id} = '${userId}'`,
+      })
+      .firstPage();
+
+    if (records.length > 0) {
+      return records[0].fields;
+    } else {
+      return null;
+    }
+  } catch (error) {
+    console.error("Error fetching user data from Airtable:", error);
+    return { success: false, error: error.message };
+  }
+};
+
+export const updateUserData = async (userId, userQuestionsData) => {
+  try {
+    console.log("Requesting user data for userId:", userId);
+    const records = await base(USER_DATA_TABLE_NAME)
+      .select({
+        filterByFormula: `{user_id} = '${userId}'`,
+      })
+      .firstPage();
+
+    if (records.length > 0) {
+      const recordId = records[0].id;
+
+      const updated = await base(USER_DATA_TABLE_NAME).update(recordId, { 
+        user_questions_data: userQuestionsData,
+      });
+
+      return { success: true, recordId: updated.id };
+    } else {
+      // 🆕 Create new record
+      const created = await base(USER_DATA_TABLE_NAME).create({
+        user_id: userId,
+        user_questions_data: userQuestionsData,
+      });
+
+      return { success: true, recordId: created.id };
+    }
+  } catch (error) {
+    console.error("Error updating user questions data:", error);
     return { success: false, error: error.message };
   }
 };

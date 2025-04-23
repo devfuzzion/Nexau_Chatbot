@@ -1,11 +1,10 @@
 import { updateUser, getUserById } from "../db/user.queries.js";
-import { logUserData } from "../airtable.utils.js";
+import { logUserData, getUserData } from "../airtable.utils.js";
 
 export const saveUserDatainDb = async (req, res) => {
   try {
     const { storeName, website, products, story } = req.body;
     const userId = req.params.userId;
-    console.log(userId);
     if (!storeName || !website || !products || !story) {
       return res
         .status(400)
@@ -33,6 +32,7 @@ export const saveUserDatainDb = async (req, res) => {
 export const getUserDataFromDb = async (req, res) => {
   try {
     const userId = req.params.userId;
+    console.log(userId, "from controller");
 
     if (!userId) {
       return res
@@ -40,8 +40,8 @@ export const getUserDataFromDb = async (req, res) => {
         .json({ success: false, message: "User ID is required." });
     }
 
-    const user = await getUserById(userId);
-
+    const user = await getUserData(userId);
+    console.log("user_data", user);
     if (!user) {
       return res
         .status(404)

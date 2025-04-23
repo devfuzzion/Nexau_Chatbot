@@ -1,5 +1,5 @@
-const backendUrl = "https://ejitukppt8.execute-api.eu-west-3.amazonaws.com/dev";
-// const backendUrl = "http://localhost:3000";
+// const backendUrl = "https://ejitukppt8.execute-api.eu-west-3.amazonaws.com/dev";
+const backendUrl = "http://localhost:3000";
 
 export const fetchThreads = async (userId) => {
   try {
@@ -183,8 +183,11 @@ export const appendFeedbackMessage = async (
 
 export const updateUserData = async (userId, userData) => {
   try {
-    if (!userId || !userData) {
-      throw new Error("User ID and user data are required.");
+    console.log("userId", userId);
+    console.log("userData", userData);
+    
+    if (!userId) {
+      throw new Error("User ID is required.");
     }
 
     const response = await fetch(
@@ -221,7 +224,6 @@ export const getUserData = async (userId) => {
     if (!userId) {
       throw new Error("User ID is required.");
     }
-
     const response = await fetch(`${backendUrl}/users/${userId}`, {
       method: "GET",
       headers: {
@@ -233,13 +235,13 @@ export const getUserData = async (userId) => {
       const errorData = await response.json();
       throw new Error(errorData.message || "Failed to fetch user data.");
     }
-
     const data = await response.json();
-
+    console.log("user ka data", data);
     if (!data.success || !data.data) {
       throw new Error(data.message || "User data not found.");
     }
 
+    console.log("data", data);
     return data.data; // returning only the actual user data
   } catch (error) {
     console.error("Error fetching user data:", error);
