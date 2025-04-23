@@ -183,9 +183,8 @@ export const appendFeedbackMessage = async (
 
 export const updateUserData = async (userId, userData) => {
   try {
-    console.log("userId", userId);
-    console.log("userData", userData);
-    
+    console.log("userId in updateUserData", userId);
+
     if (!userId) {
       throw new Error("User ID is required.");
     }
@@ -221,6 +220,7 @@ export const updateUserData = async (userId, userData) => {
 
 export const getUserData = async (userId) => {
   try {
+    console.log("userId in getUserData", userId);
     if (!userId) {
       throw new Error("User ID is required.");
     }
