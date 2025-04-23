@@ -16,6 +16,8 @@ const App = () => {
       console.log('Received cookie value:', cookieValue);
       localStorage.setItem('userId', cookieValue);
     }
+    console.log("cookieValue", cookieValue);
+    
   }, []);
 
   useEffect(() => {
