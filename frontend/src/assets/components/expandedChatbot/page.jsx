@@ -22,6 +22,12 @@ const ExpandedChatbot = () => {
 
 
   useEffect(() => {
+    const pathname = window.location.pathname; // e.g. "/expanded/user_1234567890"
+    console.log("pathname", pathname);
+    const pathParts = pathname.split('/');
+    const user_id = pathParts[pathParts.length - 1];
+    setUserId(user_id);
+
     const fetchUserData = async () => {
       const userData = await getUserData(userId);
       setUserData(userData);

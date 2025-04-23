@@ -48,6 +48,9 @@ const Header = ({
 
     if(window.location.href.includes("/expanded")){
       localStorage.setItem("isExpanded", true);
+      let user_id = window.location.href.split("/expanded/")[1];
+      console.log("user_id fetched from url", user_id);
+      localStorage.setItem("userId", user_id);
     }else{
       localStorage.setItem("isExpanded", false);
     }
@@ -70,15 +73,18 @@ const Header = ({
       localStorage.setItem("isExpanded", !isExpanded);
       const baseUrl = currentUrl.split('/').slice(0, 3).join('/'); // Get protocol and domain
       
+      // Get userId from localStorage
+      const userId = localStorage.getItem('userId') || "guest";
+      
       let expandedUrl;
 
       if(!isExpanded){
-        expandedUrl = `${baseUrl}/expanded`;
+        expandedUrl = `${baseUrl}/expanded/${userId}`;
       }else{
         expandedUrl = `${baseUrl}/`;
       }
       
-      // Redirect to the expanded URL into new tab
+      // Redirect to the expanded URL in a new tab
       window.open(expandedUrl, '_blank');
     };
 
@@ -310,5 +316,6 @@ const Header = ({
     </div>
   );
 };
+
 
 export default Header;
