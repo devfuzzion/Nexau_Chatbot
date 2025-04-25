@@ -544,6 +544,11 @@ body.dark-mode {
     margin-bottom: 15px;
     font-size: 14px;
   }
+  .chatbot-name {
+    font-size: 10px;
+    font-weight: 600;
+    color: #333;
+  }
 
   .history-section h4 {
     font-size: 13px;

@@ -25,7 +25,7 @@ const Chatbot = ({ userData, setUserData }) => {
   const [isDarkMode, setIsDarkMode] = useState(() => {
     return localStorage.getItem("isDarkMode") === "true";
   });
-  const [userId, setUserId] = useState( localStorage.getItem('userId') || "guest" );
+  const [userId, setUserId] = useState(localStorage.getItem('userId') || "guest");
 
 
   useEffect(() => {
@@ -56,7 +56,7 @@ const Chatbot = ({ userData, setUserData }) => {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ 
+          body: JSON.stringify({
             threadTitle: "Nuevo Chat",
             userId: localStorage.getItem('userId') || "guest",
           }),
@@ -194,27 +194,29 @@ const Chatbot = ({ userData, setUserData }) => {
 
       {/* Chatbot Container */}
       <div
-        className={`chatbot-container ${isExpanded ? "expanded" : ""} ${
-          isVisible ? "" : "hidden"
-        } ${isDarkMode ? "dark" : ""}`}
+        className={`chatbot-container ${isExpanded ? "expanded" : ""} ${isVisible ? "" : "hidden"
+          } ${isDarkMode ? "dark" : ""}`}
       >
-        <Header
-          chatState={chatState}
-          setChatState={setChatState}
-          isProfileOpen={isProfileOpen}
-          handleProfileOpen={handleProfileOpen}
-          onExpand={handleExpand}
-          isExpanded={isExpanded}
-          onToggleVisibility={toggleVisibility}
-          threads={threads}
-          selectedThread={selectedThread}
-          setSelectedThread={setSelectedThread}
-          createThread={createThread}
-          deleteThreadById={deleteThreadById}
-          updateThreadTitleById={updateThreadTitleById}
-          isDarkMode={isDarkMode}
-          toggleTheme={toggleTheme}
-        />
+        {!isExpanded && (
+          <Header
+            chatState={chatState}
+            setChatState={setChatState}
+            isProfileOpen={isProfileOpen}
+            handleProfileOpen={handleProfileOpen}
+            onExpand={handleExpand}
+            isExpanded={isExpanded}
+            onToggleVisibility={toggleVisibility}
+            threads={threads}
+            selectedThread={selectedThread}
+            setSelectedThread={setSelectedThread}
+            createThread={createThread}
+            deleteThreadById={deleteThreadById}
+            updateThreadTitleById={updateThreadTitleById}
+            isDarkMode={isDarkMode}
+            toggleTheme={toggleTheme}
+          />
+        )}
+
         <Body
           userData={userData}
           setUserData={setUserData}
