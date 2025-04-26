@@ -1,6 +1,6 @@
 // const backendUrl = "https://ejitukppt8.execute-api.eu-west-3.amazonaws.com/dev";
 // const backendUrl = "http://localhost:3000";
-const backendUrl = "http://13.38.107.93:3001";
+const backendUrl = "http://13.38.107.93:3000";
 
 export async function createThread(userId = "guest") {
   try {
