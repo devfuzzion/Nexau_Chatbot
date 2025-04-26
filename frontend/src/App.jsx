@@ -14,7 +14,8 @@ const App = () => {
 
     if (cookieValue) {
       console.log('Received cookie value:', cookieValue);
-      localStorage.setItem('userId', cookieValue);
+      // localStorage.setItem('userId', cookieValue);
+      localStorage.setItem('userId', "guest");
     }
     console.log("cookieValue", cookieValue);
     

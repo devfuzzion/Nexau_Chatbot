@@ -11,7 +11,7 @@ const ProfileOverlay = ({
   onClose,
 }) => {
   const [storeInfo, setStoreInfo] = useState({
-    storeName: "",
+    store_name: "",
     website: "",
     products: "",
     story: "",
@@ -30,7 +30,7 @@ const ProfileOverlay = ({
       });
     }
 
-  }, []);
+  }, [userData]);
   
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -46,7 +46,7 @@ const ProfileOverlay = ({
       if (response.success) {
         setUserData({
           ...userData,
-          storename: storeInfo.storeName,
+          storeName: storeInfo.storeName,
           website: storeInfo.website,
           products: storeInfo.products,
           story: storeInfo.story,
@@ -80,8 +80,8 @@ const ProfileOverlay = ({
           <h3 className="section-title">Información de tu ecommerce</h3>
           <input
             type="text"
-            name="storeName"
-            value={storeInfo.storeName}
+            name="store_name"
+            value={storeInfo.store_name}
             onChange={handleChange}
             placeholder="Nombre de tu tienda"
             className="form-input"

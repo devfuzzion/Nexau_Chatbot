@@ -5,11 +5,11 @@ export const saveUserDatainDb = async (req, res) => {
   try {
     const { storeName, website, products, story } = req.body;
     const userId = req.params.userId;
-    if (!storeName || !website || !products || !story) {
-      return res
-        .status(400)
-        .json({ success: false, message: "Missing required fields." });
-    }
+    // if (!storeName || !website || !products || !story) { 
+    //   return res
+    //     .status(400)
+    //     .json({ success: false, message: "Missing required fields." });
+    // }
 
     // const result = await updateUser(userId, {
     //   storeName,

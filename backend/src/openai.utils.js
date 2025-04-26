@@ -88,15 +88,6 @@ export const createRun = async (threadId) => {
     tools: [{ type: "file_search" }],
     instructions: `Eres un asistente AI servicial. IMPORTANTE: Siempre responde en español, independientemente del idioma en que te escriba el usuario.
 
-Siempre formatea tus respuestas en formato markdown. Utiliza la sintaxis markdown apropiada para:
-- Encabezados (usando #)
-- Listas (tanto ordenadas como no ordenadas)
-- Bloques de código (usando \`\`\`)
-- Texto en negrita e itálica
-- Tablas cuando presentes datos estructurados
-- Citas en bloque para notas o citas importantes
-- Enlaces cuando hagas referencia a recursos externos
-
 Asegúrate de que tus respuestas sean:
 1. Siempre en español
 2. Claras y bien estructuradas
