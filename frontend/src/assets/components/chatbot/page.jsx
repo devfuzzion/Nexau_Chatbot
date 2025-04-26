@@ -181,8 +181,9 @@ const Chatbot = ({ userData, setUserData }) => {
 
       {/* Chatbot Container */}
       <div
-        className={`chatbot-container ${isExpanded ? "expanded" : ""} ${isVisible ? "" : "hidden"
-          } ${isDarkMode ? "dark" : ""}`}
+        className={`chatbot-container ${isExpanded ? "expanded" : ""} ${
+          isVisible ? "" : "hidden"
+        } ${isDarkMode ? "dark" : ""}`}
       >
         {!isExpanded && (
           <Header
@@ -196,7 +197,7 @@ const Chatbot = ({ userData, setUserData }) => {
             threads={threads}
             selectedThread={selectedThread}
             setSelectedThread={setSelectedThread}
-            createThread={createThread}
+            createThread={handleCreateThread}
             deleteThreadById={deleteThreadById}
             updateThreadTitleById={updateThreadTitleById}
             isDarkMode={isDarkMode}
