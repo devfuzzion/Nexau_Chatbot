@@ -1,5 +1,27 @@
-const backendUrl = "https://ejitukppt8.execute-api.eu-west-3.amazonaws.com/dev";
+// const backendUrl = "https://ejitukppt8.execute-api.eu-west-3.amazonaws.com/dev";
 // const backendUrl = "http://localhost:3000";
+const backendUrl = "http://13.38.107.93:3001/";
+
+export async function createThread(userId = "guest") {
+  try {
+    const response = await fetch(`${backendUrl}/create-thread`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        threadTitle: "Nuevo Chat",
+        userId,
+      }),
+    });
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error creating thread:", error);
+    throw error;
+  }
+}
 
 export const fetchThreads = async (userId) => {
   try {
@@ -44,7 +66,12 @@ export const fetchMessages = async (threadId) => {
   }
 };
 
-export const sendMessage = async (threadId, userMessage, userId, file = null) => {
+export const sendMessage = async (
+  threadId,
+  userMessage,
+  userId,
+  file = null,
+) => {
   try {
     const formData = new FormData();
     formData.append("userMessage", userMessage);
@@ -158,7 +185,7 @@ export const appendFeedbackMessage = async (
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ feedback, originalFeedback, userId}),
+        body: JSON.stringify({ feedback, originalFeedback, userId }),
       },
     );
 
@@ -248,3 +275,57 @@ export const getUserData = async (userId) => {
     throw error; // optional: or return null if you prefer silent failure
   }
 };
+
+export async function fetchFeedbackStates(threadId, userId) {
+  try {
+    const response = await fetch(
+      `${backendUrl}/feedback/states/${threadId}/${userId}`,
+    );
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error fetching feedback states:", error);
+    throw error;
+  }
+}
+
+export async function fetchDocumentUploads(threadId, userId) {
+  try {
+    const response = await fetch(
+      `${backendUrl}/documents/${threadId}/${userId}`,
+    );
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error fetching document uploads:", error);
+    throw error;
+  }
+}
+
+export async function storeFeedbackState({
+  userId,
+  messageId,
+  threadId,
+  isLiked,
+}) {
+  try {
+    const response = await fetch(`${backendUrl}/feedback/state`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ userId, messageId, threadId, isLiked }),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || "Failed to store feedback state");
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error storing feedback state:", error);
+    throw error;
+  }
+}

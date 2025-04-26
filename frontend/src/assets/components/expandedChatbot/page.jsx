@@ -7,6 +7,7 @@ import {
   deleteThread,
   updateThreadTitle,
   getUserData,
+  createThread,
 } from "../../../api/chatService.js";
 
 const ExpandedChatbot = () => {
@@ -16,15 +17,15 @@ const ExpandedChatbot = () => {
   const [selectedThread, setSelectedThread] = useState("");
   const [chatState, setChatState] = useState("maximized");
   const [isProfileOpen, setIsProfileOpen] = useState(false);
-  const [userId, setUserId] = useState(localStorage.getItem('userId') || "guest");
+  const [userId, setUserId] = useState(
+    localStorage.getItem("userId") || "guest",
+  );
   const [userData, setUserData] = useState(null);
-
-
 
   useEffect(() => {
     const pathname = window.location.pathname; // e.g. "/expanded/user_1234567890"
     console.log("pathname", pathname);
-    const pathParts = pathname.split('/');
+    const pathParts = pathname.split("/");
     const user_id = pathParts[pathParts.length - 1];
     setUserId(user_id);
 
@@ -37,28 +38,20 @@ const ExpandedChatbot = () => {
   }, []);
 
   // Function to create a new thread
-  const createThread = async () => {
+  const handleCreateThread = async () => {
     try {
-      const response = await fetch(
-        // "http://localhost:3000/create-thread",
-        "https://ejitukppt8.execute-api.eu-west-3.amazonaws.com/dev/create-thread",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ threadTitle: "Nuevo Chat", userId: localStorage.getItem('userId') || "guest" }),
-        },
-      );
-
-      const data = await response.json();
+      const userId = localStorage.getItem("userId") || "guest";
+      const data = await createThread(userId);
 
       if (data.success) {
         const threadsData = await fetchThreads(userId);
         setThreads(threadsData);
+
         if (data.thread && data.thread.id) {
           setSelectedThread(data.thread.id);
         }
+      } else {
+        console.error("Failed to create thread");
       }
     } catch (error) {
       console.error("Error creating thread:", error);
@@ -122,9 +115,9 @@ const ExpandedChatbot = () => {
   const handleMinimize = () => {
     // Get the current URL and construct the minimized URL
     const currentUrl = window.location.href;
-    const baseUrl = currentUrl.split('/').slice(0, 3).join('/');
+    const baseUrl = currentUrl.split("/").slice(0, 3).join("/");
     const minimizedUrl = baseUrl;
-    
+
     // Redirect to the minimized URL
     window.location.href = minimizedUrl;
   };
@@ -142,7 +135,7 @@ const ExpandedChatbot = () => {
         threads={threads}
         selectedThread={selectedThread}
         setSelectedThread={setSelectedThread}
-        createThread={createThread}
+        createThread={handleCreateThread}
         deleteThreadById={deleteThreadById}
         updateThreadTitleById={updateThreadTitleById}
       />
@@ -155,7 +148,7 @@ const ExpandedChatbot = () => {
         setThreads={setThreads}
         selectedThread={selectedThread}
         setSelectedThread={setSelectedThread}
-        createThread={createThread}
+        createThread={handleCreateThread}
         deleteThreadById={deleteThreadById}
         updateThreadTitleById={updateThreadTitleById}
       />
@@ -163,4 +156,4 @@ const ExpandedChatbot = () => {
   );
 };
 
-export default ExpandedChatbot; 
+export default ExpandedChatbot;
