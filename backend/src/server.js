@@ -28,7 +28,7 @@ import {
   logDocumentUpload,
   getDocumentUploads,
   getUserData,
-  updateUserData,
+  updateUserData
 } from "./airtable.utils.js";
 import {
   getAllThreads,
@@ -79,7 +79,7 @@ app.get("/ping", (req, res) => {
 });
 
 app.get("/", (req, res) => {
-  res.send("Love 1");
+  res.send("Love");
 });
 
 app.post("/threads", async (req, res) => {
@@ -172,7 +172,7 @@ app.post("/run/:threadId", async (req, res) => {
           response: messages[0].content[0].text.value,
         });
 
-        console.log("Conversation logged successfully");
+              console.log("Conversation logged successfully");
 
         res.json({ success: true, botMessage: messages[0] });
       } catch (err) {
@@ -198,11 +198,7 @@ app.post("/run/:threadId", async (req, res) => {
 app.post("/create-thread", async (req, res) => {
   try {
     const thread = await createThread();
-    const dbThread = await createThreadInDb(
-      thread.id,
-      req.body.threadTitle,
-      req.body.userId,
-    );
+    const dbThread = await createThreadInDb(thread.id, req.body.threadTitle, req.body.userId);
     console.log(dbThread);
     res.json({ success: true, thread });
   } catch (err) {
@@ -439,10 +435,8 @@ app.put("/threads/:id", async (req, res) => {
 app.get("/users/:userId", async (req, res) => {
   const { userId } = req.params;
   console.log("userId", userId);
-  if (!userId) {
-    return res
-      .status(400)
-      .json({ success: false, message: "User ID is required." });
+  if (!userId) {  
+    return res.status(400).json({ success: false, message: "User ID is required." });
   }
 
   const result = await getUserData(userId);
@@ -461,19 +455,13 @@ app.post("/users/:userId/user-questions-data", async (req, res) => {
     const { userQuestionsData } = req.body;
 
     if (!userId || !userQuestionsData) {
-      return res.status(400).json({
-        success: false,
-        message: "User ID and user questions data are required.",
-      });
+      return res.status(400).json({ success: false, message: "User ID and user questions data are required." });
     }
 
     const result = await updateUserData(userId, userQuestionsData);
 
     if (result.success) {
-      res.json({
-        success: true,
-        message: "User questions data updated successfully.",
-      });
+      res.json({ success: true, message: "User questions data updated successfully." });
     } else {
       throw new Error(result.message);
     }
@@ -482,3 +470,4 @@ app.post("/users/:userId/user-questions-data", async (req, res) => {
     res.status(500).json({ success: false, message: "Internal server error." });
   }
 });
+
