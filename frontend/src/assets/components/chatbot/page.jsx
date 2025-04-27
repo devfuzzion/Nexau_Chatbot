@@ -7,6 +7,7 @@ import {
   fetchThreads,
   deleteThread,
   updateThreadTitle,
+  createThread,
 } from "../../../api/chatService.js";
 const Chatbot = ({ userData, setUserData }) => {
   // Initialize states from localStorage
@@ -25,8 +26,9 @@ const Chatbot = ({ userData, setUserData }) => {
   const [isDarkMode, setIsDarkMode] = useState(() => {
     return localStorage.getItem("isDarkMode") === "true";
   });
-  const [userId, setUserId] = useState(localStorage.getItem('userId') || "guest");
-
+  const [userId, setUserId] = useState(
+    localStorage.getItem("userId") || "guest",
+  );
 
   useEffect(() => {
     const loadThreads = async () => {
@@ -46,7 +48,7 @@ const Chatbot = ({ userData, setUserData }) => {
   }, [userId]);
 
   // Function to create a new thread - moved from LeftColumn component
-  const createThread = async () => {
+  const handleCreateThread = async () => {
     try {
       const response = await fetch(
         "http://13.36.138.40:3000/create-thread",
@@ -67,13 +69,9 @@ const Chatbot = ({ userData, setUserData }) => {
       const data = await response.json();
 
       if (data.success) {
-        // Refresh threads after creating a new one
-        const threadsData = await fetchThreads(
-          userId || "guest",
-        );
+        const threadsData = await fetchThreads(userId);
         setThreads(threadsData);
 
-        // Select the newly created thread
         if (data.thread && data.thread.id) {
           setSelectedThread(data.thread.id);
         }
@@ -176,27 +174,31 @@ const Chatbot = ({ userData, setUserData }) => {
     setIsDarkMode(darkMode);
     localStorage.setItem("isDarkMode", darkMode);
     // Update body class for global theme
-    document.body.classList.toggle('dark-mode', darkMode);
+    document.body.classList.toggle("dark-mode", darkMode);
   };
 
   // Apply theme on mount
   useEffect(() => {
-    document.body.classList.toggle('dark-mode', isDarkMode);
+    document.body.classList.toggle("dark-mode", isDarkMode);
   }, []);
 
   return (
     <>
       {/* Infinity Button (visible only when chatbot is hidden) */}
       {!isVisible && (
-        <button className={`infinity-button ${isDarkMode ? 'dark' : ''}`} onClick={toggleVisibility}>
+        <button
+          className={`infinity-button ${isDarkMode ? "dark" : ""}`}
+          onClick={toggleVisibility}
+        >
           <img src="/images/chat_icon.png" alt="logo" className="chat-logo" />
         </button>
       )}
 
       {/* Chatbot Container */}
       <div
-        className={`chatbot-container ${isExpanded ? "expanded" : ""} ${isVisible ? "" : "hidden"
-          } ${isDarkMode ? "dark" : ""}`}
+        className={`chatbot-container ${isExpanded ? "expanded" : ""} ${
+          isVisible ? "" : "hidden"
+        } ${isDarkMode ? "dark" : ""}`}
       >
         <Header
           chatState={chatState}
@@ -227,7 +229,7 @@ const Chatbot = ({ userData, setUserData }) => {
           setThreads={setThreads}
           selectedThread={selectedThread}
           setSelectedThread={setSelectedThread}
-          createThread={createThread}
+          createThread={handleCreateThread}
           deleteThreadById={deleteThreadById}
           updateThreadTitleById={updateThreadTitleById}
           isDarkMode={isDarkMode}
