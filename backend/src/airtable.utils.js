@@ -175,6 +175,7 @@ export const logUserData = async ({
   story,
 }) => {
   try {
+    console.log("logUserData", userId, storeName, website, products, story);
     const records = await base(USER_DATA_TABLE_NAME)
       .select({
         filterByFormula: `{user_id} = '${userId}'`,

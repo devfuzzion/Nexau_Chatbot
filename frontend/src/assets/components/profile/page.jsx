@@ -11,7 +11,7 @@ const ProfileOverlay = ({
   onClose,
 }) => {
   const [storeInfo, setStoreInfo] = useState({
-    store_name: "",
+    storeName: "",
     website: "",
     products: "",
     story: "",
@@ -23,13 +23,12 @@ const ProfileOverlay = ({
     if (!userData?.user_id) return;
     if (userData) {
       setStoreInfo({
-        storeName: userData.store_name || "",
+        storeName: userData.storeName || userData.store_name || "",
         website: userData.website || "",
         products: userData.products || "",
         story: userData.story || "",
       });
     }
-
   }, [userData]);
   
   const handleChange = (e) => {
@@ -40,20 +39,31 @@ const ProfileOverlay = ({
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
-
+    console.log("handleSubmit", storeInfo);
+    
     try {
-      const response = await updateUserData(userId, storeInfo);
+      // Convert storeInfo to match backend expectations
+      const dataToUpdate = {
+        store_name: storeInfo.storeName,
+        website: storeInfo.website,
+        products: storeInfo.products,
+        story: storeInfo.story
+      };
+      
+      const response = await updateUserData(userId, dataToUpdate);
+      
       if (response.success) {
+        // Update the userData with the new values
         setUserData({
           ...userData,
+          // Include both versions to ensure compatibility
+          store_name: storeInfo.storeName,
           storeName: storeInfo.storeName,
           website: storeInfo.website,
           products: storeInfo.products,
           story: storeInfo.story,
         });
-        // onClose(); // close overlay if needed
       } else {
-        // setError(response.message || "Error al actualizar los datos.");
         console.log(response.message);
       }
     } catch (err) {
@@ -80,8 +90,8 @@ const ProfileOverlay = ({
           <h3 className="section-title">Información de tu ecommerce</h3>
           <input
             type="text"
-            name="store_name"
-            value={storeInfo.store_name}
+            name="storeName"
+            value={storeInfo.storeName}
             onChange={handleChange}
             placeholder="Nombre de tu tienda"
             className="form-input"

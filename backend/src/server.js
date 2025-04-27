@@ -494,7 +494,7 @@ app.get("/users/:userId", async (req, res) => {
 
 app.post("/users/:userId/user-questions-data", async (req, res) => {
   try {
-    console.log("userId", req.params.userId);
+    console.log("api striked /user-questions-data ", req.body);
     const { userId } = req.params;
     const { userQuestionsData } = req.body;
 
