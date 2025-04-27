@@ -58,8 +58,9 @@ const MessageList = ({
     const fetchFeedbackStates = async () => {
       try {
         const response = await fetch(
-          `https://ejitukppt8.execute-api.eu-west-3.amazonaws.com/dev/feedback/states/${threadId}/${userId}`,
+          // `https://ejitukppt8.execute-api.eu-west-3.amazonaws.com/dev/feedback/states/${threadId}/${userId}`,
           // `http://localhost:3000/feedback/states/${threadId}/${userId}`,
+          `http://13.36.138.40:3000/feedback/states/${threadId}/${userId}`,
         );
         const data = await response.json();
         if (data.success) {
@@ -81,7 +82,8 @@ const MessageList = ({
       try {
         const response = await fetch(
           // `http://localhost:3000/documents/${threadId}/${userId}`,
-          `https://ejitukppt8.execute-api.eu-west-3.amazonaws.com/dev/documents/${threadId}/${userId}`,
+          // `https://ejitukppt8.execute-api.eu-west-3.amazonaws.com/dev/documents/${threadId}/${userId}`,
+          `http://13.36.138.40:3000/documents/${threadId}/${userId}`,
         );
         const data = await response.json();
         if (data.success) {
@@ -198,10 +200,11 @@ const MessageList = ({
         return [...filtered, { messageId, isLiked }];
       });
 
-      // Store in Airtable
+      // Store in Airtable - include the feedback text in the same request
       const response = await fetch(
-        "https://ejitukppt8.execute-api.eu-west-3.amazonaws.com/dev/feedback/state",
+        // "https://ejitukppt8.execute-api.eu-west-3.amazonaws.com/dev/feedback/state",
         // "http://localhost:3000/feedback/state",
+        `http://13.36.138.40:3000/feedback/state`,
         {
           method: "POST",
           headers: {
@@ -212,6 +215,7 @@ const MessageList = ({
             messageId: messageId,
             threadId: threadId,
             isLiked: isLiked,
+            feedbackText: type // Include the feedback text here
           }),
         },
       );
@@ -226,8 +230,7 @@ const MessageList = ({
         throw new Error(data.error);
       }
 
-      // Call the parent handler
-      await handleFeedback(messageId, type);
+      // No need to call handleFeedback separately, it's all handled in one record now
     } catch (error) {
       console.error("Error storing feedback state:", error);
       // Revert local state on error
@@ -239,9 +242,39 @@ const MessageList = ({
   };
 
   const handleCopy = (text, index) => {
-    navigator.clipboard.writeText(text);
-    setCopiedIndex(index);
-    setTimeout(() => setCopiedIndex(null), 2000);
+    try {
+      // Try the standard clipboard API first
+      navigator.clipboard.writeText(text)
+        .then(() => {
+          setCopiedIndex(index);
+          setTimeout(() => setCopiedIndex(null), 2000);
+        })
+        .catch(err => {
+          console.warn("Clipboard API failed, using fallback method", err);
+          // Fallback for Mac users
+          const textArea = document.createElement("textarea");
+          textArea.value = text;
+          // Make the textarea out of viewport
+          textArea.style.position = "fixed";
+          textArea.style.left = "-999999px";
+          textArea.style.top = "-999999px";
+          document.body.appendChild(textArea);
+          textArea.focus();
+          textArea.select();
+          
+          const successful = document.execCommand('copy');
+          document.body.removeChild(textArea);
+          
+          if (successful) {
+            setCopiedIndex(index);
+            setTimeout(() => setCopiedIndex(null), 2000);
+          } else {
+            console.error("Fallback clipboard copy failed");
+          }
+        });
+    } catch (err) {
+      console.error("Copy failed:", err);
+    }
   };
 
   const startEditing = (index) => {
@@ -254,11 +287,16 @@ const MessageList = ({
     setFeedbackText("");
   };
 
-  const submitFeedback = (messageId) => {
-    if (feedbackText.trim()) {
-      handleFeedback(messageId, feedbackText.trim());
-    }
+  const submitFeedback = async (messageId) => {
     cancelEditing();
+    if (feedbackText.trim()) {
+      try {
+        // Just use handleFeedback which will now properly update existing records
+        await handleFeedback(messageId, feedbackText.trim());
+      } catch (error) {
+        console.error("Error submitting feedback:", error);
+      }
+    }
   };
 
   const handleExampleClick = (text) => {

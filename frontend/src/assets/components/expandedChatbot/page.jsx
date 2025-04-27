@@ -16,10 +16,21 @@ const ExpandedChatbot = () => {
   const [selectedThread, setSelectedThread] = useState("");
   const [chatState, setChatState] = useState("maximized");
   const [isProfileOpen, setIsProfileOpen] = useState(false);
-  const [userId, setUserId] = useState(localStorage.getItem('userId') || "guest");
+  const [userId, setUserId] = useState(localStorage.getItem('userId'));
   const [userData, setUserData] = useState(null);
 
-
+  const fetchUserData = async () => {
+    try {
+      if (!userId) {
+        throw new Error("User ID is required.");
+      }
+      const userData = await getUserData(userId);
+      setUserData(userData);
+      console.log("userData", userData);
+    } catch (err) {
+      console.error("Failed to fetch user data", err);
+    }
+  };
 
   useEffect(() => {
     const pathname = window.location.pathname; // e.g. "/expanded/user_1234567890"
@@ -27,21 +38,19 @@ const ExpandedChatbot = () => {
     const pathParts = pathname.split('/');
     const user_id = pathParts[pathParts.length - 1];
     setUserId(user_id);
-
-    const fetchUserData = async () => {
-      const userData = await getUserData(userId);
-      setUserData(userData);
-      console.log("userData", userData);
-    };
-    fetchUserData();
   }, []);
+
+  useEffect(() => {
+    fetchUserData();
+  }, [userId]);
 
   // Function to create a new thread
   const createThread = async () => {
     try {
       const response = await fetch(
+        "http://13.36.138.40:3000/create-thread",
+        // "https://ejitukppt8.execute-api.eu-west-3.amazonaws.com/dev/create-thread",
         // "http://localhost:3000/create-thread",
-        "https://ejitukppt8.execute-api.eu-west-3.amazonaws.com/dev/create-thread",
         {
           method: "POST",
           headers: {

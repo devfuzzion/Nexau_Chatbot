@@ -49,7 +49,8 @@ const Chatbot = ({ userData, setUserData }) => {
   const createThread = async () => {
     try {
       const response = await fetch(
-        "https://ejitukppt8.execute-api.eu-west-3.amazonaws.com/dev/create-thread",
+        "http://13.36.138.40:3000/create-thread",
+        // "https://ejitukppt8.execute-api.eu-west-3.amazonaws.com/dev/create-thread",
         // "http://localhost:3000/create-thread",
         {
           method: "POST",
@@ -197,25 +198,24 @@ const Chatbot = ({ userData, setUserData }) => {
         className={`chatbot-container ${isExpanded ? "expanded" : ""} ${isVisible ? "" : "hidden"
           } ${isDarkMode ? "dark" : ""}`}
       >
-        {!isExpanded && (
-          <Header
-            chatState={chatState}
-            setChatState={setChatState}
-            isProfileOpen={isProfileOpen}
-            handleProfileOpen={handleProfileOpen}
-            onExpand={handleExpand}
-            isExpanded={isExpanded}
-            onToggleVisibility={toggleVisibility}
-            threads={threads}
-            selectedThread={selectedThread}
-            setSelectedThread={setSelectedThread}
-            createThread={createThread}
-            deleteThreadById={deleteThreadById}
-            updateThreadTitleById={updateThreadTitleById}
-            isDarkMode={isDarkMode}
-            toggleTheme={toggleTheme}
-          />
-        )}
+        <Header
+          chatState={chatState}
+          setChatState={setChatState}
+          isProfileOpen={isProfileOpen}
+          handleProfileOpen={handleProfileOpen}
+          onExpand={handleExpand}
+          isExpanded={isExpanded}
+          onToggleVisibility={toggleVisibility}
+          threads={threads}
+          selectedThread={selectedThread}
+          setSelectedThread={setSelectedThread}
+          createThread={createThread}
+          deleteThreadById={deleteThreadById}
+          updateThreadTitleById={updateThreadTitleById}
+          isDarkMode={isDarkMode}
+          toggleTheme={toggleTheme}
+        />
+
 
         <Body
           userData={userData}

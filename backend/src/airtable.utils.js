@@ -65,37 +65,79 @@ export const storeFeedbackState = async ({
   messageId,
   threadId,
   isLiked,
+  feedbackText
 }) => {
   try {
-    // First check if feedback already exists for this message
+    console.log("Checking for existing feedback record:", { messageId, threadId, userId });
+    
+    // More specific filter to find existing records for this exact message
     const existingRecords = await base(FEEDBACKS_TABLE_NAME)
       .select({
-        filterByFormula: `AND({message_id} = '${messageId}', {thread_id} = '${threadId}')`,
+        filterByFormula: `AND({message_id} = '${messageId}', {thread_id} = '${threadId}', {user_id} = '${userId}')`,
       })
       .firstPage();
-
+    
+    console.log(`Found ${existingRecords.length} existing records for message: ${messageId}`);
+    
     if (existingRecords.length > 0) {
+      console.log("Updating existing record:", existingRecords[0].id);
+      
+      // Create update fields object
+      const updateFields = {
+        user_id: userId, // Update user_id in case it changed
+      };
+      
+      // Only update isLiked field if it's not null/undefined
+      if (isLiked !== null && isLiked !== undefined) {
+        updateFields.isLiked = isLiked ? "true" : "false";
+      } else if (existingRecords[0].fields.isLiked) {
+        // Preserve existing isLiked value if present
+        updateFields.isLiked = existingRecords[0].fields.isLiked;
+      }
+      
+      // Only update feedback field if new feedback is provided
+      if (feedbackText) {
+        updateFields.feedback = feedbackText;
+      } else if (existingRecords[0].fields.feedback) {
+        // Preserve existing feedback if present
+        updateFields.feedback = existingRecords[0].fields.feedback;
+      }
+      
+      console.log("Update fields:", updateFields);
+      
       // Update existing record
       const record = await base(FEEDBACKS_TABLE_NAME).update(
         existingRecords[0].id,
-        {
-          isLiked: isLiked ? "true" : "false",
-          user_id: userId, // Update user_id in case it changed
-        },
+        updateFields
       );
+      
       return { success: true, recordId: record.id, isUpdate: true };
     } else {
+      console.log("Creating new feedback record for message:", messageId);
+      
       // Create new record
-      const record = await base(FEEDBACKS_TABLE_NAME).create({
+      const newRecord = {
         user_id: userId,
         message_id: messageId,
         thread_id: threadId,
         feedback_id: `feedback_${Date.now()}_${Math.random()
           .toString(36)
           .substr(2, 9)}`,
-        feedback: "",
-        isLiked: isLiked ? "true" : "false",
-      });
+      };
+      
+      // Only add feedback field if provided
+      if (feedbackText) {
+        newRecord.feedback = feedbackText;
+      }
+      
+      // Only add isLiked field if it's not null/undefined
+      if (isLiked !== null && isLiked !== undefined) {
+        newRecord.isLiked = isLiked ? "true" : "false";
+      }
+      
+      console.log("New record fields:", newRecord);
+      
+      const record = await base(FEEDBACKS_TABLE_NAME).create(newRecord);
       return { success: true, recordId: record.id, isUpdate: false };
     }
   } catch (error) {

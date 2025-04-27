@@ -87,9 +87,9 @@ const Body = ({
       try {
         const messageData = await fetchMessages(selectedThread);
         // Only update messages if we're still on the same thread
-        if (selectedThread === messageData[0]?.threadId) {
+        // if (selectedThread === messageData[0]?.threadId) {
           setMessages(messageData.map((msg) => ({ ...msg, isNew: false })));
-        }
+        // }
       } catch (error) {
         console.error("Failed to load messages:", error);
         setMessages([

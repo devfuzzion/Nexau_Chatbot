@@ -251,16 +251,29 @@ app.post("/threads/:threadId/:messageId", async (req, res) => {
   try {
     const { threadId, messageId } = req.params;
     const { feedback, originalFeedback } = req.body;
+    const userId = req.body.userId;
 
-    console.log(feedback, originalFeedback, 222);
+    console.log("Received text feedback:", { 
+      threadId, 
+      messageId, 
+      userId,
+      feedback: feedback ? feedback.substring(0, 50) + (feedback.length > 50 ? "..." : "") : "(none)",
+      originalFeedback: originalFeedback ? "present" : "none"
+    });
 
+    // Use storeFeedbackState instead of logFeedback to avoid creating duplicate records
     if (feedback) {
-      logFeedback({
-        userId: req.body.userId,
-        feedback: feedback,
-        threadId: threadId,
+      console.log("Storing text feedback for message:", messageId);
+      
+      const storeResult = await storeFeedbackState({
+        userId: userId,
         messageId: messageId,
+        threadId: threadId,
+        isLiked: null, // neutral feedback
+        feedbackText: feedback
       });
+      
+      console.log("Feedback storage result:", storeResult);
     }
 
     // Validate inputs
@@ -276,6 +289,8 @@ app.post("/threads/:threadId/:messageId", async (req, res) => {
         error: "Feedback is required",
       });
     }
+    
+    console.log("Retrieving message to generate feedback summary");
     const messageonWhichToGiveFeedback = await getMessageById(
       threadId,
       messageId,
@@ -286,9 +301,15 @@ app.post("/threads/:threadId/:messageId", async (req, res) => {
     }\n\nUser feedback on this message:\n${feedback}\n\nUser feedback before this feedback submission:\n${
       originalFeedback ? originalFeedback : "No feedback till now"
     }`;
+    
+    console.log("Generating feedback summary");
     const updatedFeedback = await generateFeedbackSummary(context);
+    
+    console.log("Updating thread feedback");
     const savedFeedback = await updateFeedback(threadId, updatedFeedback);
+    
     if (savedFeedback.success) {
+      console.log("Feedback successfully processed and saved");
       res.json({
         success: true,
         savedFeedback: { ...savedFeedback, updatedFeedback },
@@ -310,25 +331,41 @@ app.post("/threads/:threadId/:messageId", async (req, res) => {
 // New endpoint to store like/dislike state
 app.post("/feedback/state", async (req, res) => {
   try {
-    console.log("req.body", req.body);
-    const { userId, messageId, threadId, isLiked } = req.body;
+    console.log("Received feedback state request:", req.body);
+    const { userId, messageId, threadId, isLiked, feedbackText } = req.body;
 
-    if (!userId || !messageId || !threadId || isLiked === undefined) {
+    if (!userId || !messageId || !threadId) {
       return res.status(400).json({
         success: false,
-        error: "Missing required fields",
+        error: "Missing required fields: userId, messageId, and threadId are required",
       });
     }
+
+    // isLiked could be null for text-only feedback
+    console.log("Processing feedback state with params:", { 
+      userId, 
+      messageId, 
+      threadId, 
+      isLiked: isLiked === null ? "null" : isLiked, 
+      feedbackText: feedbackText || "(none)" 
+    });
 
     const result = await storeFeedbackState({
       userId,
       messageId,
       threadId,
       isLiked,
+      feedbackText
     });
 
+    console.log("Feedback state result:", result);
+
     if (result.success) {
-      res.json({ success: true, recordId: result.recordId });
+      res.json({ 
+        success: true, 
+        recordId: result.recordId, 
+        isUpdate: result.isUpdate 
+      });
     } else {
       throw new Error(result.error);
     }
@@ -345,6 +382,7 @@ app.post("/feedback/state", async (req, res) => {
 // New endpoint to fetch feedback states for a thread
 app.get("/feedback/states/:threadId/:userId", async (req, res) => {
   try {
+    console.log("Fetching feedback states for thread:", req.params.threadId, "and user:", req.params.userId , "and body:", req.body) ;
     const { threadId, userId } = req.params;
 
     if (!threadId) {
