@@ -20,7 +20,7 @@
 .footer-form {
   display: flex;
   justify-content: center;
-  align-items: center;
+  align-items: flex-end; /* Align items to bottom for multiline support */
   gap: 10px;
   width: 90%;
   border-radius: 5px;
@@ -41,7 +41,16 @@
   background-color: rgba(232, 235, 241, 255);
   color: black;
   transition: background-color 0.3s ease-in-out, color 0.3s ease-in-out,
-    box-shadow 0.3s ease-in-out;
+    box-shadow 0.3s ease-in-out, height 0.2s ease-in-out;
+  resize: none; /* Prevent manual resizing */
+  overflow-y: auto; /* Enable scrolling when needed */
+  line-height: 1.5;
+  max-height: 144px; /* Max height after 5 lines */
+  min-height: 24px; /* Reduced to half the original size */
+}
+
+.footer-input.multiline {
+  min-height: 24px; /* Reduced from 48px to half the size */
 }
 
 .footer-input:focus {
@@ -59,6 +68,7 @@
   cursor: pointer;
   transition: background-color 0.3s ease, transform 0.2s ease-in-out,
     box-shadow 0.3s ease-in-out;
+  height: 46px; /* Reduced from 40px to match smaller input */
 }
 
 .footer-button:hover {
@@ -163,10 +173,12 @@
     width: 75%; /* Adjust input width */
     padding: 8px; /* Reduce padding */
     font-size: 13px; /* Reduce font size */
+    min-height: 22px; /* Reduced height for tablets */
   }
 
   .footer-button {
     padding: 7px; /* Reduce padding */
+    height: 32px; /* Match reduced input height */
   }
 
   .powered-by {
@@ -190,14 +202,14 @@
 
   .footer-input {
     width: 100%;
-    height: 30px; /* Increase input width */
+    min-height: 15px; /* Reduced from 30px to half the size */
     padding: 6px; /* Further reduce padding */
     font-size: 12px; /* Further reduce font size */
   }
 
   .footer-button {
     width: 13%;
-    height: 44px; /* Match input width */
+    height: 28px; /* Reduced to match smaller input */
     padding: 6px; /* Further reduce padding */
   }
 
@@ -288,23 +300,24 @@
 .footer-form {
   display: flex;
   gap: 8px;
-  align-items: center;
+  align-items: flex-end; /* Ensure buttons align with bottom of text area */
 }
 
-.footer-input {
-  flex: 1;
-  padding: 12px;
-  border: 1px solid #e5e5e5;
-  border-radius: 8px;
-  font-size: 16px;
-  background-color: #ffffff;
-  color: #353740;
+.footer-input::-webkit-scrollbar {
+  width: 6px;
 }
 
-.footer-input.dark-mode {
-  background-color: #2d2d2d;
-  border-color: #404040;
-  color: #ececf1;
+.footer-input::-webkit-scrollbar-track {
+  background: transparent; 
+}
+
+.footer-input::-webkit-scrollbar-thumb {
+  background-color: #ccc;
+  border-radius: 6px;
+}
+
+.dark-mode .footer-input::-webkit-scrollbar-thumb {
+  background-color: #666;
 }
 
 .footer-button {
@@ -318,6 +331,7 @@
   align-items: center;
   justify-content: center;
   transition: all 0.2s ease;
+  align-self: flex-end;
 }
 
 .footer-button:hover:not(.disabled) {

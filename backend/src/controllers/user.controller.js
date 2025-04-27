@@ -4,7 +4,7 @@ import { logUserData, getUserData } from "../airtable.utils.js";
 export const saveUserDatainDb = async (req, res) => {
   try {
     console.log("api striked /user-questions-data ", req.body);
-    const { storeName, website, products, story } = req.body;
+    const { store_name, website, products, story } = req.body;
     const userId = req.params.userId;
     // if (!storeName || !website || !products || !story) { 
     //   return res
@@ -19,7 +19,7 @@ export const saveUserDatainDb = async (req, res) => {
     //   story,
     // });
 
-    logUserData({ userId, storeName, website, products, story });
+    logUserData({ userId, store_name, website, products, story });
     return res
       .status(201)
       .json({ success: true, message: "User Data Updated successfully." });

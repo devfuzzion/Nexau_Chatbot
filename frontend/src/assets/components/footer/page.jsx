@@ -1,17 +1,45 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { FileInput, SendHorizonal, FileCheck, X } from 'lucide-react';
 import './index.css';
 
 const Footer = ({ onSendMessage, isDarkMode, isExpanded, isDisabled }) => {
   const [message, setMessage] = useState('');
   const [selectedFile, setSelectedFile] = useState(null);
+  const [lineCount, setLineCount] = useState(1);
   const fileInputRef = useRef(null);
+  const textareaRef = useRef(null);
+
+  // Update line count whenever message changes
+  useEffect(() => {
+    const newLineCount = (message.match(/\n/g) || []).length + 1;
+    setLineCount(newLineCount > 5 ? 5 : newLineCount);
+  }, [message]);
 
   const handleFileSelect = (e) => {
     const file = e.target.files[0];
     if (file) {
       setSelectedFile(file);
       console.log('File selected:', file.name);
+    }
+  };
+
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter' && e.shiftKey) {
+      e.preventDefault();
+      const cursorPosition = e.target.selectionStart;
+      const newMessage = message.substring(0, cursorPosition) + '\n' + message.substring(cursorPosition);
+      setMessage(newMessage);
+      
+      // Set cursor position after the new line on next render
+      setTimeout(() => {
+        if (textareaRef.current) {
+          textareaRef.current.selectionStart = cursorPosition + 1;
+          textareaRef.current.selectionEnd = cursorPosition + 1;
+        }
+      }, 0);
+    } else if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSubmit(e);
     }
   };
 
@@ -25,6 +53,7 @@ const Footer = ({ onSendMessage, isDarkMode, isExpanded, isDisabled }) => {
       await onSendMessage(messageText, selectedFile);
       setMessage('');
       setSelectedFile(null);
+      setLineCount(1);
       if (fileInputRef.current) {
         fileInputRef.current.value = '';
       }
@@ -58,15 +87,20 @@ const Footer = ({ onSendMessage, isDarkMode, isExpanded, isDisabled }) => {
         </div>
       )}
       <form className='footer-form' onSubmit={handleSubmit}>
-        <input
-          type='text'
+        <textarea
+          ref={textareaRef}
           placeholder='Escríbeme tu duda...'
-          className={`footer-input ${isDarkMode ? 'dark-mode' : ''} ${isDisabled ? 'disabled' : ''}`}
+          className={`footer-input ${isDarkMode ? 'dark-mode' : ''} ${isDisabled ? 'disabled' : ''} ${lineCount > 1 ? 'multiline' : ''}`}
           value={message}
           autoFocus={false}
           onChange={(e) => setMessage(e.target.value)}
-          style={{ fontSize: '16px' }}
-          inputMode="text"
+          onKeyDown={handleKeyDown}
+          style={{ 
+            fontSize: '16px',
+            height: `${Math.min(lineCount * 18 + 6, 96)}px`,
+            overflowY: lineCount >= 5 ? 'auto' : 'hidden'
+          }}
+          rows={1}
           disabled={isDisabled}
         />
         <input

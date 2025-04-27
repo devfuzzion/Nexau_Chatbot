@@ -169,13 +169,13 @@ export const getFeedbackStates = async (threadId, userId) => {
 
 export const logUserData = async ({
   userId,
-  storeName,
+  store_name,
   website,
   products,
   story,
 }) => {
   try {
-    console.log("logUserData", userId, storeName, website, products, story);
+    console.log("logUserData", userId, store_name, website, products, story);
     const records = await base(USER_DATA_TABLE_NAME)
       .select({
         filterByFormula: `{user_id} = '${userId}'`,
@@ -187,7 +187,7 @@ export const logUserData = async ({
       const recordId = records[0].id;
 
       const updated = await base(USER_DATA_TABLE_NAME).update(recordId, {
-        store_name: storeName || "",
+        store_name: store_name || "",
         website: website || "",
         products: products || "",
         story: story || "",
@@ -198,7 +198,7 @@ export const logUserData = async ({
       // 🆕 Create new record
       const created = await base(USER_DATA_TABLE_NAME).create({
         user_id: userId,
-        store_name: storeName || "",
+        store_name: store_name || "",
         website: website || "",
         products: products || "",
         story: story || "",
