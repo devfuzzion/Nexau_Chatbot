@@ -3,6 +3,8 @@ import Header from "../header/page.jsx";
 import Body from "../body/page.jsx";
 import { Infinity } from "lucide-react";
 import "./index.css";
+import Swal from 'sweetalert2';
+import { showLoading, showError } from "../../../utils/sweetalertHelper.js";
 import {
   fetchThreads,
   deleteThread,
@@ -50,6 +52,9 @@ const Chatbot = ({ userData, setUserData }) => {
   // Function to create a new thread - moved from LeftColumn component
   const handleCreateThread = async () => {
     try {
+      // Show the loading animation
+      showLoading('Creando nuevo chat...', 'Por favor espere mientras se crea su nuevo chat', isDarkMode);
+
       const response = await fetch(
         "http://13.36.138.40:3000/create-thread",
         // "https://ejitukppt8.execute-api.eu-west-3.amazonaws.com/dev/create-thread",
@@ -75,11 +80,18 @@ const Chatbot = ({ userData, setUserData }) => {
         if (data.thread && data.thread.id) {
           setSelectedThread(data.thread.id);
         }
+        
+        // Close the loading animation
+        Swal.close();
       } else {
         console.error("Failed to create thread");
+        // Show error message
+        showError('Error', 'No se pudo crear el chat, por favor intente de nuevo', isDarkMode);
       }
     } catch (error) {
       console.error("Error creating thread:", error);
+      // Show error message
+      showError('Error', 'No se pudo crear el chat, por favor intente de nuevo', isDarkMode);
     }
   };
   const deleteThreadById = async (id) => {

@@ -33,7 +33,7 @@ export const saveUserDatainDb = async (req, res) => {
 export const getUserDataFromDb = async (req, res) => {
   try {
     const userId = req.params.userId;
-    console.log(userId, "from controller");
+    // console.log(userId, "from controller");
 
     if (!userId) {
       return res
@@ -42,7 +42,7 @@ export const getUserDataFromDb = async (req, res) => {
     }
 
     const user = await getUserData(userId);
-    console.log("user_data", user);
+    // console.log("user_data", user);
     if (!user) {
       return res
         .status(404)

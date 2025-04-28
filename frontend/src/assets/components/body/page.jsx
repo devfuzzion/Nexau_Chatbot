@@ -168,6 +168,7 @@ const Body = ({
 
   const sendMessageToBot = async (message, file = null) => {
     try {
+      console.log("selectedThread",selectedThread);
       const thread = threads.find(
         (thread) => thread.threadid === selectedThread,
       );
@@ -204,7 +205,9 @@ const Body = ({
           id: botResponse.messageId,
         },
       ]);
+      console.log("messages",messages.length,messages);
       if (messages.length === 2) {
+        console.log("Generating thread title from openai");
         setIsWaitingForResponse(false);
         await updateThreadTitleById(selectedThread, null, true);
       }

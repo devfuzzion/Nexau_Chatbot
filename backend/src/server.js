@@ -447,6 +447,7 @@ app.listen(3000, "0.0.0.0", () => {
 });
 
 app.put("/threads/:id", async (req, res) => {
+  console.log("api striked /threads/:id", req.body);
   const { id } = req.params;
   const { title, aiTitle } = req.body;
 
@@ -461,6 +462,7 @@ app.put("/threads/:id", async (req, res) => {
       const result = await updateThreadTitle(id, title);
       res.status(result.success ? 200 : 404).json({ ...result, title });
     } else {
+      console.log("Generating thread title from openai");
       const messages = await listMesasgesInThread(id);
       const title = await generateThreadTitle(messages);
       const result = await updateThreadTitle(id, title);

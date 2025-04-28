@@ -10,6 +10,8 @@ import {
   X,
   Theater,
 } from "lucide-react";
+import Swal from 'sweetalert2';
+import { showLoading, showError } from "../../../utils/sweetalertHelper.js";
 import ThreadMenuPopup from "../threadMenu/threadMenu.page.jsx";
 import DeleteConfirmationPopup from "../deletePopup/deletePopup.page.jsx";
 import ProfileOverlay from "../profile/page.jsx";
@@ -61,6 +63,10 @@ const LeftColumn = ({
     toggleTheme(!isDarkMode);
   };
 
+  const handleCreateThread = () => {
+    onCreateThread();
+  };
+
   return (
     <div className={`left-column ${isDarkMode ? "dark" : ""}`}>
       {/* Delete Confirmation Popup */}
@@ -82,7 +88,7 @@ const LeftColumn = ({
       {/* <div className="chatbot-name">
         <h3>Eva - Consultora IA 24/7</h3>
       </div> */}
-      <div className="new-chat-button" onClick={onCreateThread}>
+      <div className="new-chat-button" onClick={handleCreateThread}>
         <Plus size={20} />
         <span>Nuevo Chat</span>
       </div>

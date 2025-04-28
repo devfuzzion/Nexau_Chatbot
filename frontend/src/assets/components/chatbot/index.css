@@ -117,3 +117,33 @@
     right: 10px;
   }
 }
+
+/* SweetAlert2 custom styles */
+.swal2-popup {
+  border-radius: 12px;
+  font-family: var(--font-family);
+}
+
+.dark-mode .swal2-popup {
+  background-color: #2C2C2C;
+  color: #FFFFFF;
+}
+
+.dark-mode .swal2-title,
+.dark-mode .swal2-html-container {
+  color: #FFFFFF;
+}
+
+.dark-mode .swal2-loader {
+  border-color: #4b9eff transparent #4b9eff transparent;
+}
+
+.dark-mode .swal2-confirm.swal2-styled {
+  background-color: #4b9eff;
+  color: #FFFFFF;
+}
+
+.dark-mode .swal2-cancel.swal2-styled {
+  background-color: #555;
+  color: #FFFFFF;
+}
