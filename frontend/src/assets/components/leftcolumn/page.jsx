@@ -79,9 +79,9 @@ const LeftColumn = ({
         deleting={deletingThread}
       />
       {/* New Chat Button */}
-      <div className="chatbot-name">
+      {/* <div className="chatbot-name">
         <h3>Eva - Consultora IA 24/7</h3>
-      </div>
+      </div> */}
       <div className="new-chat-button" onClick={onCreateThread}>
         <Plus size={20} />
         <span>Nuevo Chat</span>

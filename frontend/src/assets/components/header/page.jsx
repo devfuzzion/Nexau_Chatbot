@@ -206,7 +206,7 @@ const Header = ({
         <div className="logo-container">
           <img src="/images/Logo C.io.png" alt="logo" className="logo" />
         </div>
-        <p className="title">Consultor Genesis</p>
+        <p className="title">Eva - Consultora IA 24/7</p>
       </div>
 
       {/* Right Section */}

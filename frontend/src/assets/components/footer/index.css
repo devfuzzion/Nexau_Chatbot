@@ -47,6 +47,7 @@
   line-height: 1.5;
   max-height: 144px; /* Max height after 5 lines */
   min-height: 24px; /* Reduced to half the original size */
+  font-family: "Roboto", sans-serif !important; 
 }
 
 .footer-input.multiline {
