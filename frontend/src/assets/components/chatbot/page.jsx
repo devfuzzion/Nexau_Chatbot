@@ -230,7 +230,6 @@ const Chatbot = ({ userData, setUserData }) => {
           toggleTheme={toggleTheme}
         />
 
-
         <Body
           userData={userData}
           setUserData={setUserData}
