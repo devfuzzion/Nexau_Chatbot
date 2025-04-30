@@ -179,7 +179,7 @@
 
   .footer-button {
     padding: 7px; /* Reduce padding */
-    height: 32px; /* Match reduced input height */
+    height: 42px; /* Match reduced input height */
   }
 
   .powered-by {
@@ -199,6 +199,7 @@
     width: 90%; /* Occupy full width */
     gap: 5px; /* Further reduce gap between elements */
     flex-direction: row; /* Stack elements vertically */
+    align-items: center; /* Ensure all items are vertically centered */
   }
 
   .footer-input {
@@ -209,9 +210,20 @@
   }
 
   .footer-button {
-    width: 13%;
-    height: 28px; /* Reduced to match smaller input */
+    width: 32px; /* Fixed width instead of percentage */
+    min-width: 32px; /* Ensure minimum width */
+    height: 38px; /* Fixed square height to match input */
+    min-height: 32px; /* Ensure minimum height */
     padding: 6px; /* Further reduce padding */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 0; /* Remove any bottom margin */
+  }
+
+  .footer-button svg {
+    height: 18px; /* Set icon size */
+    width: 18px;
   }
 
   .powered-by {

@@ -42,10 +42,10 @@
 
 .right-section {
   display: flex;
-  align-items: center;
+  align-items: end;
   margin-left: auto;
-  gap: 10px;
-  flex-wrap: wrap;
+  gap: 5px;
+  /* flex-wrap: wrap; */
   min-width: 0;
 }
 

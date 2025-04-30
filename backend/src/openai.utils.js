@@ -81,12 +81,30 @@ export const getThreadDataFromOpenAi = async (threadId) => {
 //   return updatedThread;
 // };
 
-export const createRun = async (threadId) => {
+export const createRun = async (threadId, userData = {}) => {
+  // Prepare personalized context from user data
+  let personalizedContext = "";
+  console.log("userData", userData);
+  
+  if (userData && Object.keys(userData).length > 0) {
+    personalizedContext = `
+Información del usuario:
+- Nombre de la tienda(store_name): ${userData.store_name || "No disponible"}
+- Sitio web(website): ${userData.website || "No disponible"}
+- Plataforma de e-commerce(ecommerce_platform): ${userData.ecommerce_platform || "No disponible"}
+- Productos(products): ${userData.products || "No disponible"}
+- Historia de la tienda(story): ${userData.story || "No disponible"}
+- Datos adicionales(user_questions_data): ${userData.user_questions_data || "No disponible"}
+`;
+  }
+
   const run = await openai.beta.threads.runs.createAndPoll(threadId, {
     assistant_id: ASSISTANT_ID,
     include: ["step_details.tool_calls[*].file_search.results[*].content"],
     tools: [{ type: "file_search" }],
     instructions: `Eres un asistente AI servicial. IMPORTANTE: Siempre responde en español, independientemente del idioma en que te escriba el usuario.
+
+${personalizedContext}
 
 Asegúrate de que tus respuestas sean:
 1. Siempre en español
@@ -94,8 +112,13 @@ Asegúrate de que tus respuestas sean:
 3. Visualmente atractivas usando formato markdown
 4. Profesionales y amigables
 5. Incluyan ejemplos cuando sea apropiado
+6. Personalizadas según la información del usuario cuando sea relevante
 
-Recuerda: No importa en qué idioma te escriba el usuario, siempre responde en español.`,
+Cuando sea relevante para la consulta, utiliza la información del usuario para personalizar tu respuesta. Por ejemplo, si hablas sobre estrategias de marketing, puedes relacionarlas con los productos que vende o la plataforma de e-commerce que utiliza.
+
+Recuerda: No importa en qué idioma te escriba el usuario, siempre responde en español.
+Si necesitas más ayuda para identificar o configurar tu plataforma de comercio electrónico, por favor proporciona más detalles o especifica cualquier otra herramienta o servicio que estés utilizando.
+`,
   });
 
   return run;

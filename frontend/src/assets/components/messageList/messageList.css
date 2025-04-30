@@ -74,3 +74,40 @@
     margin-right: 0 !important;
   }
 }
+
+/* Styling for KaTeX math formulas */
+.katex-display {
+  margin: 1em 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding-top: 0.5em;
+  padding-bottom: 0.5em;
+}
+
+/* Better formula display in dark mode */
+.dark .katex .katex-mathml {
+  color: #e0e0e0;
+}
+
+.dark .katex {
+  color: #e0e0e0;
+}
+
+.dark .katex-display {
+  background-color: rgba(255, 255, 255, 0.05);
+  border-radius: 6px;
+}
+
+/* Inline math styling */
+.katex {
+  font-size: 1.1em;
+  line-height: 1.2;
+}
+
+/* Ensure formulas don't overflow on mobile */
+@media (max-width: 480px) {
+  .katex-display {
+    max-width: 100%;
+    overflow-x: auto;
+  }
+}

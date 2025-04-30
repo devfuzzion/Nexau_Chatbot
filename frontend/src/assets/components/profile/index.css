@@ -79,6 +79,7 @@
   border-radius: 6px;
   font-size: 1rem;
   width: 50%;
+  box-sizing: border-box;
   /* max-height: 10%; */
 }
 
@@ -88,9 +89,10 @@
   border: 1px solid #ddd;
   border-radius: 6px;
   width: 50%;
+  box-sizing: border-box;
   font-size: 1rem;
   resize: none;
-  height: 65px;
+  height: 95px;
 }
 
 .update-btn {
@@ -143,6 +145,7 @@
 }
 
 .form-select {
+  background-color: #e8ebf0;
   appearance: none;
   -webkit-appearance: none;
   -moz-appearance: none;
@@ -151,7 +154,10 @@
   background-position: right 1rem center;
   background-size: 1em;
   cursor: pointer;
-  width: 52.5% !important;
+  width: 50% !important;
+  box-sizing: border-box;
+  min-width: 50%;
+  max-width: 50%;
 }
 
 .form-select option {
@@ -245,7 +251,8 @@
     flex:1;
   }
   .form-input,
-  .form-textarea {
+  .form-textarea,
+  .form-select {
     width: 80%;
     font-size: 0.95rem;
   }
@@ -276,5 +283,8 @@
 
   .form-select {
     background-position: right 0.5rem center;
+    width: 80% !important;
+    min-width: 80%;
+    max-width: 80%;
   }
 }

@@ -223,7 +223,7 @@ const Chatbot = ({ userData, setUserData }) => {
           threads={threads}
           selectedThread={selectedThread}
           setSelectedThread={setSelectedThread}
-          createThread={createThread}
+          createThread={handleCreateThread}
           deleteThreadById={deleteThreadById}
           updateThreadTitleById={updateThreadTitleById}
           isDarkMode={isDarkMode}

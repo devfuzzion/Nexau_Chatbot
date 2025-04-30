@@ -67,6 +67,15 @@ const Footer = ({ onSendMessage, isDarkMode, isExpanded, isDisabled }) => {
     }
   };
 
+  // Calculate the height for textarea
+  const getTextareaHeight = () => {
+    const baseHeight = Math.min(lineCount * 18 + 6, 96);
+    return {
+      height: `${baseHeight}px`,
+      overflowY: lineCount >= 5 ? 'auto' : 'hidden'
+    };
+  };
+
   return (
     <div className={`footer-container ${isDarkMode ? 'dark-mode' : ''} ${isExpanded ? 'expanded' : ''}`}>
       {selectedFile && (
@@ -97,8 +106,7 @@ const Footer = ({ onSendMessage, isDarkMode, isExpanded, isDisabled }) => {
           onKeyDown={handleKeyDown}
           style={{ 
             fontSize: '16px',
-            height: `${Math.min(lineCount * 18 + 6, 96)}px`,
-            overflowY: lineCount >= 5 ? 'auto' : 'hidden'
+            ...getTextareaHeight()
           }}
           rows={1}
           disabled={isDisabled}

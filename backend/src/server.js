@@ -150,8 +150,19 @@ app.post("/run/:threadId", async (req, res) => {
           console.log("Document upload logged successfully");
         }
 
-        console.log("Creating run...");
-        const run = await createRun(req.params.threadId);
+        // Fetch user data from Airtable before creating run
+        console.log("Fetching user data for personalized response...");
+        let userData = null;
+        try {
+          userData = await getUserData(req.body.userId);
+          console.log("User data fetched successfully");
+        } catch (userDataError) {
+          console.error("Error fetching user data:", userDataError);
+          // Continue even if user data fetch fails
+        }
+
+        console.log("Creating run with personalized context...");
+        const run = await createRun(req.params.threadId, userData);
         console.log("Run created successfully");
 
         console.log("Fetching updated messages...");

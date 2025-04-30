@@ -15,6 +15,9 @@ import TypingIndicator from "../typingIndicator/typingIndicator.page.jsx";
 import MarkdownPreview from "@uiw/react-markdown-preview";
 import "./messageList.css";
 import { marked } from 'marked';
+import 'katex/dist/katex.min.css';
+import remarkMath from 'remark-math';
+import rehypeKatex from 'rehype-katex';
 import {
   fetchFeedbackStates,
   fetchDocumentUploads,
@@ -157,6 +160,13 @@ const MessageList = ({
     if (threadId) {
       // Only show initial UI if it's a new thread (no messages) and not loading
       setShowInitialUI(messages.length === 0 && !isLoading);
+      
+      // Reset states when thread changes
+      setFeedbackStates([]);
+      setDocumentUploads([]);
+      setCopiedIndex(null);
+      setEditingIndex(null);
+      setFeedbackText("");
     }
   }, [threadId, messages.length, isLoading]);
 
@@ -181,6 +191,8 @@ const MessageList = ({
   // Fetch feedback states when component mounts or threadId changes
   useEffect(() => {
     const loadFeedbackStates = async () => {
+      if (!threadId) return;
+      
       try {
         const response = await fetch(
           // `https://ejitukppt8.execute-api.eu-west-3.amazonaws.com/dev/feedback/states/${threadId}/${userId}`,
@@ -197,7 +209,7 @@ const MessageList = ({
     };
 
     loadFeedbackStates();
-  }, [threadId]);
+  }, [threadId, userId]);
 
   // Update documentUploads when new messages arrive
   useEffect(() => {
@@ -370,36 +382,69 @@ const MessageList = ({
     try {
       console.log("Original markdown:", text);
   
-      // Convert markdown to HTML
-      const html = marked.parse(text);
+      // Process math expressions separately to preserve them
+      // This regex looks for LaTeX expressions enclosed in parentheses and dollar signs
+      const processedText = text.replace(/\(\s*(\\[a-zA-Z]+\(.+?\)|.+?)\s*\)/g, '$$1$');
+  
+      // Convert markdown to HTML using marked
+      const html = marked.parse(processedText);
+      
+      // Get plain text version (for fallback and text/plain)
+      const plainText = convertMarkdownToPlainText(processedText);
   
       const hasClipboardItem = typeof ClipboardItem !== 'undefined';
   
       if (navigator.clipboard && navigator.clipboard.write && hasClipboardItem) {
-        const plainBlob = new Blob([text], { type: 'text/plain' });
-        const htmlBlob = new Blob([html], { type: 'text/html' });
-  
-        const data = [
-          new ClipboardItem({
+        // Modern clipboard API with format support
+        try {
+          // Create blobs for different formats
+          const plainBlob = new Blob([plainText], { type: 'text/plain' });
+          const htmlBlob = new Blob([html], { type: 'text/html' });
+          const markdownBlob = new Blob([text], { type: 'text/markdown' });
+          
+          // Try to write with all formats for best cross-platform support
+          const clipboardItem = new ClipboardItem({
             'text/plain': plainBlob,
             'text/html': htmlBlob,
-          }),
-        ];
-  
-        await navigator.clipboard.write(data);
-        console.log("Copied using ClipboardItem with HTML and plain text");
-        setCopiedIndex(index);
-        setTimeout(() => setCopiedIndex(null), 2000);
+            'text/markdown': markdownBlob,
+          });
+          
+          await navigator.clipboard.write([clipboardItem]);
+          console.log("Copied using ClipboardItem with multiple formats");
+          setCopiedIndex(index);
+          setTimeout(() => setCopiedIndex(null), 2000);
+        } catch (clipErr) {
+          console.warn("Enhanced clipboard copy failed, trying HTML only:", clipErr);
+          
+          // Fallback to simpler format combination
+          const plainBlob = new Blob([plainText], { type: 'text/plain' });
+          const htmlBlob = new Blob([html], { type: 'text/html' });
+          
+          await navigator.clipboard.write([
+            new ClipboardItem({
+              'text/plain': plainBlob,
+              'text/html': htmlBlob,
+            }),
+          ]);
+          
+          console.log("Copied using ClipboardItem with HTML and plain text");
+          setCopiedIndex(index);
+          setTimeout(() => setCopiedIndex(null), 2000);
+        }
       } else if (navigator.clipboard && navigator.clipboard.writeText) {
+        // Fallback to simple text copy
+        // For Mac, we'll use the original markdown text for better paste results
         await navigator.clipboard.writeText(text);
-        console.log("Fallback: Copied using writeText");
+        console.log("Fallback: Copied using writeText with original markdown");
         setCopiedIndex(index);
         setTimeout(() => setCopiedIndex(null), 2000);
       } else {
+        // Last resort fallback
         copyTextFallback(text, index);
       }
     } catch (err) {
       console.error("Copy failed:", err);
+      // If all else fails, try with the original markdown text
       copyTextFallback(text, index);
     }
   };
@@ -593,6 +638,8 @@ const MessageList = ({
                               isDarkMode ? "dark" : ""
                             }`}
                             source={typingMessage}
+                            remarkPlugins={[remarkMath]}
+                            rehypePlugins={[rehypeKatex]}
                           />
                         ) : (
                           <MarkdownPreview
@@ -600,6 +647,8 @@ const MessageList = ({
                               isDarkMode ? "dark" : ""
                             }`}
                             source={msg.text}
+                            remarkPlugins={[remarkMath]}
+                            rehypePlugins={[rehypeKatex]}
                           />
                         )}
                       </div>

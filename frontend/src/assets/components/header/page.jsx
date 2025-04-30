@@ -103,8 +103,12 @@ const Header = ({
     setRenamingThread(null);
   };
 
-  const handleCreateThread = () => {
-    createThread();
+  const handleCreateThread = async () => {
+    const newThread = await createThread();
+    // Automatically select the new thread
+    if (newThread && newThread.id) {
+      setSelectedThread(newThread.threadid);
+    }
     setIsMenuOpen(false);
   };
 
