@@ -79,7 +79,7 @@
   border-radius: 6px;
   font-size: 1rem;
   width: 50%;
-  max-height: 10%;
+  /* max-height: 10%; */
 }
 
 .form-textarea {
@@ -142,6 +142,28 @@
   background-color: #e8ebf0;
 }
 
+.form-select {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 1rem center;
+  background-size: 1em;
+  cursor: pointer;
+  width: 52.5% !important;
+}
+
+.form-select option {
+  color: #333;
+  background-color: white;
+  padding: 8px;
+}
+
+.dark-mode .form-select option {
+  color: white;
+  background-color: #464c59;
+}
 
 @media (max-width: 768px) {
 
@@ -250,5 +272,9 @@
   .section-description {
     font-size: 0.8rem;
     width: 90%;
+  }
+
+  .form-select {
+    background-position: right 0.5rem center;
   }
 }

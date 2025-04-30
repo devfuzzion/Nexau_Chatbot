@@ -10,17 +10,14 @@ const App = () => {
   useEffect(() => {
     // Get the current URL search parameters
     const queryParams = new URLSearchParams(window.location.search);
-    const cookieValue1 = queryParams.get('cookieValue1');
-    const cookieValue2 = queryParams.get('cookieValue2');
+    const cookieValue = queryParams.get('cookieValue');
 
-    if (cookieValue1) {
-      console.log('Received cookie value:', cookieValue1);
-      localStorage.setItem('userId', cookieValue1);
-      localStorage.setItem('userId2', cookieValue2);
+    if (cookieValue) {
+      console.log('Received cookie value:', cookieValue);
+      localStorage.setItem('userId', cookieValue);
       // localStorage.setItem('userId', "guest");
     }
-    console.log("cookieValue1", cookieValue1);
-    console.log("cookieValue2", cookieValue2);
+    console.log("cookieValue", cookieValue);
     
   }, []);
 

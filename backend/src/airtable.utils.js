@@ -173,9 +173,10 @@ export const logUserData = async ({
   website,
   products,
   story,
+  ecommerce_platform,
 }) => {
   try {
-    console.log("logUserData", userId, store_name, website, products, story);
+    console.log("logUserData", userId, store_name, website, products, story, ecommerce_platform);
     const records = await base(USER_DATA_TABLE_NAME)
       .select({
         filterByFormula: `{user_id} = '${userId}'`,
@@ -190,7 +191,9 @@ export const logUserData = async ({
         store_name: store_name || "",
         website: website || "",
         products: products || "",
+
         story: story || "",
+        ecommerce_platform: ecommerce_platform || "",
       });
 
       return { success: true, recordId: updated.id, updated: true };
@@ -202,6 +205,7 @@ export const logUserData = async ({
         website: website || "",
         products: products || "",
         story: story || "",
+        ecommerce_platform: ecommerce_platform || "",
       });
     }
 
@@ -267,6 +271,7 @@ export const getUserData = async (userId) => {
       .firstPage();
 
     if (records.length > 0) {
+      console.log("records", records[0].fields);
       return records[0].fields;
     } else {
       return null;

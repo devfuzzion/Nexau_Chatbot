@@ -13,6 +13,7 @@ const ProfileOverlay = ({
   const [storeInfo, setStoreInfo] = useState({
     storeName: "",
     website: "",
+    ecommerce_platform: "",
     products: "",
     story: "",
   });
@@ -20,16 +21,17 @@ const ProfileOverlay = ({
   const [userId, setUserId] = useState(localStorage.getItem('userId') || "guest");
 
   useEffect(() => {
-    if (!userData?.user_id) return;
+    console.log("userData", userData);
     if (userData) {
       setStoreInfo({
         storeName: userData.storeName || userData.store_name || "",
         website: userData.website || "",
+        ecommerce_platform: userData.ecommerce_platform || "",
         products: userData.products || "",
         story: userData.story || "",
       });
     }
-  }, [userData]);
+  }, []);
   
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -46,8 +48,9 @@ const ProfileOverlay = ({
       const dataToUpdate = {
         store_name: storeInfo.storeName,
         website: storeInfo.website,
+        ecommerce_platform: storeInfo.ecommerce_platform,
         products: storeInfo.products,
-        story: storeInfo.story
+        story: storeInfo.story,
       };
       
       const response = await updateUserData(userId, dataToUpdate);
@@ -60,6 +63,7 @@ const ProfileOverlay = ({
           store_name: storeInfo.storeName,
           storeName: storeInfo.storeName,
           website: storeInfo.website,
+          ecommerce_platform: storeInfo.ecommerce_platform,
           products: storeInfo.products,
           story: storeInfo.story,
         });
@@ -104,6 +108,18 @@ const ProfileOverlay = ({
             placeholder="Página web"
             className="form-input"
           />
+          <select
+            name="ecommerce_platform"
+            value={storeInfo.ecommerce_platform}
+            onChange={handleChange}
+            className="form-input form-select"
+          >
+            <option value="" disabled>Plataforma de ecommerce</option>
+            <option value="Shopify">Shopify</option>
+            <option value="Prestashop">Prestashop</option>
+            <option value="Woocommerce">Woocommerce</option>
+            <option value="Otra">Otra</option>
+          </select>
         </div>
 
         <div className="form-section text-area-section">
@@ -135,7 +151,6 @@ const ProfileOverlay = ({
             rows={4}
           />
         </div>
-
         <button type="submit" className="update-btn" disabled={isSubmitting}>
           {isSubmitting ? "Actualizando..." : "Actualizar"}
         </button>

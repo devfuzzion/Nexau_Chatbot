@@ -14,6 +14,7 @@ import {
 import TypingIndicator from "../typingIndicator/typingIndicator.page.jsx";
 import MarkdownPreview from "@uiw/react-markdown-preview";
 import "./messageList.css";
+import { marked } from 'marked';
 import {
   fetchFeedbackStates,
   fetchDocumentUploads,
@@ -90,8 +91,39 @@ const convertMarkdownToPlainText = (markdown) => {
 // Additional utility - not used to avoid text corruption issues
 const applyTextEmphasis = (text) => {
   // This function could apply special formatting but we're not using it
-  // to avoid cross-platform compatibility issues
+  // to avoid cross-ecommerce_platform compatibility issues
   return text;
+};
+
+// Add this new function before the MessageList component
+const convertMarkdownToRTF = (markdown) => {
+  // RTF header
+  let rtf = '{\\rtf1\\ansi\\ansicpg1252\\deff0\\deflang1033{\\fonttbl{\\f0\\fnil\\fcharset0 Calibri;}}\n';
+  
+  // Convert markdown to RTF
+  let text = markdown
+    // Handle headings
+    .replace(/^(#{1,6})\s+(.+)$/gm, (match, hashes, content) => {
+      const level = hashes.length;
+      const fontSize = 24 - (level * 2); // Decrease font size for each heading level
+      return `\\fs${fontSize * 2}\\b ${content}\\b0\\fs24\\par\n`;
+    })
+    
+    // Handle bold text
+    .replace(/(\*\*|__)(.*?)\1/g, '\\b $2\\b0 ')
+    
+    // Handle italic text
+    .replace(/(\*|_)(.*?)\1/g, '\\i $2\\i0 ')
+    
+    // Handle line breaks
+    .replace(/\n/g, '\\par\n')
+    
+    // Handle lists
+    .replace(/^(\s*[-*+]|\s*\d+\.)\s+(.+)$/gm, '\\bullet $2\\par\n');
+  
+  rtf += text;
+  rtf += '}';
+  return rtf;
 };
 
 const MessageList = ({
@@ -153,7 +185,7 @@ const MessageList = ({
         const response = await fetch(
           // `https://ejitukppt8.execute-api.eu-west-3.amazonaws.com/dev/feedback/states/${threadId}/${userId}`,
           // `http://localhost:3000/feedback/states/${threadId}/${userId}`,
-          `http://13.36.138.40:3000/feedback/states/${threadId}/${userId}`,
+          `https://nexau.devfuzzion.com/api/feedback/states/${threadId}/${userId}`,
         );
         const data = await response.json();
         if (data.success) {
@@ -174,7 +206,7 @@ const MessageList = ({
         const response = await fetch(
           // `http://localhost:3000/documents/${threadId}/${userId}`,
           // `https://ejitukppt8.execute-api.eu-west-3.amazonaws.com/dev/documents/${threadId}/${userId}`,
-          `http://13.36.138.40:3000/documents/${threadId}/${userId}`,
+          `https://nexau.devfuzzion.com/api/documents/${threadId}/${userId}`,
         );
         const data = await response.json();
         if (data.success) {
@@ -296,7 +328,7 @@ const MessageList = ({
       const response = await fetch(
         // "https://ejitukppt8.execute-api.eu-west-3.amazonaws.com/dev/feedback/state",
         // "http://localhost:3000/feedback/state",
-        `http://13.36.138.40:3000/feedback/state`,
+        `https://nexau.devfuzzion.com/api/feedback/state`,
         {
           method: "POST",
           headers: {
@@ -334,66 +366,44 @@ const MessageList = ({
     }
   };
 
-  const handleCopy = (text, index) => {
+  const handleCopy = async (text, index) => {
     try {
       console.log("Original markdown:", text);
-      
-      // Convert markdown to formatted plain text
-      const formattedText = convertMarkdownToPlainText(text);
-      console.log("Formatted text for clipboard:", formattedText);
-      
-      // Check if modern clipboard features are available
+  
+      // Convert markdown to HTML
+      const html = marked.parse(text);
+  
       const hasClipboardItem = typeof ClipboardItem !== 'undefined';
-      
-      // Try modern clipboard API first (supported in newer browsers)
+  
       if (navigator.clipboard && navigator.clipboard.write && hasClipboardItem) {
-        // Create a blob with the text to avoid encoding issues
-        const blob = new Blob([formattedText], { type: 'text/plain' });
-        const data = [new ClipboardItem({ 'text/plain': blob })];
-        
-        navigator.clipboard.write(data)
-          .then(() => {
-            console.log("Copy successful using Clipboard API write");
-            setCopiedIndex(index);
-            setTimeout(() => setCopiedIndex(null), 2000);
-          })
-          .catch(err => {
-            console.warn("Clipboard write API failed, trying writeText:", err);
-            // Fallback to writeText method
-            navigator.clipboard.writeText(formattedText)
-              .then(() => {
-                console.log("Copy successful using Clipboard API writeText");
-                setCopiedIndex(index);
-                setTimeout(() => setCopiedIndex(null), 2000);
-              })
-              .catch(err => {
-                console.warn("Clipboard writeText API failed, using fallback method:", err);
-                // Final fallback for older browsers
-                copyTextFallback(formattedText, index);
-              });
-          });
+        const plainBlob = new Blob([text], { type: 'text/plain' });
+        const htmlBlob = new Blob([html], { type: 'text/html' });
+  
+        const data = [
+          new ClipboardItem({
+            'text/plain': plainBlob,
+            'text/html': htmlBlob,
+          }),
+        ];
+  
+        await navigator.clipboard.write(data);
+        console.log("Copied using ClipboardItem with HTML and plain text");
+        setCopiedIndex(index);
+        setTimeout(() => setCopiedIndex(null), 2000);
       } else if (navigator.clipboard && navigator.clipboard.writeText) {
-        // Try writeText if write is not available
-        navigator.clipboard.writeText(formattedText)
-          .then(() => {
-            console.log("Copy successful using Clipboard API writeText");
-            setCopiedIndex(index);
-            setTimeout(() => setCopiedIndex(null), 2000);
-          })
-          .catch(err => {
-            console.warn("Clipboard API failed, using fallback method:", err);
-            copyTextFallback(formattedText, index);
-          });
+        await navigator.clipboard.writeText(text);
+        console.log("Fallback: Copied using writeText");
+        setCopiedIndex(index);
+        setTimeout(() => setCopiedIndex(null), 2000);
       } else {
-        // Use fallback for browsers without clipboard API
-        copyTextFallback(formattedText, index);
+        copyTextFallback(text, index);
       }
     } catch (err) {
       console.error("Copy failed:", err);
-      // Final fallback
       copyTextFallback(text, index);
     }
   };
+  
   
   // Fallback method for copying text
   const copyTextFallback = (text, index) => {
