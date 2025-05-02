@@ -27,111 +27,6 @@ import {
   storeFeedbackState,
 } from "./../../../api/chatService.js";
 
-// Helper function to convert markdown to plain text
-const convertMarkdownToPlainText = (markdown) => {
-  if (!markdown) return "";
-
-  // Clean up markdown syntax
-  let text = markdown
-    // Handle headings with simple formatting
-    .replace(/^(#{1,6})\s+(.+)$/gm, (match, hashes, content) => {
-      // Convert headings to appropriate text formatting
-      const level = hashes.length;
-
-      if (level === 1) {
-        // H1: UPPERCASE with extra line breaks
-        return `\n${content.toUpperCase()}\n\n`;
-      } else if (level === 2) {
-        // H2: Regular case with line breaks
-        return `\n${content}\n\n`;
-      } else if (level === 3) {
-        // H3: Regular case with line break
-        return `\n${content}\n\n`;
-      } else {
-        // H4-H6: Regular formatting
-        return `\n${content}\n\n`;
-      }
-    })
-
-    // Fix multi-line headings that might be in the middle of text
-    .replace(/\n#{1,6}\s+(.+)/g, '\n$1')
-
-    // Process lists - preserve bullet points and numbering
-    .replace(/^(\s*[-*+]|\s*\d+\.)\s+(.+)$/gm, '$1 $2')
-
-    // Handle tables - simplify but preserve structure
-    .replace(/^\|(.+)\|$/gm, (match, content) => {
-      // For each table row, clean up the cell content but preserve the structure
-      const cells = content.split('|').map(cell => cell.trim());
-      return cells.join('\t'); // Use tab as column separator
-    })
-    // Remove the separator line in tables (---|---|---)
-    .replace(/^\|-+(\|-+)*\|$/gm, '')
-
-    // Remove code blocks but preserve content
-    .replace(/```[\s\S]*?```/g, (match) => {
-      return match.replace(/```(?:\w+)?\n([\s\S]*?)\n```/g, '\n$1\n');
-    })
-
-    // Remove inline code backticks
-    .replace(/`([^`]+)`/g, '$1')
-
-    // Clean links - just show text part
-    .replace(/\[(.*?)\]\((.*?)\)/g, '$1')
-
-    // Handle horizontal rules, replace with line breaks
-    .replace(/^\s*[-*_]{3,}\s*$/gm, '\n\n');
-
-  // Handle bold markdown
-  text = text.replace(/(\*\*|__)(.*?)\1/g, '$2');
-
-  // Handle italic markdown
-  text = text.replace(/(\*|_)(.*?)\1/g, '$2');
-
-  // Fix extra line breaks (more than 2 consecutive)
-  text = text.replace(/\n{3,}/g, '\n\n');
-
-  return text;
-};
-
-// Additional utility - not used to avoid text corruption issues
-const applyTextEmphasis = (text) => {
-  // This function could apply special formatting but we're not using it
-  // to avoid cross-ecommerce_platform compatibility issues
-  return text;
-};
-
-// Add this new function before the MessageList component
-const convertMarkdownToRTF = (markdown) => {
-  // RTF header
-  let rtf = '{\\rtf1\\ansi\\ansicpg1252\\deff0\\deflang1033{\\fonttbl{\\f0\\fnil\\fcharset0 Calibri;}}\n';
-
-  // Convert markdown to RTF
-  let text = markdown
-    // Handle headings
-    .replace(/^(#{1,6})\s+(.+)$/gm, (match, hashes, content) => {
-      const level = hashes.length;
-      const fontSize = 24 - (level * 2); // Decrease font size for each heading level
-      return `\\fs${fontSize * 2}\\b ${content}\\b0\\fs24\\par\n`;
-    })
-
-    // Handle bold text
-    .replace(/(\*\*|__)(.*?)\1/g, '\\b $2\\b0 ')
-
-    // Handle italic text
-    .replace(/(\*|_)(.*?)\1/g, '\\i $2\\i0 ')
-
-    // Handle line breaks
-    .replace(/\n/g, '\\par\n')
-
-    // Handle lists
-    .replace(/^(\s*[-*+]|\s*\d+\.)\s+(.+)$/gm, '\\bullet $2\\par\n');
-
-  rtf += text;
-  rtf += '}';
-  return rtf;
-};
-
 // Helper function to remove text wrapped in 【】
 const removeBracketedText = (line) => {
   return line.replace(/【.*?】/g, '');
@@ -221,7 +116,7 @@ const MixedContent = ({ content, isDarkMode }) => {
         if (part.type === 'math') {
           return (
             <div key={index} className={`math-content ${isDarkMode ? "dark" : ""}`}>
-              <MathJax inline={false}>
+              <MathJax inline={true} dynamic={true}>
                 {`\\[${part.content}\\]`}
               </MathJax>
             </div>
