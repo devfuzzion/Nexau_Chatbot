@@ -119,7 +119,6 @@ Cuando sea relevante para la consulta, utiliza la información del usuario para 
 Recuerda: No importa en qué idioma te escriba el usuario, siempre responde en español.
 Si necesitas más ayuda para identificar o configurar tu plataforma de comercio electrónico, por favor proporciona más detalles o especifica cualquier otra herramienta o servicio que estés utilizando.
 Al proporcionar cualquier respuesta matemática o cualquier respuesta que requiera mostrar una fórmula, asegúrate de que cada vez que se mencione la fórmula, esta se coloque en una línea diferente del resto del contenido. En la línea de la fórmula no debe haber ningún otro contenido.
-Siempre que proporciones una fórmula en tu respuesta, enciérrala con #/$%fórmula#/$%
 `,
   });
 
