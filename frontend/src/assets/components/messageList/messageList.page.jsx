@@ -18,6 +18,9 @@ import { marked } from 'marked';
 import 'katex/dist/katex.min.css';
 import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
+import { MathJax } from "better-react-mathjax";
+
+// import { InlineMath, BlockMath } from 'react-katex';
 import {
   fetchFeedbackStates,
   fetchDocumentUploads,
@@ -27,14 +30,14 @@ import {
 // Helper function to convert markdown to plain text
 const convertMarkdownToPlainText = (markdown) => {
   if (!markdown) return "";
-  
+
   // Clean up markdown syntax
   let text = markdown
     // Handle headings with simple formatting
     .replace(/^(#{1,6})\s+(.+)$/gm, (match, hashes, content) => {
       // Convert headings to appropriate text formatting
       const level = hashes.length;
-      
+
       if (level === 1) {
         // H1: UPPERCASE with extra line breaks
         return `\n${content.toUpperCase()}\n\n`;
@@ -49,13 +52,13 @@ const convertMarkdownToPlainText = (markdown) => {
         return `\n${content}\n\n`;
       }
     })
-    
+
     // Fix multi-line headings that might be in the middle of text
     .replace(/\n#{1,6}\s+(.+)/g, '\n$1')
-    
+
     // Process lists - preserve bullet points and numbering
     .replace(/^(\s*[-*+]|\s*\d+\.)\s+(.+)$/gm, '$1 $2')
-    
+
     // Handle tables - simplify but preserve structure
     .replace(/^\|(.+)\|$/gm, (match, content) => {
       // For each table row, clean up the cell content but preserve the structure
@@ -64,30 +67,30 @@ const convertMarkdownToPlainText = (markdown) => {
     })
     // Remove the separator line in tables (---|---|---)
     .replace(/^\|-+(\|-+)*\|$/gm, '')
-    
+
     // Remove code blocks but preserve content
     .replace(/```[\s\S]*?```/g, (match) => {
       return match.replace(/```(?:\w+)?\n([\s\S]*?)\n```/g, '\n$1\n');
     })
-    
+
     // Remove inline code backticks
     .replace(/`([^`]+)`/g, '$1')
-    
+
     // Clean links - just show text part
     .replace(/\[(.*?)\]\((.*?)\)/g, '$1')
-    
+
     // Handle horizontal rules, replace with line breaks
     .replace(/^\s*[-*_]{3,}\s*$/gm, '\n\n');
-  
+
   // Handle bold markdown
   text = text.replace(/(\*\*|__)(.*?)\1/g, '$2');
-  
+
   // Handle italic markdown
   text = text.replace(/(\*|_)(.*?)\1/g, '$2');
-  
+
   // Fix extra line breaks (more than 2 consecutive)
   text = text.replace(/\n{3,}/g, '\n\n');
-  
+
   return text;
 };
 
@@ -102,7 +105,7 @@ const applyTextEmphasis = (text) => {
 const convertMarkdownToRTF = (markdown) => {
   // RTF header
   let rtf = '{\\rtf1\\ansi\\ansicpg1252\\deff0\\deflang1033{\\fonttbl{\\f0\\fnil\\fcharset0 Calibri;}}\n';
-  
+
   // Convert markdown to RTF
   let text = markdown
     // Handle headings
@@ -111,22 +114,133 @@ const convertMarkdownToRTF = (markdown) => {
       const fontSize = 24 - (level * 2); // Decrease font size for each heading level
       return `\\fs${fontSize * 2}\\b ${content}\\b0\\fs24\\par\n`;
     })
-    
+
     // Handle bold text
     .replace(/(\*\*|__)(.*?)\1/g, '\\b $2\\b0 ')
-    
+
     // Handle italic text
     .replace(/(\*|_)(.*?)\1/g, '\\i $2\\i0 ')
-    
+
     // Handle line breaks
     .replace(/\n/g, '\\par\n')
-    
+
     // Handle lists
     .replace(/^(\s*[-*+]|\s*\d+\.)\s+(.+)$/gm, '\\bullet $2\\par\n');
-  
+
   rtf += text;
   rtf += '}';
   return rtf;
+};
+
+// Helper function to remove text wrapped in 【】
+const removeBracketedText = (line) => {
+  return line.replace(/【.*?】/g, '');
+};
+
+// Helper function to count backslashes in a line
+const countBackslashes = (line) => {
+  return (line.match(/\\/g) || []).length;
+};
+
+// Helper function to check if a line contains math formula
+const containsMathFormula = (line, index, lines) => {
+  const backslashCount = countBackslashes(line);
+  
+  // Check all three conditions using OR
+  return (
+    // Condition 1: Line is between \\[ and \\]
+    (index > 0 && index < lines.length - 1 && 
+     lines[index - 1].includes('\\[') && 
+     lines[index + 1].includes('\\]')) ||
+    
+    // Condition 2: Line has more than two pairs of backslashes
+    (backslashCount > 4) ||
+    
+    // Condition 3: Line has more than one backslash
+    (backslashCount > 1)
+  );
+};
+
+// Helper function to check if line should be skipped
+const shouldSkipLine = (line) => {
+  return line.includes('\\[') || line.includes('\\]');
+};
+
+// Function to extract math formula from a line
+const extractMathFormula = (line) => {
+  return line.trim();
+};
+
+// Function to split content into math and non-math parts
+const splitContent = (text) => {
+  if (!text) return [];
+  const lines = text.split('\n');
+  console.log("lines", lines);
+  const result = [];
+  let currentGroup = { type: 'text', content: '' };
+
+  lines.forEach((line, index) => {
+    // Remove text wrapped in 【】
+    line = removeBracketedText(line);
+
+    // Skip lines containing \\[ or \\]
+    if (shouldSkipLine(line)) {
+      return;
+    }
+
+    if (containsMathFormula(line, index, lines)) {
+      const mathFormula = extractMathFormula(line);
+      if (mathFormula) {
+        if (currentGroup.content) {
+          result.push(currentGroup);
+        }
+        result.push({ type: 'math', content: mathFormula });
+        currentGroup = { type: 'text', content: '' };
+      } else {
+        currentGroup.content += (currentGroup.content ? '\n' : '') + line;
+      }
+    } else {
+      currentGroup.content += (currentGroup.content ? '\n' : '') + line;
+    }
+  });
+
+  if (currentGroup.content) {
+    result.push(currentGroup);
+  }
+
+  return result;
+};
+
+// Component to render mixed content
+const MixedContent = ({ content, isDarkMode }) => {
+  const parts = splitContent(content);
+  
+  return (
+    <div className="mixed-content">
+      {parts.map((part, index) => {
+        if (part.type === 'math') {
+          return (
+            <div key={index} className={`math-content ${isDarkMode ? "dark" : ""}`}>
+              <MathJax inline={false}>
+                {`\\[${part.content}\\]`}
+              </MathJax>
+            </div>
+          );
+        } else {
+          return (
+            <div key={index} className="markdown-content">
+              <MarkdownPreview
+                className={`markdown-preview ${isDarkMode ? "dark" : ""}`}
+                source={part.content}
+                remarkPlugins={[remarkMath]}
+                rehypePlugins={[rehypeKatex]}
+              />
+            </div>
+          );
+        }
+      })}
+    </div>
+  );
 };
 
 const MessageList = ({
@@ -154,13 +268,14 @@ const MessageList = ({
   const thinkingTimeoutRef = useRef(null);
   const thinkingIndicatorRef = useRef(null);
   const containerRef = useRef(null);
+  const typingSpeed = 20; // Reduced from default to increase speed (lower number = faster)
 
   // Reset showInitialUI when thread changes
   useEffect(() => {
     if (threadId) {
       // Only show initial UI if it's a new thread (no messages) and not loading
       setShowInitialUI(messages.length === 0 && !isLoading);
-      
+
       // Reset states when thread changes
       setFeedbackStates([]);
       setDocumentUploads([]);
@@ -192,7 +307,7 @@ const MessageList = ({
   useEffect(() => {
     const loadFeedbackStates = async () => {
       if (!threadId) return;
-      
+
       try {
         const response = await fetch(
           // `https://ejitukppt8.execute-api.eu-west-3.amazonaws.com/dev/feedback/states/${threadId}/${userId}`,
@@ -355,8 +470,8 @@ const MessageList = ({
           }),
         },
       );
-      
-      
+
+
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.error || "Failed to store feedback state");
@@ -381,19 +496,18 @@ const MessageList = ({
   const handleCopy = async (text, index) => {
     try {
       console.log("Original markdown:", text);
-  
+    
       // Process math expressions separately to preserve them
-      // This regex looks for LaTeX expressions enclosed in parentheses and dollar signs
       const processedText = text.replace(/\(\s*(\\[a-zA-Z]+\(.+?\)|.+?)\s*\)/g, '$$1$');
-  
+    
       // Convert markdown to HTML using marked
       const html = marked.parse(processedText);
       
       // Get plain text version (for fallback and text/plain)
       const plainText = convertMarkdownToPlainText(processedText);
-  
+    
       const hasClipboardItem = typeof ClipboardItem !== 'undefined';
-  
+    
       if (navigator.clipboard && navigator.clipboard.write && hasClipboardItem) {
         // Modern clipboard API with format support
         try {
@@ -432,8 +546,8 @@ const MessageList = ({
           setTimeout(() => setCopiedIndex(null), 2000);
         }
       } else if (navigator.clipboard && navigator.clipboard.writeText) {
-        // Fallback to simple text copy
-        // For Mac, we'll use the original markdown text for better paste results
+        // For Mac, ensure we're using the original markdown text
+        // This helps maintain formatting when pasting into markdown editors
         await navigator.clipboard.writeText(text);
         console.log("Fallback: Copied using writeText with original markdown");
         setCopiedIndex(index);
@@ -448,8 +562,7 @@ const MessageList = ({
       copyTextFallback(text, index);
     }
   };
-  
-  
+
   // Fallback method for copying text
   const copyTextFallback = (text, index) => {
     try {
@@ -611,7 +724,7 @@ const MessageList = ({
                       <div
                         className={`document-pill ${
                           isExpanded ? "expanded" : ""
-                        }`}
+                          }`}
                       >
                         <FileText size={16} />
                         <span className="document-name">
@@ -626,30 +739,16 @@ const MessageList = ({
                       msg.isBot
                         ? "bot-message-container"
                         : "client-message-container"
-                    }
+                      }
                     ${isDarkMode ? "dark" : ""}
                     ${isExpanded ? "expanded" : ""}`}
                   >
                     {msg.isBot ? (
                       <div className="markdown-preview">
                         {index === messages.length - 1 && isTyping ? (
-                          <MarkdownPreview
-                            className={`markdown-preview ${
-                              isDarkMode ? "dark" : ""
-                            }`}
-                            source={typingMessage}
-                            remarkPlugins={[remarkMath]}
-                            rehypePlugins={[rehypeKatex]}
-                          />
+                          <MixedContent content={typingMessage} isDarkMode={isDarkMode} />
                         ) : (
-                          <MarkdownPreview
-                            className={`markdown-preview ${
-                              isDarkMode ? "dark" : ""
-                            }`}
-                            source={msg.text}
-                            remarkPlugins={[remarkMath]}
-                            rehypePlugins={[rehypeKatex]}
-                          />
+                          <MixedContent content={msg.text} isDarkMode={isDarkMode} />
                         )}
                       </div>
                     ) : (
@@ -669,7 +768,7 @@ const MessageList = ({
                             onChange={(e) => setFeedbackText(e.target.value)}
                             className={`feedback-textarea ${
                               isDarkMode ? "dark" : ""
-                            }`}
+                              }`}
                             placeholder="envíanos un comentario..."
                             autoFocus
                           />
@@ -694,7 +793,7 @@ const MessageList = ({
                           <button
                             className={`feedback-btn ${
                               messageFeedback?.isLiked ? "active" : ""
-                            }`}
+                              }`}
                             onClick={() =>
                               handleLikeDislike(msg.id, "I liked this message")
                             }
@@ -705,7 +804,7 @@ const MessageList = ({
                           <button
                             className={`feedback-btn ${
                               messageFeedback?.isLiked === false ? "active" : ""
-                            }`}
+                              }`}
                             onClick={() =>
                               handleLikeDislike(
                                 msg.id,
@@ -749,9 +848,9 @@ const MessageList = ({
           ref={thinkingIndicatorRef}
           className={`message-container bot-message-container ${
             isDarkMode ? "dark" : ""
-          } ${isExpanded ? "expanded" : ""}`}
+            } ${isExpanded ? "expanded" : ""}`}
         >
-          <TypingIndicator text="Pensando..." />
+          <TypingIndicator text="Pensando..." speed={typingSpeed} />
         </div>
       )}
 

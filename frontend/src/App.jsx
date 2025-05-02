@@ -2,6 +2,7 @@ import "./App.css";
 import { useEffect, useState } from "react";
 import { getUserData } from "./api/chatService";
 import Chatbot from "./assets/components/chatbot/page.jsx";
+import { MathJaxContext } from "better-react-mathjax";
 const App = () => {
   const [userData, setUserData] = useState(null);
   const [userId, setUserId] = useState(localStorage.getItem('userId') || "guest");
@@ -39,7 +40,11 @@ const App = () => {
 
   // if (loading) return <div>Loading...</div>;
 
-  return <Chatbot userData={userData} setUserData={setUserData} />;
+  return (
+    <MathJaxContext>
+      <Chatbot userData={userData} setUserData={setUserData} />
+    </MathJaxContext>
+  );
 };
 
 export default App;

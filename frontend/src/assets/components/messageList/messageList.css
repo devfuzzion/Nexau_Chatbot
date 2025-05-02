@@ -57,6 +57,15 @@
   margin-left: auto;
 }
 
+.math-content .dark {
+  color: #e0e0e0;
+}
+
+.MathJax {
+  text-align: start !important;
+  padding-left: 5% !important;
+}
+
 .expanded .document-pill {
   margin-right: calc(10rem + 2%) ;
 }
@@ -77,15 +86,18 @@
 
 /* Styling for KaTeX math formulas */
 .katex-display {
-  margin: 1em 0;
+  margin: 1.2em 0;
   overflow-x: auto;
   overflow-y: hidden;
-  padding-top: 0.5em;
-  padding-bottom: 0.5em;
+  padding: 0.8em;
+  background-color: rgba(0, 0, 0, 0.03);
+  border-radius: 6px;
+  border-left: 3px solid #3366ff;
 }
 
 /* Better formula display in dark mode */
-.dark .katex .katex-mathml {
+.dark .katex .katex-mathml,
+.dark .katex-html {
   color: #e0e0e0;
 }
 
@@ -94,14 +106,19 @@
 }
 
 .dark .katex-display {
-  background-color: rgba(255, 255, 255, 0.05);
-  border-radius: 6px;
+  background-color: rgba(255, 255, 255, 0.08);
+  border-left: 3px solid #5580ff;
 }
 
 /* Inline math styling */
 .katex {
   font-size: 1.1em;
-  line-height: 1.2;
+  line-height: 1.4;
+}
+
+/* For inline math */
+.markdown-preview p .katex {
+  padding: 0 2px;
 }
 
 /* Ensure formulas don't overflow on mobile */
@@ -109,5 +126,11 @@
   .katex-display {
     max-width: 100%;
     overflow-x: auto;
+    padding: 0.6em;
+    margin: 1em 0;
+  }
+  
+  .katex {
+    font-size: 1em;
   }
 }
