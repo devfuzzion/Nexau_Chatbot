@@ -71,7 +71,8 @@ const Header = ({
       // Get the current URL and construct the expanded URL
       const currentUrl = window.location.href;
       localStorage.setItem("isExpanded", !isExpanded);
-      const baseUrl = currentUrl.split('/').slice(0, 3).join('/'); // Get protocol and domain
+      let baseUrl = currentUrl.split('/').slice(0, 3).join('/'); // Get protocol and domain
+      // baseUrl = 'http://programas.consultoria.io/chatbot'
       
       // Get userId from localStorage
       const userId = localStorage.getItem('userId') || "guest";
@@ -80,8 +81,10 @@ const Header = ({
 
       if(!isExpanded){
         expandedUrl = `${baseUrl}/expanded/${userId}`;
+        expandedUrl = 'http://programas.consultoria.io/chatbot'
       }else{
         expandedUrl = `${baseUrl}/`;
+        expandedUrl = 'http://programas.consultoria.io/chatbot'
       }
       
       // Redirect to the expanded URL in a new tab
