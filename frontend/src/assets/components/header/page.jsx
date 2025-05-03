@@ -81,10 +81,10 @@ const Header = ({
 
     if (!isExpanded) {
       expandedUrl = `${baseUrl}/expanded/${userId}`;
-      // expandedUrl = 'http://programas.consultoria.io/chatbot'
+      expandedUrl = 'http://programas.consultoria.io/chatbot'
     } else {
       expandedUrl = `${baseUrl}/`;
-      // expandedUrl = 'http://programas.consultoria.io/chatbot'
+      expandedUrl = 'http://programas.consultoria.io/chatbot'
     }
 
     // Redirect to the expanded URL in a new tab
