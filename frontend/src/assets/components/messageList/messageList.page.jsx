@@ -19,7 +19,7 @@ import "katex/dist/katex.min.css";
 import remarkMath from "remark-math";
 import rehypeKatex from "rehype-katex";
 import { MathJax } from "better-react-mathjax";
-import { BlockMath, InlineMath } from 'react-katex';
+import { BlockMath, InlineMath } from "react-katex";
 
 // import { InlineMath, BlockMath } from 'react-katex';
 import {
@@ -109,7 +109,7 @@ const splitContent = (text) => {
 // Component to render mixed content
 const MixedContent = ({ content, isDarkMode }) => {
   const parts = splitContent(content);
-  
+
   // Helper to copy TeX to clipboard
   const copyTeX = (tex) => {
     navigator.clipboard.writeText(tex);
@@ -120,7 +120,10 @@ const MixedContent = ({ content, isDarkMode }) => {
       {parts.map((part, index) => {
         if (part.type === "math") {
           return (
-            <div key={index} className={`math-content ${isDarkMode ? "dark" : ""}`}>
+            <div
+              key={index}
+              className={`math-content ${isDarkMode ? "dark" : ""}`}
+            >
               <BlockMath math={part.content} />
             </div>
           );
@@ -431,7 +434,7 @@ const MessageList = ({
       );
 
       // Convert markdown to HTML using marked
-      const html = marked.parse(processedText);
+      const html = marked.parse(text);
 
       // Get plain text version (for fallback and text/plain)
       const plainText = convertMarkdownToPlainText(processedText);
@@ -664,11 +667,12 @@ const MessageList = ({
                       >
                         <FileText size={16} />
                         <span className="document-name">
-                          { messageDocument.documentName
-                            ? (messageDocument.documentName.length > 30
-                                ? messageDocument.documentName.slice(0, 30) + '...'
-                                : messageDocument.documentName)
-                            : '' }
+                          {messageDocument.documentName
+                            ? messageDocument.documentName.length > 30
+                              ? messageDocument.documentName.slice(0, 30) +
+                                "..."
+                              : messageDocument.documentName
+                            : ""}
                         </span>
                       </div>
                     </div>
