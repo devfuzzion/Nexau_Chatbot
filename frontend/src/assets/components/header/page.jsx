@@ -46,12 +46,12 @@ const Header = ({
   useEffect(() => {
     console.log(window.location.href, 222);
 
-    if(window.location.href.includes("/expanded")){
+    if (window.location.href.includes("/expanded")) {
       localStorage.setItem("isExpanded", true);
       let user_id = window.location.href.split("/expanded/")[1];
       console.log("user_id fetched from url", user_id);
       localStorage.setItem("userId", user_id);
-    }else{
+    } else {
       localStorage.setItem("isExpanded", false);
     }
 
@@ -67,29 +67,29 @@ const Header = ({
   useEffect(() => {
     console.log(chatState, "header");
   }, [chatState]);
-    const handleExpand = () => {
-      // Get the current URL and construct the expanded URL
-      const currentUrl = window.location.href;
-      localStorage.setItem("isExpanded", !isExpanded);
-      let baseUrl = currentUrl.split('/').slice(0, 3).join('/'); // Get protocol and domain
-      // baseUrl = 'http://programas.consultoria.io/chatbot'
-      
-      // Get userId from localStorage
-      const userId = localStorage.getItem('userId') || "guest";
-      
-      let expandedUrl;
+  const handleExpand = () => {
+    // Get the current URL and construct the expanded URL
+    const currentUrl = window.location.href;
+    localStorage.setItem("isExpanded", !isExpanded);
+    let baseUrl = currentUrl.split('/').slice(0, 3).join('/'); // Get protocol and domain
+    // baseUrl = 'http://programas.consultoria.io/chatbot'
 
-      if(!isExpanded){
-        expandedUrl = `${baseUrl}/expanded/${userId}`;
-        expandedUrl = 'http://programas.consultoria.io/chatbot'
-      }else{
-        expandedUrl = `${baseUrl}/`;
-        expandedUrl = 'http://programas.consultoria.io/chatbot'
-      }
-      
-      // Redirect to the expanded URL in a new tab
-      window.open(expandedUrl, '_blank');
-    };
+    // Get userId from localStorage
+    const userId = localStorage.getItem('userId') || "guest";
+
+    let expandedUrl;
+
+    if (!isExpanded) {
+      expandedUrl = `${baseUrl}/expanded/${userId}`;
+      // expandedUrl = 'http://programas.consultoria.io/chatbot'
+    } else {
+      expandedUrl = `${baseUrl}/`;
+      // expandedUrl = 'http://programas.consultoria.io/chatbot'
+    }
+
+    // Redirect to the expanded URL in a new tab
+    window.open(expandedUrl, '_blank');
+  };
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
@@ -167,7 +167,7 @@ const Header = ({
     if (
       newTitle.trim() &&
       newTitle.trim() !==
-        threads.find((t) => t.threadid === threadId)?.threadTitle
+      threads.find((t) => t.threadid === threadId)?.threadTitle
     ) {
       updateThreadTitleById(threadId, newTitle.trim());
     }
@@ -218,12 +218,16 @@ const Header = ({
 
       {/* Right Section */}
       <div className="right-section">
-        <button className="expand-icon" onClick={handleExpand} title="Maximizar">
-          <Expand size={20} />
-        </button>
-        <button className="chevron-down-button" onClick={onToggleVisibility} title="Cerrar chatbot">
-          <ChevronDown size={20} />
-        </button>
+        {!isExpanded && (
+          <>
+            <button className="expand-icon" onClick={handleExpand} title="Maximizar">
+              <Expand size={20} />
+            </button>
+            <button className="chevron-down-button" onClick={onToggleVisibility} title="Cerrar chatbot">
+              <ChevronDown size={20} />
+            </button>
+          </>
+        )}
       </div>
       {/* Mobile Menu */}
       <div className={`mobile-menu ${isMenuOpen ? "" : "hidden"}`}>
@@ -270,9 +274,8 @@ const Header = ({
               threads.map((thread) => (
                 <li
                   key={thread.threadid}
-                  className={`history-item ${
-                    selectedThread === thread.threadid ? "selected" : ""
-                  }`}
+                  className={`history-item ${selectedThread === thread.threadid ? "selected" : ""
+                    }`}
                 >
                   {renamingThread === thread.threadid ? (
                     <input
