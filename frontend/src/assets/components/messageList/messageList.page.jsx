@@ -70,7 +70,7 @@ const extractMathFormula = (line) => {
 const splitContent = (text) => {
   if (!text) return [];
   const lines = text.split("\n");
-  console.log("lines", lines);
+  // console.log("lines", lines);
   const result = [];
   let currentGroup = { type: "text", content: "" };
 
