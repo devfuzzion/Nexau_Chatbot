@@ -213,7 +213,11 @@
   }
 
   .right-section {
-    display: flex; 
+    display: flex !important;
+    align-items: center;
+    gap: 5px;
+    margin-left: auto;
+    min-width: 0;
   }
 
   .hamburger-button {
@@ -475,5 +479,28 @@
   border: 1px solid white;  
   
 
+  }
+  .ellipsis-title {
+    max-width: 60px;
+  }
+}
+
+.ellipsis-title {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 120px;
+  display: block;
+}
+
+@media (max-width: 1100px) and (min-width: 720px) {
+  .ellipsis-title {
+    max-width: 120px;
+  }
+  .title {
+    font-size: 16px;
+  }
+  .chatbot-container{
+    width: 45%;
   }
 }

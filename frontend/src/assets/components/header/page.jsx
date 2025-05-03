@@ -210,16 +210,16 @@ const Header = ({
         <div className="logo-container">
           <img src="/images/Logo C.io.png" alt="logo" className="logo" />
         </div>
-        <p className="title">Eva - Consultora IA 24/7</p>
+        <p className="title ">Eva - Consultora IA 24/7</p>
       </div>
 
       {/* Right Section */}
       <div className="right-section">
-        <button className="expand-icon" onClick={handleExpand}>
-          {!isExpanded ? <Expand size={20} /> : '' }
+        <button className="expand-icon" onClick={handleExpand} title="Maximizar">
+          <Expand size={20} />
         </button>
-        <button className="chevron-down-button" onClick={onToggleVisibility}>
-          {!isExpanded ? <ChevronDown size={20} /> : '' }
+        <button className="chevron-down-button" onClick={onToggleVisibility} title="Cerrar chatbot">
+          <ChevronDown size={20} />
         </button>
       </div>
       {/* Mobile Menu */}

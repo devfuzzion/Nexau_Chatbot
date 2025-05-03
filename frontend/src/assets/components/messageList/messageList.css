@@ -70,6 +70,16 @@
   margin-right: calc(10rem + 2%) ;
 }
 
+.katex-display>.katex {
+  text-align: start !important;
+  padding-left: 10% !important;
+}
+
+.katex-display {
+border:none !important;
+background-color: transparent !important;
+}
+
 .document-container{
   display: flex;
   gap: 10px;

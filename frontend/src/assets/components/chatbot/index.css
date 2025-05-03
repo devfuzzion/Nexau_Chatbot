@@ -3,7 +3,7 @@
   position: fixed;
   bottom: 20px;
   right: 50px;
-  width: 25%;
+  width: clamp(20vw, 25%, 400px); /* Responsive width: min 60vw, preferred 25%, max 400px */
   height: 500px;
   background-color: white;
   border-radius: 10px;
@@ -63,13 +63,21 @@
 }
 
 /* Responsive Design */
+/* For large tablets (1024px and below) */
+@media (max-width: 1024px) {
+  .chatbot-container {
+    width: 40%;
+    right: 30px;
+  }
+}
+
 /* For tablets (768px and below) */
 @media (max-width: 768px) {
   .chatbot-container {
-    width: 40%;
+    width: 50%;
     height: 400px;
     bottom: 15px;
-    right: 30px;
+    right: 20px;
   }
 
   .chatbot-container.expanded {
@@ -82,7 +90,16 @@
 
   .infinity-button {
     bottom: 15px;
-    right: 30px;
+    right: 20px;
+  }
+}
+
+/* For small tablets/large phones (600px and below) */
+@media (max-width: 600px) {
+  .chatbot-container {
+    width: 70%;
+    height: 350px;
+    right: 10px;
   }
 }
 

@@ -19,6 +19,7 @@ import 'katex/dist/katex.min.css';
 import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
 import { MathJax } from "better-react-mathjax";
+import { BlockMath, InlineMath } from 'react-katex';
 
 // import { InlineMath, BlockMath } from 'react-katex';
 import {
@@ -70,7 +71,6 @@ const extractMathFormula = (line) => {
 const splitContent = (text) => {
   if (!text) return [];
   const lines = text.split('\n');
-  console.log("lines", lines);
   const result = [];
   let currentGroup = { type: 'text', content: '' };
 
@@ -110,15 +110,18 @@ const splitContent = (text) => {
 const MixedContent = ({ content, isDarkMode }) => {
   const parts = splitContent(content);
   
+  // Helper to copy TeX to clipboard
+  const copyTeX = (tex) => {
+    navigator.clipboard.writeText(tex);
+  };
+
   return (
     <div className="mixed-content">
       {parts.map((part, index) => {
         if (part.type === 'math') {
           return (
             <div key={index} className={`math-content ${isDarkMode ? "dark" : ""}`}>
-              <MathJax inline={true} dynamic={true}>
-                {`\\[${part.content}\\]`}
-              </MathJax>
+              <BlockMath math={part.content} />
             </div>
           );
         } else {
@@ -163,7 +166,7 @@ const MessageList = ({
   const thinkingTimeoutRef = useRef(null);
   const thinkingIndicatorRef = useRef(null);
   const containerRef = useRef(null);
-  const typingSpeed = 20; // Reduced from default to increase speed (lower number = faster)
+  const typingSpeed = 1; // Reduced to 1 for super fast typing
 
   // Reset showInitialUI when thread changes
   useEffect(() => {

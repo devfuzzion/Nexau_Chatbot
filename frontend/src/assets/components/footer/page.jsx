@@ -98,7 +98,7 @@ const Footer = ({ onSendMessage, isDarkMode, isExpanded, isDisabled }) => {
       <form className='footer-form' onSubmit={handleSubmit}>
         <textarea
           ref={textareaRef}
-          placeholder='Escríbeme tu duda...'
+          placeholder='Eva - Consultora IA 24/7'
           className={`footer-input ${isDarkMode ? 'dark-mode' : ''} ${isDisabled ? 'disabled' : ''} ${lineCount > 1 ? 'multiline' : ''}`}
           value={message}
           autoFocus={false}

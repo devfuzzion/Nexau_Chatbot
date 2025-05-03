@@ -285,6 +285,8 @@
   display: flex;
   justify-content: center;
   gap: 8px;
+  padding-top: 2px;
+  padding-bottom: 2px;
   color: #555;
   border-radius: 4px;
   cursor: pointer;
@@ -328,7 +330,7 @@
 
 .feedback-btn.submit-btn:hover {
   background-color: rgb(144, 189, 202);
-  transform: translateY(-2px);
+  transform: translateY(-1px);
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
