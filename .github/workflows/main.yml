@@ -26,6 +26,7 @@ jobs:
             cd frontend
             git pull origin main
             npm install
+            npm i react-katex@3.0.1 --force
             npm run build
             sudo cp -r ~/Nexau_Chatbot/frontend/dist/* /usr/share/nginx/html/
             sudo systemctl reload nginx
