@@ -664,7 +664,11 @@ const MessageList = ({
                       >
                         <FileText size={16} />
                         <span className="document-name">
-                          {messageDocument.documentName}
+                          { messageDocument.documentName
+                            ? (messageDocument.documentName.length > 30
+                                ? messageDocument.documentName.slice(0, 30) + '...'
+                                : messageDocument.documentName)
+                            : '' }
                         </span>
                       </div>
                     </div>
