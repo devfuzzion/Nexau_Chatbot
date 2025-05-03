@@ -20,6 +20,7 @@ import remarkMath from "remark-math";
 import rehypeKatex from "rehype-katex";
 import { MathJax } from "better-react-mathjax";
 import { BlockMath, InlineMath } from "react-katex";
+import { rehypeExternalLinks } from "./customRehypeLinkPlugin"; // adjust path if needed
 
 // import { InlineMath, BlockMath } from 'react-katex';
 import {
@@ -134,7 +135,7 @@ const MixedContent = ({ content, isDarkMode }) => {
                 className={`markdown-preview ${isDarkMode ? "dark" : ""}`}
                 source={part.content}
                 remarkPlugins={[remarkMath]}
-                rehypePlugins={[rehypeKatex]}
+                rehypePlugins={[rehypeKatex, rehypeExternalLinks]}
               />
             </div>
           );
