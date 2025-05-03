@@ -432,7 +432,7 @@ const MessageList = ({
         /\(\s*(\\[a-zA-Z]+\(.+?\)|.+?)\s*\)/g,
         "$$1$",
       );
-
+      text = text.replaceAll("【30:0†source】", "");
       // Convert markdown to HTML using marked
       const html = marked.parse(text);
 
