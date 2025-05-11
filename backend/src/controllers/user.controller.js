@@ -1,12 +1,13 @@
 import { updateUser, getUserById } from "../db/user.queries.js";
-import { logUserData, getUserData } from "../airtable.utils.js";
+import { logUserData, getUserData, updateUserData } from "../airtable.utils.js";
 
 export const saveUserDatainDb = async (req, res) => {
   try {
-    const { store_name, website, products, story, ecommerce_platform } = req.body;
+    const { store_name, website, products, story, ecommerce_platform } =
+      req.body;
     console.log("api striked /user-questions-data ", req.body);
     const userId = req.params.userId;
-    // if (!storeName || !website || !products || !story) { 
+    // if (!storeName || !website || !products || !story) {
     //   return res
     //     .status(400)
     //     .json({ success: false, message: "Missing required fields." });
@@ -19,11 +20,17 @@ export const saveUserDatainDb = async (req, res) => {
     //   story,
     // });
 
-    logUserData({ userId, store_name, website, products, story, ecommerce_platform });
+    logUserData({
+      userId,
+      store_name,
+      website,
+      products,
+      story,
+      ecommerce_platform,
+    });
     return res
       .status(201)
       .json({ success: true, message: "User Data Updated successfully." });
-
   } catch (error) {
     console.error("Error updating user data:", error);
     res.status(500).json({ success: false, message: "Internal server error." });
@@ -55,5 +62,34 @@ export const getUserDataFromDb = async (req, res) => {
     return res
       .status(500)
       .json({ success: false, message: "Internal server error." });
+  }
+};
+
+export const updateUserQuestionData = async (req, res) => {
+  try {
+    console.log("api striked /user-questions-data ", req.body);
+    const { userId } = req.params;
+    const { userQuestionsData } = req.body;
+
+    if (!userId || !userQuestionsData) {
+      return res.status(400).json({
+        success: false,
+        message: "User ID and user questions data are required.",
+      });
+    }
+
+    const result = await updateUserData(userId, userQuestionsData);
+
+    if (result.success) {
+      res.json({
+        success: true,
+        message: "User questions data updated successfully.",
+      });
+    } else {
+      throw new Error(result.message);
+    }
+  } catch (error) {
+    console.error("Error updating user questions data:", error);
+    res.status(500).json({ success: false, message: "Internal server error." });
   }
 };
