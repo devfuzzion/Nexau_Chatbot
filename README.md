@@ -1,16 +1,13 @@
 ---
-
 # 🧠 Nexau AI Chatbot
 
 This is a full-stack project with a **React** frontend and an **Express.js** + **PostgreSQL** backend. The application supports Markdown editing, LaTeX math rendering, and AI integration via OpenAI.
+---
 
 ## 📁 Project Structure
 
-```
-root/
-├── backend/    # Node.js + Express server with PostgreSQL and Airtable integration
-└── frontend/   # React + Vite frontend for the Markdown editor
-```
+- `backend/` – Node.js + Express server with PostgreSQL and Airtable integration
+- `frontend/` – React + Vite frontend for the Markdown editor
 
 ---
 
@@ -146,7 +143,6 @@ npm run build
 | Lint    | `npm run lint`    | Run ESLint for code quality |
 
 ---
-
 
 ## ✍️ Author
 
