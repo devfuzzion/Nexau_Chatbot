@@ -40,3 +40,34 @@
 .read-the-docs {
   color: #888;
 } */
+
+.login-wall {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-width: 300px;
+  margin: 100px auto;
+  text-align: center;
+}
+
+.login-heading {
+  font-size: 20px;
+}
+
+.login-input {
+  padding: 10px;
+  font-size: 16px;
+}
+
+.login-button {
+  padding: 10px;
+  font-size: 16px;
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+}
+
+.login-error {
+  color: red;
+}
