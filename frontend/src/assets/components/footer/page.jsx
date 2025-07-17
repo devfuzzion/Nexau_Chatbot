@@ -1,9 +1,9 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { FileInput, SendHorizonal, FileCheck, X } from 'lucide-react';
-import './index.css';
+import React, { useState, useRef, useEffect } from "react";
+import { FileInput, SendHorizonal, FileCheck, X } from "lucide-react";
+import "./index.css";
 
 const Footer = ({ onSendMessage, isDarkMode, isExpanded, isDisabled }) => {
-  const [message, setMessage] = useState('');
+  const [message, setMessage] = useState("");
   const [selectedFile, setSelectedFile] = useState(null);
   const [lineCount, setLineCount] = useState(1);
   const fileInputRef = useRef(null);
@@ -19,17 +19,20 @@ const Footer = ({ onSendMessage, isDarkMode, isExpanded, isDisabled }) => {
     const file = e.target.files[0];
     if (file) {
       setSelectedFile(file);
-      console.log('File selected:', file.name);
+      console.log("File selected:", file.name);
     }
   };
 
   const handleKeyDown = (e) => {
-    if (e.key === 'Enter' && e.shiftKey) {
+    if (e.key === "Enter" && e.shiftKey) {
       e.preventDefault();
       const cursorPosition = e.target.selectionStart;
-      const newMessage = message.substring(0, cursorPosition) + '\n' + message.substring(cursorPosition);
+      const newMessage =
+        message.substring(0, cursorPosition) +
+        "\n" +
+        message.substring(cursorPosition);
       setMessage(newMessage);
-      
+
       // Set cursor position after the new line on next render
       setTimeout(() => {
         if (textareaRef.current) {
@@ -37,7 +40,7 @@ const Footer = ({ onSendMessage, isDarkMode, isExpanded, isDisabled }) => {
           textareaRef.current.selectionEnd = cursorPosition + 1;
         }
       }, 0);
-    } else if (e.key === 'Enter' && !e.shiftKey) {
+    } else if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       handleSubmit(e);
     }
@@ -46,16 +49,16 @@ const Footer = ({ onSendMessage, isDarkMode, isExpanded, isDisabled }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (message.trim() && !isDisabled) {
-      console.log('Sending message with file:', selectedFile?.name);
-      const messageText = selectedFile 
+      console.log("Sending message with file:", selectedFile?.name);
+      const messageText = selectedFile
         ? `document:${selectedFile.name}\nUser message: ${message}`
         : message;
       await onSendMessage(messageText, selectedFile);
-      setMessage('');
+      setMessage("");
       setSelectedFile(null);
       setLineCount(1);
       if (fileInputRef.current) {
-        fileInputRef.current.value = '';
+        fileInputRef.current.value = "";
       }
     }
   };
@@ -63,7 +66,7 @@ const Footer = ({ onSendMessage, isDarkMode, isExpanded, isDisabled }) => {
   const handleRemoveFile = () => {
     setSelectedFile(null);
     if (fileInputRef.current) {
-      fileInputRef.current.value = '';
+      fileInputRef.current.value = "";
     }
   };
 
@@ -72,15 +75,34 @@ const Footer = ({ onSendMessage, isDarkMode, isExpanded, isDisabled }) => {
     const baseHeight = Math.min(lineCount * 18 + 6, 96);
     return {
       height: `${baseHeight}px`,
-      overflowY: lineCount >= 5 ? 'auto' : 'hidden'
+      overflowY: lineCount >= 5 ? "auto" : "hidden",
     };
   };
+  const handlePaste = (e) => {
+    const items = e.clipboardData?.items;
+    if (!items) return;
 
+    for (const item of items) {
+      if (item.type.indexOf("image") !== -1) {
+        const file = item.getAsFile();
+        if (file) {
+          setSelectedFile(file);
+          console.log("Image pasted:", file.name);
+        }
+        e.preventDefault(); // Optional: prevent pasting image data as text
+        break;
+      }
+    }
+  };
   return (
-    <div className={`footer-container ${isDarkMode ? 'dark-mode' : ''} ${isExpanded ? 'expanded' : ''}`}>
+    <div
+      className={`footer-container ${isDarkMode ? "dark-mode" : ""} ${
+        isExpanded ? "expanded" : ""
+      }`}
+    >
       {selectedFile && (
-        <div className='file-preview-container'>
-          <div className={`file-preview ${isDarkMode ? 'dark-mode' : ''}`}>
+        <div className="file-preview-container">
+          <div className={`file-preview ${isDarkMode ? "dark-mode" : ""}`}>
             <div className="file-info">
               <FileCheck size={16} />
               <span className="file-name">{selectedFile.name}</span>
@@ -95,18 +117,21 @@ const Footer = ({ onSendMessage, isDarkMode, isExpanded, isDisabled }) => {
           </div>
         </div>
       )}
-      <form className='footer-form' onSubmit={handleSubmit}>
+      <form className="footer-form" onSubmit={handleSubmit}>
         <textarea
           ref={textareaRef}
-          placeholder='Eva - Consultora IA 24/7'
-          className={`footer-input ${isDarkMode ? 'dark-mode' : ''} ${isDisabled ? 'disabled' : ''} ${lineCount > 1 ? 'multiline' : ''}`}
+          onPaste={handlePaste}
+          placeholder="Eva - Consultora IA 24/7"
+          className={`footer-input ${isDarkMode ? "dark-mode" : ""} ${
+            isDisabled ? "disabled" : ""
+          } ${lineCount > 1 ? "multiline" : ""}`}
           value={message}
           autoFocus={false}
           onChange={(e) => setMessage(e.target.value)}
           onKeyDown={handleKeyDown}
-          style={{ 
-            fontSize: '16px',
-            ...getTextareaHeight()
+          style={{
+            fontSize: "16px",
+            ...getTextareaHeight(),
           }}
           rows={1}
           disabled={isDisabled}
@@ -115,13 +140,15 @@ const Footer = ({ onSendMessage, isDarkMode, isExpanded, isDisabled }) => {
           type="file"
           ref={fileInputRef}
           onChange={handleFileSelect}
-          style={{ display: 'none' }}
+          style={{ display: "none" }}
           id="file-input"
           disabled={isDisabled}
         />
         <button
-          type='button'
-          className={`footer-button ${isDarkMode ? 'dark-mode' : ''} ${selectedFile ? 'file-selected' : ''} ${isDisabled ? 'disabled' : ''}`}
+          type="button"
+          className={`footer-button ${isDarkMode ? "dark-mode" : ""} ${
+            selectedFile ? "file-selected" : ""
+          } ${isDisabled ? "disabled" : ""}`}
           onClick={() => !isDisabled && fileInputRef.current?.click()}
           title="Attach file"
           disabled={isDisabled}
@@ -129,15 +156,23 @@ const Footer = ({ onSendMessage, isDarkMode, isExpanded, isDisabled }) => {
           <FileInput size={20} />
         </button>
         <button
-          type='submit'
-          className={`footer-button ${isDarkMode ? 'dark-mode' : ''} ${isDisabled ? 'disabled' : ''}`}
+          type="submit"
+          className={`footer-button ${isDarkMode ? "dark-mode" : ""} ${
+            isDisabled ? "disabled" : ""
+          }`}
           disabled={isDisabled || !message.trim()}
         >
           <SendHorizonal size={20} />
         </button>
       </form>
-      <div className={`powered-by ${isDarkMode ? 'dark-mode' : ''}`}>
-        Powered by <strong onClick={() => window.open('https://nexau.es', '_blank')} style={{ cursor: 'pointer' }}>Nexau</strong>
+      <div className={`powered-by ${isDarkMode ? "dark-mode" : ""}`}>
+        Powered by{" "}
+        <strong
+          onClick={() => window.open("https://nexau.es", "_blank")}
+          style={{ cursor: "pointer" }}
+        >
+          Nexau
+        </strong>
       </div>
     </div>
   );

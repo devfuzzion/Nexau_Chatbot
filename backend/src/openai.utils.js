@@ -1,7 +1,7 @@
 import OpenAI from "openai";
 import dotenv from "dotenv";
 import fs from "fs";
-
+import { uploadImageToS3 } from "./s3.js";
 dotenv.config();
 const openai = new OpenAI();
 const ASSISTANT_ID = process.env.ASSISTANT_ID;
@@ -12,13 +12,36 @@ export const processFileContent = async (file) => {
   const text = file.buffer.toString("utf-8");
   return text;
 };
+const imageMimeTypes = new Set([
+  "image/png",
+  "image/jpeg",
+  "image/jpg",
+  "image/webp",
+  "image/gif",
+  "image/bmp",
+  "image/svg+xml",
+  "image/tiff",
+  "image/heic",
+]);
+const generateImage = async (prompt, size) => {
+  const imageResponse = await openai.images.generate({
+    prompt,
+    n: 1,
+    size,
+    model: "dall-e-3",
+  });
 
+  const imageUrl = imageResponse.data[0].url;
+  console.log("Image Generated", imageUrl);
+  return imageUrl;
+};
 export const uploadFileToOpenAI = async (file) => {
   try {
     console.log("Uploading file to OpenAI:", file.originalname);
+    const purpose = imageMimeTypes.has(file.mimetype) ? "vision" : "assistants";
     const uploadedFile = await openai.files.create({
       file: fs.createReadStream(file.path),
-      purpose: "assistants",
+      purpose,
     });
     console.log("File uploaded successfully:", uploadedFile.id);
     return uploadedFile;
@@ -42,14 +65,29 @@ export const appendMessageInThread = async (
     if (file) {
       // Upload file to OpenAI first
       const uploadedFile = await uploadFileToOpenAI(file);
-
-      // Add file attachment to message
-      messageOptions["attachments"] = [
-        {
-          file_id: uploadedFile.id,
-          tools: [{ type: "file_search" }],
-        },
-      ];
+      if (uploadedFile.purpose === "vision") {
+        messageOptions = {
+          role: "user",
+          content: [
+            {
+              type: "text",
+              text: userMessage,
+            },
+            {
+              type: "image_file",
+              image_file: { file_id: uploadedFile.id },
+            },
+          ],
+        };
+      } else {
+        // Add file attachment to message
+        messageOptions["attachments"] = [
+          {
+            file_id: uploadedFile.id,
+            tools: [{ type: "file_search" }],
+          },
+        ];
+      }
     }
 
     const message = await openai.beta.threads.messages.create(
@@ -85,23 +123,52 @@ export const createRun = async (threadId, userData = {}) => {
   // Prepare personalized context from user data
   let personalizedContext = "";
   console.log("userData", userData);
-  
+
   if (userData && Object.keys(userData).length > 0) {
     personalizedContext = `
 Información del usuario:
 - Nombre de la tienda(store_name): ${userData.store_name || "No disponible"}
 - Sitio web(website): ${userData.website || "No disponible"}
-- Plataforma de e-commerce(ecommerce_platform): ${userData.ecommerce_platform || "No disponible"}
+- Plataforma de e-commerce(ecommerce_platform): ${
+      userData.ecommerce_platform || "No disponible"
+    }
 - Productos(products): ${userData.products || "No disponible"}
 - Historia de la tienda(story): ${userData.story || "No disponible"}
-- Datos adicionales(user_questions_data): ${userData.user_questions_data || "No disponible"}
+- Datos adicionales(user_questions_data): ${
+      userData.user_questions_data || "No disponible"
+    }
 `;
   }
 
   const run = await openai.beta.threads.runs.createAndPoll(threadId, {
     assistant_id: ASSISTANT_ID,
     include: ["step_details.tool_calls[*].file_search.results[*].content"],
-    tools: [{ type: "file_search" }],
+    tools: [
+      { type: "file_search" },
+      {
+        type: "function",
+        function: {
+          name: "generate_image",
+          description: "Generate an image based on a user prompt using DALL·E.",
+          parameters: {
+            type: "object",
+            properties: {
+              prompt: {
+                type: "string",
+                description: "A detailed description of the image to generate.",
+              },
+              size: {
+                type: "string",
+                enum: ["1024x1024", "1024x1792", "1792x1024"],
+                default: "1024x1024",
+                description: "Size of the image",
+              },
+            },
+            required: ["prompt"],
+          },
+        },
+      },
+    ],
     instructions: `Eres un asistente AI servicial. IMPORTANTE: Siempre responde en español, independientemente del idioma en que te escriba el usuario.
 
 ${personalizedContext}
@@ -121,7 +188,52 @@ Si necesitas más ayuda para identificar o configurar tu plataforma de comercio 
 Al proporcionar cualquier respuesta matemática o cualquier respuesta que requiera mostrar una fórmula, asegúrate de que cada vez que se mencione la fórmula, esta se coloque en una línea diferente del resto del contenido. En la línea de la fórmula no debe haber ningún otro contenido.
 `,
   });
+  if (run.status === "requires_action") {
+    const toolCalls = run.required_action.submit_tool_outputs.tool_calls;
+    for (const call of toolCalls) {
+      if (call.function.name === "generate_image") {
+        const { prompt, size } = JSON.parse(call.function.arguments);
+        const imageUrl = await generateImage(prompt, size);
+        console.log(imageUrl, "Generated");
+        const s3Url = await uploadImageToS3(imageUrl);
+        let toolRun = await openai.beta.threads.runs.submitToolOutputs(
+          threadId,
+          run.id,
+          {
+            tool_outputs: [
+              {
+                tool_call_id: call.id,
+                output: s3Url,
+              },
+            ],
+          },
+        );
+        const maxAttempts = 20;
+        const interval = 2000; // 2 seconds
+        let attempts = 0;
+        while (attempts < maxAttempts) {
+          await new Promise((res) => setTimeout(res, interval));
+          toolRun = await openai.beta.threads.runs.retrieve(
+            threadId,
+            toolRun.id,
+          );
 
+          if (
+            ["completed", "failed", "cancelled", "requires_action"].includes(
+              toolRun.status,
+            )
+          ) {
+            console.log("Tool run completed with status:", toolRun.status);
+            break;
+          }
+
+          console.log("Polling... status:", toolRun.status);
+          attempts++;
+        }
+        return toolRun;
+      }
+    }
+  }
   return run;
 };
 
@@ -140,7 +252,8 @@ export const delThread = async (threadId) => {
 export const generateThreadTitle = async (messages) => {
   const context = messages
     .map(
-      (msg) => `${msg.role}: ${msg.content.map((c) => c.text.value).join(" ")}`,
+      (msg) =>
+        `${msg.role}: ${msg?.content.map((c) => c?.text?.value)?.join(" ")}`,
     )
     .join("\n");
   const completion = await openai.chat.completions.create({
