@@ -40,6 +40,7 @@ import {
 } from "./db/threads.queries.js";
 import userRouter from "./routes/user.router.js";
 import threadRouter from "./routes/thread.router.js";
+import feedbackRouter from "./routes/feedback.router.js";
 const app = express();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -75,6 +76,7 @@ app.use(cors());
 app.use(express.json());
 app.use("/users", userRouter);
 app.use("/threads", threadRouter);
+app.use("/feedback", feedbackRouter);
 app.get("/ping", (req, res) => {
   res.send("<h1>Pong</h1>");
 });

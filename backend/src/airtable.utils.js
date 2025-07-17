@@ -10,7 +10,8 @@ const base = new Airtable({ apiKey: process.env.AIRTABLE_API_KEY }).base(
 const CONVERSATIONS_TABLE_NAME = process.env.AIRTABLE_CONVERSATIONS_TABLE_NAME;
 const FEEDBACKS_TABLE_NAME = process.env.AIRTABLE_FEEDBACKS_TABLE_NAME;
 const USER_DATA_TABLE_NAME = process.env.AIRTABLE_USER_DATA_TABLE_NAME;
-const DOCUMENTS_UPLOADS_TABLE_NAME = process.env.AIRTABLE_DOCUMENTS_UPLOADS_TABLE_NAME;
+const DOCUMENTS_UPLOADS_TABLE_NAME =
+  process.env.AIRTABLE_DOCUMENTS_UPLOADS_TABLE_NAME;
 
 export const logConversation = async ({
   userId,
@@ -65,28 +66,34 @@ export const storeFeedbackState = async ({
   messageId,
   threadId,
   isLiked,
-  feedbackText
+  feedbackText,
 }) => {
   try {
-    console.log("Checking for existing feedback record:", { messageId, threadId, userId });
-    
+    console.log("Checking for existing feedback record:", {
+      messageId,
+      threadId,
+      userId,
+    });
+
     // More specific filter to find existing records for this exact message
     const existingRecords = await base(FEEDBACKS_TABLE_NAME)
       .select({
         filterByFormula: `AND({message_id} = '${messageId}', {thread_id} = '${threadId}', {user_id} = '${userId}')`,
       })
       .firstPage();
-    
-    console.log(`Found ${existingRecords.length} existing records for message: ${messageId}`);
-    
+
+    console.log(
+      `Found ${existingRecords.length} existing records for message: ${messageId}`,
+    );
+
     if (existingRecords.length > 0) {
       console.log("Updating existing record:", existingRecords[0].id);
-      
+
       // Create update fields object
       const updateFields = {
         user_id: userId, // Update user_id in case it changed
       };
-      
+
       // Only update isLiked field if it's not null/undefined
       if (isLiked !== null && isLiked !== undefined) {
         updateFields.isLiked = isLiked ? "true" : "false";
@@ -94,7 +101,7 @@ export const storeFeedbackState = async ({
         // Preserve existing isLiked value if present
         updateFields.isLiked = existingRecords[0].fields.isLiked;
       }
-      
+
       // Only update feedback field if new feedback is provided
       if (feedbackText) {
         updateFields.feedback = feedbackText;
@@ -102,19 +109,19 @@ export const storeFeedbackState = async ({
         // Preserve existing feedback if present
         updateFields.feedback = existingRecords[0].fields.feedback;
       }
-      
+
       console.log("Update fields:", updateFields);
-      
+
       // Update existing record
       const record = await base(FEEDBACKS_TABLE_NAME).update(
         existingRecords[0].id,
-        updateFields
+        updateFields,
       );
-      
+
       return { success: true, recordId: record.id, isUpdate: true };
     } else {
       console.log("Creating new feedback record for message:", messageId);
-      
+
       // Create new record
       const newRecord = {
         user_id: userId,
@@ -124,19 +131,19 @@ export const storeFeedbackState = async ({
           .toString(36)
           .substr(2, 9)}`,
       };
-      
+
       // Only add feedback field if provided
       if (feedbackText) {
         newRecord.feedback = feedbackText;
       }
-      
+
       // Only add isLiked field if it's not null/undefined
       if (isLiked !== null && isLiked !== undefined) {
         newRecord.isLiked = isLiked ? "true" : "false";
       }
-      
+
       console.log("New record fields:", newRecord);
-      
+
       const record = await base(FEEDBACKS_TABLE_NAME).create(newRecord);
       return { success: true, recordId: record.id, isUpdate: false };
     }
@@ -176,7 +183,15 @@ export const logUserData = async ({
   ecommerce_platform,
 }) => {
   try {
-    console.log("logUserData", userId, store_name, website, products, story, ecommerce_platform);
+    console.log(
+      "logUserData",
+      userId,
+      store_name,
+      website,
+      products,
+      story,
+      ecommerce_platform,
+    );
     const records = await base(USER_DATA_TABLE_NAME)
       .select({
         filterByFormula: `{user_id} = '${userId}'`,
@@ -224,7 +239,10 @@ export const logDocumentUpload = async ({
   documentName,
 }) => {
   try {
-    console.log("Logging document upload to Airtable",DOCUMENTS_UPLOADS_TABLE_NAME);
+    console.log(
+      "Logging document upload to Airtable",
+      DOCUMENTS_UPLOADS_TABLE_NAME,
+    );
     const record = await base(DOCUMENTS_UPLOADS_TABLE_NAME).create({
       user_id: userId,
       thread_id: threadId || "",
@@ -242,6 +260,7 @@ export const logDocumentUpload = async ({
 
 export const getDocumentUploads = async (threadId, userId) => {
   try {
+    console.log(DOCUMENTS_UPLOADS_TABLE_NAME, 11111);
     const records = await base(DOCUMENTS_UPLOADS_TABLE_NAME)
       .select({
         filterByFormula: `AND({thread_id} = '${threadId}', {user_id} = '${userId}')`,
@@ -260,7 +279,6 @@ export const getDocumentUploads = async (threadId, userId) => {
     return { success: false, error: error.message };
   }
 };
-
 
 export const getUserData = async (userId) => {
   try {
@@ -294,7 +312,7 @@ export const updateUserData = async (userId, userQuestionsData) => {
     if (records.length > 0) {
       const recordId = records[0].id;
 
-      const updated = await base(USER_DATA_TABLE_NAME).update(recordId, { 
+      const updated = await base(USER_DATA_TABLE_NAME).update(recordId, {
         user_questions_data: userQuestionsData,
       });
 

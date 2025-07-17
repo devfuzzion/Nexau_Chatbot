@@ -10,7 +10,7 @@ import {
   updateUserData,
 } from "../airtable.utils.js";
 
-export const updateFeedback = async () => {
+export const updateFeedback = async (req, res) => {
   try {
     console.log("Received feedback state request:", req.body);
     const { userId, messageId, threadId, isLiked, feedbackText } = req.body;
