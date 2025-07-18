@@ -1,6 +1,6 @@
 // const backendUrl = "https://ejitukppt8.execute-api.eu-west-3.amazonaws.com/dev";
 // const backendUrl = "http://localhost:3000";
-const backendUrl = "https://nexau.devfuzzion.com/api";
+const backendUrl = "https://staging.nexau.devfuzzion.com/api";
 
 export async function createThread(userId = "guest") {
   try {
