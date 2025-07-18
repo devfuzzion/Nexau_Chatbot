@@ -229,7 +229,7 @@ app.get("/documents/:threadId/:userId", async (req, res) => {
   }
 });
 
-app.listen(3000, "0.0.0.0", () => {
+app.listen(3002, "0.0.0.0", () => {
   console.log(`Server is listening on 3000`);
 });
 
