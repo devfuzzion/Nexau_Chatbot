@@ -1,4 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
+
+import { Download } from "lucide-react";
+import ReactMarkdown from "react-markdown";
 import {
   ThumbsUp,
   ThumbsDown,
@@ -23,11 +26,6 @@ import { BlockMath, InlineMath } from "react-katex";
 import { rehypeExternalLinks } from "./customRehypeLinkPlugin"; // adjust path if needed
 
 // import { InlineMath, BlockMath } from 'react-katex';
-import {
-  fetchFeedbackStates,
-  fetchDocumentUploads,
-  storeFeedbackState,
-} from "./../../../api/chatService.js";
 
 // Helper function to remove text wrapped in 【】
 const removeBracketedText = (line) => {
@@ -106,44 +104,114 @@ const splitContent = (text) => {
 
   return result;
 };
-
-// Component to render mixed content
 const MixedContent = ({ content, isDarkMode }) => {
   const parts = splitContent(content);
 
-  // Helper to copy TeX to clipboard
-  const copyTeX = (tex) => {
-    navigator.clipboard.writeText(tex);
-  };
-
   return (
     <div className="mixed-content">
-      {parts.map((part, index) => {
+      {parts.map((part, idx) => {
         if (part.type === "math") {
           return (
             <div
-              key={index}
+              key={idx}
               className={`math-content ${isDarkMode ? "dark" : ""}`}
             >
               <BlockMath math={part.content} />
             </div>
           );
-        } else {
-          return (
-            <div key={index} className="markdown-content">
-              <MarkdownPreview
-                className={`markdown-preview ${isDarkMode ? "dark" : ""}`}
-                source={part.content}
-                remarkPlugins={[remarkMath]}
-                rehypePlugins={[rehypeKatex, rehypeExternalLinks]}
-              />
-            </div>
-          );
         }
+
+        return (
+          <div key={idx} className="markdown-content">
+            <ReactMarkdown
+              remarkPlugins={[remarkMath]}
+              rehypePlugins={[rehypeKatex, rehypeExternalLinks]}
+              components={{
+                // img: ({ node, ...props }) => <ImageWithDownload {...props} />,
+                img: ({ node, ...props }) => <ImageWithDownload {...props} />,
+
+                // Unwrap <p> that contains ONLY an image
+                p: ({ node, children, ...props }) => {
+                  // react-markdown gives children as array of React nodes
+                  if (
+                    node.children.length === 1 &&
+                    node.children[0].type === "element" &&
+                    node.children[0].tagName === "img"
+                  ) {
+                    return <>{children}</>;
+                  }
+                  return <p {...props}>{children}</p>;
+                },
+              }}
+            >
+              {part.content}
+            </ReactMarkdown>
+          </div>
+        );
       })}
     </div>
   );
 };
+
+export function ImageWithDownload({ src, alt }) {
+  const [loading, setLoading] = useState(false);
+  const [progress, setProgress] = useState(0);
+
+  const handleDownload = async () => {
+    setLoading(true);
+    setProgress(0);
+    const filename = src.split("/").pop();
+
+    try {
+      const res = await fetch(src, { mode: "cors" });
+      const total = parseInt(res.headers.get("Content-Length"), 10) || 0;
+      const reader = res.body.getReader();
+      let received = 0;
+      const chunks = [];
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        chunks.push(value);
+        received += value.length;
+        if (total) setProgress(received / total);
+      }
+
+      const blob = new Blob(chunks);
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    } catch (err) {
+      console.error("Download error:", err);
+      alert("Download failed");
+    }
+
+    setLoading(false);
+    setProgress(0);
+  };
+
+  return (
+    <div className="image-wrapper">
+      <img src={src} alt={alt} />
+      <button
+        className="download-button"
+        onClick={handleDownload}
+        disabled={loading}
+        title="Download image"
+      >
+        {loading ? `${Math.round(progress * 100)}%` : <Download size={16} />}
+      </button>
+      {loading && (
+        <progress className="download-progress" value={progress} max={1} />
+      )}
+    </div>
+  );
+}
 
 const MessageList = ({
   messages,
@@ -245,8 +313,9 @@ const MessageList = ({
         console.error("Error fetching document uploads:", error);
       }
     };
-
-    updateDocumentUploads();
+    if (threadId) {
+      updateDocumentUploads();
+    }
   }, [threadId, messages]); // Add messages as a dependency
 
   useEffect(() => {
@@ -813,29 +882,29 @@ const MessageList = ({
 export default MessageList;
 
 // Add these styles to your CSS
-const styles = `
-.document-attachment {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-top: 8px;
-  padding: 6px 12px;
-  background-color: rgba(0, 0, 0, 0.05);
-  border-radius: 6px;
-  font-size: 14px;
-}
+// const styles = `
+// .document-attachment {
+//   display: flex;
+//   align-items: center;
+//   gap: 8px;
+//   margin-top: 8px;
+//   padding: 6px 12px;
+//   background-color: rgba(0, 0, 0, 0.05);
+//   border-radius: 6px;
+//   font-size: 14px;
+// }
 
-.document-attachment.dark {
-  background-color: rgba(255, 255, 255, 0.1);
-}
+// .document-attachment.dark {
+//   background-color: rgba(255, 255, 255, 0.1);
+// }
 
-.document-name {
-  color: inherit;
-  text-decoration: none;
-}
+// .document-name {
+//   color: inherit;
+//   text-decoration: none;
+// }
 
-.client-message-container {
-  display: flex;
-  flex-direction: column;
-}
-`;
+// .client-message-container {
+//   display: flex;
+//   flex-direction: column;
+// }
+// `;
